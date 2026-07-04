@@ -23,6 +23,7 @@
   --color-white: #ffffff;
   --color-black: #000000;
   --color-success: #22c55e;
+  --color-error: #ef4444;
   --color-info-bg: #f1eefd;
   --color-info-border: #ddd4fa;
   --color-info-text: #4c3fc0;
@@ -1073,9 +1074,7 @@ body {
   line-height: 1;
 }
 
-/* Success state after reset link is sent.
-   Hidden by default; JS toggles .is-visible to reveal it,
-   and hides the request form with .is-hidden. */
+/* Success state after reset link is sent. */
 .reset-success {
   display: none;
   flex-direction: column;
@@ -1143,6 +1142,68 @@ body {
 }
 
 /* =========================================================
+   TOAST NOTIFICATION
+========================================================= */
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 360px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--panel-light-bg);
+  border: 1px solid var(--panel-light-border);
+  box-shadow:
+    0 16px 32px -12px rgba(16, 13, 43, 0.22),
+    var(--shadow-soft);
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast i {
+  flex-shrink: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.toast span {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--panel-light-text);
+  line-height: 1.5;
+}
+
+.toast-success {
+  border-left: 3px solid var(--color-success);
+}
+
+.toast-success i {
+  color: var(--color-success);
+}
+
+.toast-error {
+  border-left: 3px solid var(--color-error);
+}
+
+.toast-error i {
+  color: var(--color-error);
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 @media (max-width: 992px) {
@@ -1190,5 +1251,12 @@ body {
   .theme-toggle {
     top: var(--space-4);
     right: var(--space-4);
+  }
+
+  .toast {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+    max-width: none;
   }
 }
