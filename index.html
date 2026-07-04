@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Workspare | Employee Management System</title>
+    <title>Login | Employee Management System</title>
     <link rel="shortcut icon" href="./Assets/favicon/" type="image/x-icon" />
     <!-- Main CSS -->
     <link rel="stylesheet" href="./css/style.css" />
@@ -227,7 +227,12 @@
                 </div>
 
                 <div class="social-login-row">
-                  <button class="btn-social" type="button">
+                  <!-- Google Login -->
+                  <button
+                    class="btn-social google-login-btn"
+                    type="button"
+                    aria-label="Continue with Google"
+                  >
                     <svg
                       class="btn-social__icon"
                       viewBox="0 0 48 48"
@@ -251,9 +256,16 @@
                         d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.9 36.9 44 31.1 44 24c0-1.3-.1-2.7-.4-3.5z"
                       />
                     </svg>
-                    <span class="btn-social__text">Google</span>
+
+                    <span class="btn-social__text">Continue with Google</span>
                   </button>
-                  <button class="btn-social" type="button">
+
+                  <!-- Microsoft Login -->
+                  <button
+                    class="btn-social microsoft-login-btn"
+                    type="button"
+                    aria-label="Continue with Microsoft"
+                  >
                     <svg
                       class="btn-social__icon"
                       viewBox="0 0 23 23"
@@ -283,7 +295,10 @@
                         fill="#FFBA08"
                       />
                     </svg>
-                    <span class="btn-social__text">Microsoft</span>
+
+                    <span class="btn-social__text"
+                      >Continue with Microsoft</span
+                    >
                   </button>
                 </div>
               </form>
@@ -412,12 +427,7 @@
                   </div>
                 </div>
 
-                <!-- ============ CUSTOM ROLE DROPDOWN ============
-                     Replaces the native <select> popup (which the
-                     browser renders outside our CSS/theme control)
-                     with a fully styled, theme-aware dropdown.
-                     A hidden native <select> is kept in sync for
-                     normal form submission + required validation. -->
+                <!-- ============ CUSTOM ROLE DROPDOWN ============ -->
                 <div class="form-field custom-select" id="roleField">
                   <label class="form-field__label" for="roleSelectTrigger"
                     >Role</label
@@ -558,7 +568,12 @@
                 </div>
 
                 <div class="social-login-row">
-                  <button class="btn-social" type="button">
+                  <!-- Google Login -->
+                  <button
+                    class="btn-social google-login-btn"
+                    type="button"
+                    aria-label="Continue with Google"
+                  >
                     <svg
                       class="btn-social__icon"
                       viewBox="0 0 48 48"
@@ -582,9 +597,16 @@
                         d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.9 36.9 44 31.1 44 24c0-1.3-.1-2.7-.4-3.5z"
                       />
                     </svg>
-                    <span class="btn-social__text">Google</span>
+
+                    <span class="btn-social__text">Continue with Google</span>
                   </button>
-                  <button class="btn-social" type="button">
+
+                  <!-- Microsoft Login -->
+                  <button
+                    class="btn-social microsoft-login-btn"
+                    type="button"
+                    aria-label="Continue with Microsoft"
+                  >
                     <svg
                       class="btn-social__icon"
                       viewBox="0 0 23 23"
@@ -614,7 +636,10 @@
                         fill="#FFBA08"
                       />
                     </svg>
-                    <span class="btn-social__text">Microsoft</span>
+
+                    <span class="btn-social__text"
+                      >Continue with Microsoft</span
+                    >
                   </button>
                 </div>
               </form>
@@ -718,7 +743,8 @@
     </main>
 
     <!-- script file code -->
-         <script src="./js/script.js"></script>
-     <script src="./js/theme.js"></script>
+     <script src="./js/script.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script src="./js/theme.js"></script>
   </body>
 </html>

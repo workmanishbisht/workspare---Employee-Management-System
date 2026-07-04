@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Employee Management System</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="../css/dashboard.css" />
+
+    <!-- Remix Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>EMS</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by JS -->
+          </ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <!-- ============ USER / PROFILE ============ -->
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="Manish Bisht avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">Manish Bisht</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i>
+                <span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i>
+                <span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i>
+                <span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626;"></i>
+                <span style="color: #cf2626;">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- overlay for mobile sidebar -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h2>
+                Welcome back, <span id="userName">Manish</span>!
+                <span class="wave">👋</span>
+              </h2>
+              <p>Here's what's happening in your organization today.</p>
+            </div>
+            <div class="date-picker">
+              <i class="ri-calendar-2-line"></i>
+              <span id="currentDate">04 July, 2026</span>
+            </div>
+          </div>
+
+          <!-- Stat cards -->
+          <section class="stats-grid" id="statsGrid">
+            <!-- injected by JS -->
+          </section>
+
+          <!-- Charts row -->
+          <section class="charts-grid">
+            <div class="card overview-card">
+              <div class="card__head">
+                <h3>Employee Overview</h3>
+                <div class="dropdown" id="overviewRangeDropdown">
+                  <button class="dropdown__btn">
+                    <span id="overviewRangeLabel">This Month</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                  </button>
+                  <ul class="dropdown__menu">
+                    <li data-range="week">This Week</li>
+                    <li data-range="month" class="selected">This Month</li>
+                    <li data-range="quarter">This Quarter</li>
+                    <li data-range="year">This Year</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="overviewChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card dept-card">
+              <div class="card__head">
+                <h3>Employees by Department</h3>
+                <i class="ri-sparkling-2-fill dept-card__sparkle"></i>
+              </div>
+              <div class="dept-card__body">
+                <div class="donut-wrap">
+                  <canvas id="deptChart"></canvas>
+                  <div class="donut-center">
+                    <strong id="donutTotal">0</strong>
+                    <span>Total</span>
+                  </div>
+                </div>
+                <ul class="dept-legend" id="deptLegend">
+                  <!-- injected by JS -->
+                </ul>
+              </div>
+              <button class="btn btn--ghost btn--block">
+                View Full Report
+              </button>
+            </div>
+          </section>
+
+          <!-- Quick actions + Recent activity row is on the right column (see grid below) -->
+          <div class="bottom-grid">
+            <section class="card birthdays-card">
+              <div class="card__head">
+                <h3>Upcoming Birthdays &amp; Work Anniversaries</h3>
+                <a href="#" class="link">View all</a>
+              </div>
+              <div class="birthdays-list" id="birthdaysList">
+                <!-- injected by JS -->
+              </div>
+            </section>
+
+            <aside class="side-col">
+              <section class="card quick-actions-card">
+                <div class="card__head">
+                  <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                </div>
+                <div class="quick-actions" id="quickActions">
+                  <!-- injected by JS -->
+                </div>
+              </section>
+
+              <section class="card activity-card">
+                <div class="card__head">
+                  <h3>Recent Activity</h3>
+                  <a href="#" class="link">View all</a>
+                </div>
+                <ul class="activity-list" id="activityList">
+                  <!-- injected by JS -->
+                </ul>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- script files -->
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script type="module" src="../js/dashboard.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

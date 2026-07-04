@@ -1,418 +1,147 @@
-(function () {
-  /* =========================================================
-     TOAST MESSAGE
-  ========================================================= */
+/* ==========================================================
+   VIEW SWITCHING (Login / Signup / Forgot Password)
+========================================================== */
 
-  function showToast(type, message) {
-    var oldToast = document.querySelector(".toast");
+function switchView(viewName) {
+  const body = document.getElementById("authBody");
+  if (!body) return;
 
-    if (oldToast) {
-      oldToast.remove();
-    }
-
-    var toast = document.createElement("div");
-    toast.className = "toast toast-" + type;
-
-    var icon =
-      type === "success"
-        ? '<i class="ri-checkbox-circle-fill"></i>'
-        : '<i class="ri-close-circle-fill"></i>';
-
-    toast.innerHTML = `
-      ${icon}
-      <span>${message}</span>
-    `;
-
-    document.body.appendChild(toast);
-
-    requestAnimationFrame(function () {
-      toast.classList.add("show");
-    });
-
-    setTimeout(function () {
-      toast.classList.remove("show");
-
-      setTimeout(function () {
-        toast.remove();
-      }, 300);
-    }, 3000);
-  }
-
-  /* =========================================================
-     PASSWORD SHOW/HIDE
-  ========================================================= */
-
-  var passwordToggles = document.querySelectorAll(".form-field__toggle");
-
-  passwordToggles.forEach(function (toggleBtn) {
-    toggleBtn.addEventListener("click", function () {
-      var targetId = toggleBtn.getAttribute("data-target");
-      var input = document.getElementById(targetId);
-      var icon = toggleBtn.querySelector("i");
-
-      if (!input || !icon) return;
-
-      var isHidden = input.type === "password";
-
-      input.type = isHidden ? "text" : "password";
-
-      icon.classList.toggle("ri-eye-line", !isHidden);
-      icon.classList.toggle("ri-eye-off-line", isHidden);
-    });
+  document.querySelectorAll(".auth-view").forEach((view) => {
+    view.classList.toggle("auth-view--active", view.dataset.view === viewName);
   });
 
-  /* =========================================================
-     VIEW SWITCHING
-  ========================================================= */
+  body.dataset.view = viewName;
 
-  var authBody = document.getElementById("authBody");
-  var brandTrust = document.getElementById("brandTrust");
+  if (viewName === "forgot") {
+    const requestPanel = document.getElementById("forgotRequestPanel");
+    const successPanel = document.getElementById("resetSuccess");
+    if (requestPanel) requestPanel.style.display = "";
+    if (successPanel) successPanel.style.display = "none";
+  }
+}
 
-  var brandContent = {
-    login: {
-      line1: "Manage Employees.",
-      line2: "Simplify",
-      accent: "Success.",
-      desc: "A complete solution to manage your workforce efficiently and effectively.",
-      showFeatures: true,
-      showTrust: false,
-    },
+document.addEventListener("click", (e) => {
+  const trigger = e.target.closest("[data-switch-view]");
+  if (!trigger) return;
 
-    signup: {
-      line1: "Join the Future.",
-      line2: "Of",
-      accent: "Workforce Management.",
-      desc: "Create your account and start managing your team in minutes.",
-      showFeatures: false,
-      showTrust: true,
-    },
+  e.preventDefault();
+  switchView(trigger.dataset.switchView);
+});
 
-    forgot: {
-      line1: "Forgot Your",
-      line2: "Password?",
-      accent: "No Problem.",
-      desc: "We'll help you get back into your account safely and securely.",
-      showFeatures: false,
-      showTrust: false,
-    },
-  };
+document.addEventListener("password-reset:sent", () => {
+  const requestPanel = document.getElementById("forgotRequestPanel");
+  const successPanel = document.getElementById("resetSuccess");
+  if (requestPanel) requestPanel.style.display = "none";
+  if (successPanel) successPanel.style.display = "";
+});
 
-  var brandHeadlineLine1 = document.getElementById("brandHeadlineLine1");
-  var brandHeadlineLine2 = document.getElementById("brandHeadlineLine2");
-  var brandHeadlineAccent = document.getElementById("brandHeadlineAccent");
-  var brandHeadlineDesc = document.getElementById("brandHeadlineDesc");
-  var brandFeatureList = document.getElementById("brandFeatureList");
-  var formPanelInner = document.getElementById("formPanelInner");
+/* ==========================================================
+   PASSWORD SHOW / HIDE TOGGLE
+========================================================== */
 
-  var authViews = document.querySelectorAll(".auth-view");
+document.addEventListener("click", (e) => {
+  const toggleBtn = e.target.closest(".form-field__toggle");
+  if (!toggleBtn) return;
 
-  function switchView(viewName) {
-    var content = brandContent[viewName];
+  const targetId = toggleBtn.dataset.target;
+  const input = document.getElementById(targetId);
+  if (!input) return;
 
-    authViews.forEach(function (view) {
-      var isActive = view.getAttribute("data-view") === viewName;
+  const icon = toggleBtn.querySelector("i");
+  const isHidden = input.type === "password";
 
-      view.classList.toggle("auth-view--active", isActive);
-      view.style.display = isActive ? "block" : "none";
-    });
+  input.type = isHidden ? "text" : "password";
 
-    if (formPanelInner) {
-      formPanelInner.classList.toggle(
-        "form-panel__inner--wide",
-        viewName === "signup",
-      );
-    }
-
-    if (content) {
-      brandHeadlineLine1.textContent = content.line1;
-      brandHeadlineLine2.textContent = content.line2;
-      brandHeadlineAccent.textContent = content.accent;
-      brandHeadlineDesc.textContent = content.desc;
-
-      if (brandFeatureList) {
-        brandFeatureList.style.display = content.showFeatures ? "" : "none";
-      }
-
-      if (brandTrust) {
-        brandTrust.style.display = content.showTrust ? "flex" : "none";
-      }
-    }
-
-    if (authBody) {
-      authBody.setAttribute("data-view", viewName);
-    }
-
-    if (viewName === "forgot") {
-      showForgotRequestPanel();
-    }
-
-    window.scrollTo(0, 0);
+  if (icon) {
+    icon.classList.toggle("ri-eye-line", !isHidden);
+    icon.classList.toggle("ri-eye-off-line", isHidden);
   }
 
-  document.querySelectorAll("[data-switch-view]").forEach(function (link) {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
+  toggleBtn.setAttribute(
+    "aria-label",
+    isHidden ? "Hide password" : "Show password",
+  );
+});
 
-      var target = link.getAttribute("data-switch-view");
+/* ==========================================================
+   CUSTOM ROLE SELECT DROPDOWN
+========================================================== */
 
-      switchView(target);
-    });
-  });
+function closeRoleDropdown() {
+  const field = document.getElementById("roleField");
+  const trigger = document.getElementById("roleSelectTrigger");
+  if (!field) return;
+  field.classList.remove("custom-select--open");
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+}
 
-  authViews.forEach(function (view) {
-    var isActive = view.getAttribute("data-view") === "login";
+document.addEventListener("click", (e) => {
+  const trigger = e.target.closest("#roleSelectTrigger");
+  const field = document.getElementById("roleField");
 
-    view.classList.toggle("auth-view--active", isActive);
-    view.style.display = isActive ? "block" : "none";
-  });
-
-  /* =========================================================
-     FORGOT PASSWORD: request -> success state
-  ========================================================= */
-
-  var forgotRequestPanel = document.getElementById("forgotRequestPanel");
-  var resetSuccess = document.getElementById("resetSuccess");
-  var forgotForm = document.getElementById("forgotForm");
-  var forgotEmailInput = document.getElementById("forgotEmailInput");
-  var sentEmailLabel = document.getElementById("sentEmailLabel");
-  var resendLink = document.getElementById("resendLink");
-
-  function showForgotRequestPanel() {
-    if (forgotRequestPanel) {
-      forgotRequestPanel.classList.remove("is-hidden");
+  if (trigger && field) {
+    e.stopPropagation();
+    const isOpen = field.classList.contains("custom-select--open");
+    closeRoleDropdown();
+    if (!isOpen) {
+      field.classList.add("custom-select--open");
+      trigger.setAttribute("aria-expanded", "true");
     }
+    return;
+  }
 
-    if (resetSuccess) {
-      resetSuccess.classList.remove("is-visible");
+  const option = e.target.closest(".custom-select__option");
+  if (option) {
+    const nativeSelect = document.getElementById("roleSelect");
+    const valueLabel = document.getElementById("roleSelectValue");
+    if (!nativeSelect || !valueLabel) return;
+
+    const value = option.dataset.value;
+    const label = option.textContent.trim();
+
+    nativeSelect.value = value;
+    nativeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+    valueLabel.textContent = label;
+    valueLabel.classList.remove("custom-select__value--placeholder");
+
+    const dropdown = option.closest("#roleSelectDropdown");
+    if (dropdown) {
+      dropdown.querySelectorAll(".custom-select__option").forEach((opt) => {
+        opt.setAttribute("aria-selected", opt === option ? "true" : "false");
+      });
     }
-  }
-
-  function showResetSuccess(email) {
-    if (forgotRequestPanel) {
-      forgotRequestPanel.classList.add("is-hidden");
-    }
-
-    if (resetSuccess) {
-      resetSuccess.classList.add("is-visible");
-    }
-
-    if (sentEmailLabel && email) {
-      sentEmailLabel.textContent = email;
-    }
-  }
-
-  if (forgotForm) {
-    forgotForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      var email = forgotEmailInput ? forgotEmailInput.value : "";
-
-      showResetSuccess(email);
-
-      showToast("success", "Password reset link has been sent to your email.");
-    });
-  }
-
-  if (resendLink) {
-    resendLink.addEventListener("click", function () {
-      resendLink.textContent = "Link sent again!";
-
-      showToast("success", "Password reset link sent again.");
-
-      setTimeout(function () {
-        resendLink.textContent = "Click to resend";
-      }, 2500);
-    });
-  }
-
-  /* =========================================================
-     LOGIN FORM SUBMIT
-  ========================================================= */
-
-  var loginForm = document.getElementById("loginForm");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      // Replace this with your actual login validation
-
-      var isLoginSuccess = true;
-
-      if (isLoginSuccess) {
-        showToast("success", "Login Successful. Welcome back!");
-
-        // window.location.href = "dashboard.html";
-      } else {
-        showToast("error", "Invalid email or password.");
-      }
-    });
-  }
-
-  /* =========================================================
-     CUSTOM ROLE DROPDOWN
-  ========================================================= */
-
-  var roleTrigger = document.getElementById("roleSelectTrigger");
-  var roleDropdown = document.getElementById("roleSelectDropdown");
-  var roleValueLabel = document.getElementById("roleSelectValue");
-  var roleNativeSelect = document.getElementById("roleSelect");
-
-  var roleOptions = roleDropdown
-    ? roleDropdown.querySelectorAll(".custom-select__option")
-    : [];
-
-  function closeRoleDropdown() {
-    if (!roleDropdown || !roleTrigger) return;
-
-    roleDropdown.classList.remove("is-open");
-    roleTrigger.classList.remove("is-open");
-    roleTrigger.setAttribute("aria-expanded", "false");
-  }
-
-  function openRoleDropdown() {
-    if (!roleDropdown || !roleTrigger) return;
-
-    roleDropdown.classList.add("is-open");
-    roleTrigger.classList.add("is-open");
-    roleTrigger.setAttribute("aria-expanded", "true");
-  }
-
-  function toggleRoleDropdown() {
-    if (!roleDropdown) return;
-
-    if (roleDropdown.classList.contains("is-open")) {
-      closeRoleDropdown();
-    } else {
-      openRoleDropdown();
-    }
-  }
-
-  function selectRoleOption(optionEl) {
-    if (!optionEl || !roleNativeSelect || !roleValueLabel) return;
-
-    var value = optionEl.getAttribute("data-value");
-    var label = optionEl.textContent;
-
-    roleNativeSelect.value = value;
-    roleValueLabel.textContent = label;
-
-    roleValueLabel.classList.remove("custom-select__value--placeholder");
-
-    roleOptions.forEach(function (opt) {
-      opt.classList.toggle("custom-select__option--selected", opt === optionEl);
-    });
-
-    roleNativeSelect.dispatchEvent(
-      new Event("change", {
-        bubbles: true,
-      }),
-    );
 
     closeRoleDropdown();
-    roleTrigger.focus();
+    return;
   }
 
-  if (roleTrigger && roleDropdown) {
-    roleTrigger.addEventListener("click", toggleRoleDropdown);
-
-    roleTrigger.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleRoleDropdown();
-      } else if (e.key === "Escape") {
-        closeRoleDropdown();
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        openRoleDropdown();
-      }
-    });
-
-    roleOptions.forEach(function (optionEl) {
-      optionEl.addEventListener("click", function () {
-        selectRoleOption(optionEl);
-      });
-    });
-
-    document.addEventListener("click", function (e) {
-      if (!roleTrigger.contains(e.target) && !roleDropdown.contains(e.target)) {
-        closeRoleDropdown();
-      }
-    });
+  if (!e.target.closest("#roleField")) {
+    closeRoleDropdown();
   }
+});
 
-  /* =========================================================
-     SIGNUP FORM SUBMIT
-  ========================================================= */
+document.addEventListener("keydown", (e) => {
+  const trigger = e.target.closest("#roleSelectTrigger");
+  if (!trigger) return;
 
-  var signupForm = document.getElementById("signupForm");
-
-  if (signupForm) {
-    signupForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      var fullName = document.getElementById("signupNameInput");
-      var email = document.getElementById("signupEmailInput");
-      var role = document.getElementById("roleSelect");
-      var password = document.getElementById("signupPasswordInput");
-      var confirmPassword = document.getElementById("confirmPasswordInput");
-
-      // Password Match Validation
-      if (
-        password &&
-        confirmPassword &&
-        password.value !== confirmPassword.value
-      ) {
-        confirmPassword.setCustomValidity("Passwords do not match");
-        confirmPassword.reportValidity();
-
-        showToast("error", "Password and Confirm Password do not match.");
-
-        return;
-      }
-
-      if (confirmPassword) {
-        confirmPassword.setCustomValidity("");
-      }
-
-      // Required Fields Validation
-      if (
-        !fullName.value.trim() ||
-        !email.value.trim() ||
-        !role.value ||
-        !password.value.trim()
-      ) {
-        showToast("error", "Please fill all required fields.");
-        return;
-      }
-
-      // Signup Success
-      showToast("success", "Account created successfully.");
-
-      // Reset Form
-      signupForm.reset();
-
-      if (roleValueLabel) {
-        roleValueLabel.textContent = "Select Role";
-        roleValueLabel.classList.add("custom-select__value--placeholder");
-      }
-
-      roleOptions.forEach(function (option) {
-        option.classList.remove("custom-select__option--selected");
-      });
-
-      // Redirect Example
-      // setTimeout(function () {
-      //   window.location.href = "login.html";
-      // }, 1500);
-    });
-
-    var confirmPasswordInput = document.getElementById("confirmPasswordInput");
-
-    if (confirmPasswordInput) {
-      confirmPasswordInput.addEventListener("input", function () {
-        confirmPasswordInput.setCustomValidity("");
-      });
-    }
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    trigger.click();
+  } else if (e.key === "Escape") {
+    closeRoleDropdown();
   }
-})();
+});
+
+document.addEventListener("role-select:reset", () => {
+  const valueLabel = document.getElementById("roleSelectValue");
+  if (!valueLabel) return;
+
+  valueLabel.textContent = "Select your role";
+  valueLabel.classList.add("custom-select__value--placeholder");
+  document
+    .querySelectorAll("#roleSelectDropdown .custom-select__option")
+    .forEach((opt) => opt.setAttribute("aria-selected", "false"));
+
+  closeRoleDropdown();
+});
