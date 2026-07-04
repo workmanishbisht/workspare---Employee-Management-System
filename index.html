@@ -1,11 +1,723 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Workspare</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspare | Employee Management System</title>
+    <link rel="shortcut icon" href="./Assets/favicon/" type="image/x-icon" />
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+    <!-- Remix Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body id="authBody" class="login-body" data-view="login">
+    <main id="authWrapper" class="auth-wrapper">
+      <div id="authCard" class="auth-card">
+        <!-- ===================== LEFT PANEL  ===================== -->
+
+        <section id="brandPanel" class="brand-panel">
+          <div id="brandPanelOverlay" class="brand-panel__overlay"></div>
+          <div id="brandPanelGlow" class="brand-panel__glow"></div>
+
+          <div id="brandPanelContent" class="brand-panel__content">
+            <div id="brandLogo" class="brand-logo">
+              <span id="brandLogoIcon" class="brand-logo__icon">
+                <i class="ri-team-line"></i>
+              </span>
+              <div id="brandLogoText" class="brand-logo__text">
+                <h1 id="brandName" class="brand-logo__name">Workspare</h1>
+                <p id="brandTagline" class="brand-logo__tagline">
+                  Employee Management System
+                </p>
+              </div>
+            </div>
+
+            <div id="brandHeadline" class="brand-headline">
+              <h2 id="brandHeadlineTitle" class="brand-headline__title">
+                <span id="brandHeadlineLine1">Manage Employees.</span><br />
+                <span id="brandHeadlineLine2">Simplify</span>
+                <span id="brandHeadlineAccent" class="brand-headline__accent"
+                  >Success.</span
+                >
+              </h2>
+              <span
+                id="brandHeadlineDivider"
+                class="brand-headline__divider"
+              ></span>
+              <p id="brandHeadlineDesc" class="brand-headline__desc">
+                A complete solution to manage your workforce efficiently and
+                effectively.
+              </p>
+            </div>
+
+            <ul id="brandFeatureList" class="brand-feature-list">
+              <li class="brand-feature">
+                <span class="brand-feature__icon"
+                  ><i class="ri-group-line"></i
+                ></span>
+                <div class="brand-feature__text">
+                  <h3 class="brand-feature__title">Employee Management</h3>
+                  <p class="brand-feature__desc">
+                    Add, edit and manage employee information with ease.
+                  </p>
+                </div>
+              </li>
+              <li class="brand-feature">
+                <span class="brand-feature__icon"
+                  ><i class="ri-calendar-check-line"></i
+                ></span>
+                <div class="brand-feature__text">
+                  <h3 class="brand-feature__title">Attendance Tracking</h3>
+                  <p class="brand-feature__desc">
+                    Track attendance and leave requests in real-time.
+                  </p>
+                </div>
+              </li>
+              <li class="brand-feature">
+                <span class="brand-feature__icon"
+                  ><i class="ri-bar-chart-2-line"></i
+                ></span>
+                <div class="brand-feature__text">
+                  <h3 class="brand-feature__title">Analytics Dashboard</h3>
+                  <p class="brand-feature__desc">
+                    Get insights with powerful reports and analytics.
+                  </p>
+                </div>
+              </li>
+            </ul>
+
+            <div
+              id="brandDeskScene"
+              class="brand-desk-scene"
+              aria-hidden="true"
+            >
+              <div id="deskGlow" class="desk-glow"></div>
+            </div>
+
+            <div id="brandDots" class="brand-dots">
+              <span></span><span></span><span></span> <span></span><span></span
+              ><span></span> <span></span><span></span><span></span>
+            </div>
+
+            <div id="brandTrust" class="brand-trust" style="display: none">
+              <span class="brand-trust__icon"
+                ><i class="ri-shield-keyhole-line"></i
+              ></span>
+              <div>
+                <h4 class="brand-trust__title">Trusted by 500+ companies</h4>
+                <p class="brand-trust__desc">to manage their workforce.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== RIGHT PANEL ===================== -->
+        <section id="formPanel" class="form-panel">
+          <button
+            id="themeToggle"
+            class="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+          >
+            <span id="themeToggleLight" class="theme-toggle__option">
+              <i class="ri-sun-line"></i>
+            </span>
+            <span id="themeToggleDark" class="theme-toggle__option">
+              <i class="ri-moon-line"></i>
+            </span>
+          </button>
+
+          <div id="formPanelInner" class="form-panel__inner">
+            <!-- ============ LOGIN VIEW ============ -->
+            <div
+              id="loginView"
+              class="auth-view auth-view--active"
+              data-view="login"
+            >
+              <header class="form-header">
+                <h2 class="form-header__title">
+                  Welcome Back!
+                  <span class="form-header__wave">👋</span>
+                </h2>
+                <p class="form-header__subtitle">
+                  Sign in to your account to continue
+                </p>
+              </header>
+
+              <form id="loginForm" class="login-form" novalidate>
+                <div class="form-field">
+                  <label class="form-field__label" for="loginEmailInput"
+                    >Email Address</label
+                  >
+                  <div class="form-field__control">
+                    <span class="form-field__icon"
+                      ><i class="ri-mail-line"></i
+                    ></span>
+                    <input
+                      id="loginEmailInput"
+                      class="form-field__input"
+                      type="email"
+                      name="email"
+                      placeholder="Enter your email"
+                      autocomplete="email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-field__label" for="loginPasswordInput"
+                    >Password</label
+                  >
+                  <div class="form-field__control">
+                    <span class="form-field__icon"
+                      ><i class="ri-lock-line"></i
+                    ></span>
+                    <input
+                      id="loginPasswordInput"
+                      class="form-field__input"
+                      type="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      autocomplete="current-password"
+                      required
+                    />
+                    <button
+                      class="form-field__toggle"
+                      type="button"
+                      data-target="loginPasswordInput"
+                      aria-label="Show password"
+                    >
+                      <i class="ri-eye-line"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-options">
+                  <label class="remember-me" for="rememberMeInput">
+                    <input
+                      id="rememberMeInput"
+                      class="remember-me__input"
+                      type="checkbox"
+                      checked
+                    />
+                    <span class="remember-me__box"
+                      ><i class="ri-check-line"></i
+                    ></span>
+                    <span class="remember-me__text">Remember me</span>
+                  </label>
+                  <a class="forgot-password" href="#" data-switch-view="forgot"
+                    >Forgot Password?</a
+                  >
+                </div>
+
+                <button class="btn-primary" type="submit">
+                  <span class="btn-primary__text">Sign In</span>
+                  <i class="ri-arrow-right-line btn-primary__icon"></i>
+                </button>
+
+                <div class="divider-row">
+                  <span class="divider-row__line"></span>
+                  <span class="divider-row__text">or continue with</span>
+                  <span class="divider-row__line"></span>
+                </div>
+
+                <div class="social-login-row">
+                  <button class="btn-social" type="button">
+                    <svg
+                      class="btn-social__icon"
+                      viewBox="0 0 48 48"
+                      width="20"
+                      height="20"
+                    >
+                      <path
+                        fill="#FFC107"
+                        d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"
+                      />
+                      <path
+                        fill="#FF3D00"
+                        d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"
+                      />
+                      <path
+                        fill="#4CAF50"
+                        d="M24 44c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35.1 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"
+                      />
+                      <path
+                        fill="#1976D2"
+                        d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.9 36.9 44 31.1 44 24c0-1.3-.1-2.7-.4-3.5z"
+                      />
+                    </svg>
+                    <span class="btn-social__text">Google</span>
+                  </button>
+                  <button class="btn-social" type="button">
+                    <svg
+                      class="btn-social__icon"
+                      viewBox="0 0 23 23"
+                      width="18"
+                      height="18"
+                    >
+                      <rect x="1" y="1" width="10" height="10" fill="#F35325" />
+                      <rect
+                        x="12"
+                        y="1"
+                        width="10"
+                        height="10"
+                        fill="#81BC06"
+                      />
+                      <rect
+                        x="1"
+                        y="12"
+                        width="10"
+                        height="10"
+                        fill="#05A6F0"
+                      />
+                      <rect
+                        x="12"
+                        y="12"
+                        width="10"
+                        height="10"
+                        fill="#FFBA08"
+                      />
+                    </svg>
+                    <span class="btn-social__text">Microsoft</span>
+                  </button>
+                </div>
+              </form>
+
+              <p class="signup-prompt">
+                Don't have an account?
+                <a
+                  class="signup-prompt__link"
+                  href="#"
+                  data-switch-view="signup"
+                  >Create Account</a
+                >
+              </p>
+            </div>
+
+            <!-- ============ SIGNUP VIEW ============ -->
+            <div id="signupView" class="auth-view" data-view="signup">
+              <header class="form-header">
+                <h2 class="form-header__title">
+                  Create Your Account
+                  <span class="form-header__wave">🚀</span>
+                </h2>
+                <p class="form-header__subtitle">
+                  Get started with Employee Management System
+                </p>
+              </header>
+
+              <form id="signupForm" class="login-form" novalidate>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label class="form-field__label" for="fullNameInput"
+                      >Full Name</label
+                    >
+                    <div class="form-field__control">
+                      <span class="form-field__icon"
+                        ><i class="ri-user-line"></i
+                      ></span>
+                      <input
+                        id="fullNameInput"
+                        class="form-field__input"
+                        type="text"
+                        name="fullName"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label" for="signupEmailInput"
+                      >Email Address</label
+                    >
+                    <div class="form-field__control">
+                      <span class="form-field__icon"
+                        ><i class="ri-mail-line"></i
+                      ></span>
+                      <input
+                        id="signupEmailInput"
+                        class="form-field__input"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-field">
+                    <label class="form-field__label" for="signupPasswordInput"
+                      >Password</label
+                    >
+                    <div class="form-field__control">
+                      <span class="form-field__icon"
+                        ><i class="ri-lock-line"></i
+                      ></span>
+                      <input
+                        id="signupPasswordInput"
+                        class="form-field__input"
+                        type="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                      />
+                      <button
+                        class="form-field__toggle"
+                        type="button"
+                        data-target="signupPasswordInput"
+                        aria-label="Show password"
+                      >
+                        <i class="ri-eye-line"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label" for="confirmPasswordInput"
+                      >Confirm Password</label
+                    >
+                    <div class="form-field__control">
+                      <span class="form-field__icon"
+                        ><i class="ri-lock-line"></i
+                      ></span>
+                      <input
+                        id="confirmPasswordInput"
+                        class="form-field__input"
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        required
+                      />
+                      <button
+                        class="form-field__toggle"
+                        type="button"
+                        data-target="confirmPasswordInput"
+                        aria-label="Show password"
+                      >
+                        <i class="ri-eye-line"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ============ CUSTOM ROLE DROPDOWN ============
+                     Replaces the native <select> popup (which the
+                     browser renders outside our CSS/theme control)
+                     with a fully styled, theme-aware dropdown.
+                     A hidden native <select> is kept in sync for
+                     normal form submission + required validation. -->
+                <div class="form-field custom-select" id="roleField">
+                  <label class="form-field__label" for="roleSelectTrigger"
+                    >Role</label
+                  >
+                  <div
+                    id="roleSelectTrigger"
+                    class="form-field__control custom-select__trigger"
+                    tabindex="0"
+                    role="combobox"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="roleSelectDropdown"
+                  >
+                    <span class="form-field__icon"
+                      ><i class="ri-briefcase-line"></i
+                    ></span>
+                    <span
+                      id="roleSelectValue"
+                      class="custom-select__value custom-select__value--placeholder"
+                      >Select your role</span
+                    >
+                    <span class="form-field__select-arrow"
+                      ><i class="ri-arrow-down-s-line"></i
+                    ></span>
+                  </div>
+
+                  <ul
+                    id="roleSelectDropdown"
+                    class="custom-select__dropdown"
+                    role="listbox"
+                    aria-labelledby="roleSelectTrigger"
+                  >
+                    <li
+                      class="custom-select__option"
+                      data-value="admin"
+                      role="option"
+                    >
+                      Admin
+                    </li>
+                    <li
+                      class="custom-select__option"
+                      data-value="hr"
+                      role="option"
+                    >
+                      HR Manager
+                    </li>
+                    <li
+                      class="custom-select__option"
+                      data-value="manager"
+                      role="option"
+                    >
+                      Team Manager
+                    </li>
+                    <li
+                      class="custom-select__option"
+                      data-value="employee"
+                      role="option"
+                    >
+                      Employee
+                    </li>
+                  </ul>
+
+                  <select
+                    id="roleSelect"
+                    class="custom-select__native"
+                    name="role"
+                    required
+                    tabindex="-1"
+                    aria-hidden="true"
+                  >
+                    <option value="" disabled selected hidden>
+                      Select your role
+                    </option>
+                    <option value="admin">Admin</option>
+                    <option value="hr">HR Manager</option>
+                    <option value="manager">Team Manager</option>
+                    <option value="employee">Employee</option>
+                  </select>
+                </div>
+
+                <div class="form-info">
+                  <span class="form-info__icon"
+                    ><i class="ri-information-line"></i
+                  ></span>
+                  <div>
+                    <p class="form-info__title">Select your role carefully</p>
+                    <p class="form-info__desc">
+                      You can't change your role after registration. Contact
+                      admin if needed.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-field__label" for="companyInput"
+                    >Company Name (Optional)</label
+                  >
+                  <div class="form-field__control">
+                    <span class="form-field__icon"
+                      ><i class="ri-building-2-line"></i
+                    ></span>
+                    <input
+                      id="companyInput"
+                      class="form-field__input"
+                      type="text"
+                      name="company"
+                      placeholder="Enter company name"
+                      autocomplete="organization"
+                    />
+                  </div>
+                </div>
+
+                <label class="terms-agree" for="termsAgreeInput">
+                  <input
+                    id="termsAgreeInput"
+                    class="terms-agree__input"
+                    type="checkbox"
+                    checked
+                  />
+                  <span class="terms-agree__box"
+                    ><i class="ri-check-line"></i
+                  ></span>
+                  <span class="terms-agree__text"
+                    >I agree to the <a href="#">Terms of Service</a> and
+                    <a href="#">Privacy Policy</a></span
+                  >
+                </label>
+
+                <button class="btn-primary" type="submit">
+                  <span class="btn-primary__text">Create Account</span>
+                  <i class="ri-arrow-right-line btn-primary__icon"></i>
+                </button>
+
+                <div class="divider-row">
+                  <span class="divider-row__line"></span>
+                  <span class="divider-row__text">or sign up with</span>
+                  <span class="divider-row__line"></span>
+                </div>
+
+                <div class="social-login-row">
+                  <button class="btn-social" type="button">
+                    <svg
+                      class="btn-social__icon"
+                      viewBox="0 0 48 48"
+                      width="20"
+                      height="20"
+                    >
+                      <path
+                        fill="#FFC107"
+                        d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"
+                      />
+                      <path
+                        fill="#FF3D00"
+                        d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"
+                      />
+                      <path
+                        fill="#4CAF50"
+                        d="M24 44c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35.1 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"
+                      />
+                      <path
+                        fill="#1976D2"
+                        d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.9 36.9 44 31.1 44 24c0-1.3-.1-2.7-.4-3.5z"
+                      />
+                    </svg>
+                    <span class="btn-social__text">Google</span>
+                  </button>
+                  <button class="btn-social" type="button">
+                    <svg
+                      class="btn-social__icon"
+                      viewBox="0 0 23 23"
+                      width="18"
+                      height="18"
+                    >
+                      <rect x="1" y="1" width="10" height="10" fill="#F35325" />
+                      <rect
+                        x="12"
+                        y="1"
+                        width="10"
+                        height="10"
+                        fill="#81BC06"
+                      />
+                      <rect
+                        x="1"
+                        y="12"
+                        width="10"
+                        height="10"
+                        fill="#05A6F0"
+                      />
+                      <rect
+                        x="12"
+                        y="12"
+                        width="10"
+                        height="10"
+                        fill="#FFBA08"
+                      />
+                    </svg>
+                    <span class="btn-social__text">Microsoft</span>
+                  </button>
+                </div>
+              </form>
+
+              <p class="signup-prompt">
+                Already have an account?
+                <a class="signup-prompt__link" href="#" data-switch-view="login"
+                  >Sign In</a
+                >
+              </p>
+            </div>
+
+            <!-- ============ FORGOT PASSWORD VIEW ============ -->
+            <div id="forgotView" class="auth-view" data-view="forgot">
+              <a class="back-to-login" href="#" data-switch-view="login">
+                <i class="ri-arrow-left-line"></i>
+                Back to Sign In
+              </a>
+
+              <div id="forgotRequestPanel">
+                <span class="forgot-icon-badge">
+                  <i class="ri-key-2-line"></i>
+                </span>
+
+                <header class="form-header">
+                  <h2 class="form-header__title">Forgot Password?</h2>
+                  <p class="form-header__subtitle">
+                    No worries, enter your email and we'll send you reset
+                    instructions.
+                  </p>
+                </header>
+
+                <form id="forgotForm" class="login-form" novalidate>
+                  <div class="form-field">
+                    <label class="form-field__label" for="forgotEmailInput"
+                      >Email Address</label
+                    >
+                    <div class="form-field__control">
+                      <span class="form-field__icon"
+                        ><i class="ri-mail-line"></i
+                      ></span>
+                      <input
+                        id="forgotEmailInput"
+                        class="form-field__input"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your registered email"
+                        autocomplete="email"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <button class="btn-primary" type="submit">
+                    <span class="btn-primary__text">Send Reset Link</span>
+                    <i class="ri-send-plane-line btn-primary__icon"></i>
+                  </button>
+                </form>
+              </div>
+
+              <div id="resetSuccess" class="reset-success">
+                <span class="reset-success__icon">
+                  <i class="ri-mail-check-line"></i>
+                </span>
+
+                <header class="form-header">
+                  <h2 class="form-header__title">Check Your Email</h2>
+                </header>
+
+                <p class="reset-success__desc">
+                  We've sent a password reset link to
+                  <strong id="sentEmailLabel">your email</strong>. Please check
+                  your inbox and follow the instructions.
+                </p>
+
+                <a class="btn-primary" href="#">
+                  <span class="btn-primary__text">Open Email App</span>
+                  <i class="ri-external-link-line btn-primary__icon"></i>
+                </a>
+
+                <a class="btn-secondary" href="#" data-switch-view="login">
+                  <i class="ri-arrow-left-line btn-secondary__icon"></i>
+                  <span>Back to Sign In</span>
+                </a>
+
+                <p class="resend-row">
+                  Didn't receive the email?
+                  <button
+                    id="resendLink"
+                    class="resend-row__link"
+                    type="button"
+                  >
+                    Click to resend
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- script file code -->
+    <script src="./js/script.js"></script>
+  </body>
 </html>
