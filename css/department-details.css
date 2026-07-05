@@ -1,0 +1,465 @@
+.dd-hidden {
+  display: none !important;
+}
+
+#realContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* =========================================================
+   BACK LINK
+========================================================= */
+.dd-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 4px;
+}
+
+.dd-back-link:hover {
+  color: var(--color-primary);
+}
+
+/* =========================================================
+   HERO CARD
+========================================================= */
+.dd-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dd-hero__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.dd-hero__left {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.dd-hero__icon {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  background: var(--color-info-bg);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.dd-hero__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dd-hero__title-row h2 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.dd-hero__chips {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.dd-chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dd-hero__desc {
+  font-size: 14px;
+  color: var(--panel-light-text-muted);
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.dd-hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dd-hero__actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.dd-hero__info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-light-border);
+}
+
+.dd-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.dd-info-row i {
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.dd-info-row span {
+  color: var(--panel-light-text-muted);
+}
+
+.dd-info-row strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   GRID LAYOUT (employees + side col)
+========================================================= */
+.dd-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* =========================================================
+   EMPLOYEES CARD HEADER + CONTROLS
+========================================================= */
+.dd-employees-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.dd-employees__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--panel-light-border);
+}
+
+.dd-employees__head h3 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dd-employees__controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dd-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+  min-width: 220px;
+}
+
+.dd-search i {
+  color: var(--panel-light-text-muted);
+}
+
+.dd-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  width: 100%;
+  color: var(--panel-light-text);
+}
+
+.dd-select {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-light-border);
+  background: var(--panel-light-input-bg);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--panel-light-text);
+  cursor: pointer;
+}
+
+/* =========================================================
+   EMPTY STATE (employees)
+========================================================= */
+.dd-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 24px;
+  gap: 8px;
+}
+
+.dd-empty-state i {
+  font-size: 48px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 8px;
+}
+
+.dd-empty-state h4 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dd-empty-state p {
+  font-size: 13px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   DEPARTMENT INFO LIST (side column)
+========================================================= */
+.dd-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dd-info-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.dd-info-list li span {
+  color: var(--panel-light-text-muted);
+}
+
+.dd-info-list li strong {
+  font-weight: 700;
+  text-align: right;
+}
+
+/* =========================================================
+   PROJECTS LIST
+========================================================= */
+.dd-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dd-project-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+}
+
+.dd-project-row__name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dd-project-row__manager {
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  margin-top: 2px;
+}
+
+.dd-project-row__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.dd-project-row__deadline {
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+}
+
+/* =========================================================
+   TIMELINE (Recent Activity)
+========================================================= */
+.dd-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  padding-left: 4px;
+}
+
+.dd-timeline__item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  position: relative;
+}
+
+.dd-timeline__item::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  bottom: -20px;
+  width: 1px;
+  background: var(--panel-light-border);
+}
+
+.dd-timeline__item:last-child::before {
+  display: none;
+}
+
+.dd-timeline__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.dd-timeline__dot.success {
+  background: var(--color-success);
+}
+.dd-timeline__dot.info {
+  background: var(--color-primary);
+}
+
+.dd-timeline__item p {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dd-timeline__time {
+  font-size: 11px;
+  color: var(--panel-light-text-muted);
+}
+
+/* =========================================================
+   SKELETON LOADER
+========================================================= */
+.skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeleton {
+  border-radius: 22px;
+  background: linear-gradient(
+    90deg,
+    var(--panel-light-input-bg) 25%,
+    var(--panel-light-border) 50%,
+    var(--panel-light-input-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: dd-shimmer 1.4s infinite;
+}
+
+@keyframes dd-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton--hero {
+  height: 220px;
+}
+
+.skeleton-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.skeleton--stat {
+  height: 120px;
+}
+
+.skeleton--table {
+  height: 360px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1180px) {
+  .dd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-hero__info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skeleton-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dd-hero__top {
+    flex-direction: column;
+  }
+
+  .dd-hero__actions {
+    width: 100%;
+  }
+
+  .dd-hero__actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .dd-hero__info {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-employees__controls {
+    width: 100%;
+  }
+
+  .dd-search {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .skeleton-row {
+    grid-template-columns: 1fr;
+  }
+}

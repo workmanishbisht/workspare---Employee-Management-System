@@ -186,7 +186,7 @@ export async function guardAndLoadUser() {
         email: user.email || firestoreData.email || "",
         role: firestoreData.role || "Employee",
         company: firestoreData.company || "",
-        photoURL: user.photoURL || firestoreData.photoURL || "",
+        photoURL: firestoreData.photoURL || user.photoURL || "",
       };
 
       applyUserToUI(currentUserData);
@@ -213,6 +213,10 @@ export function applyUserToUI(userData) {
   if (welcomeNameEl) {
     welcomeNameEl.textContent = userData.fullName.split(" ")[0];
   }
+
+  /* ---------- Topbar avatar removed (sidebar already shows profile image) ---------- */
+  const topbarAvatarEl = document.querySelector(".topbar__avatar");
+  if (topbarAvatarEl) topbarAvatarEl.style.display = "none";
 }
 
 /* ==========================================================

@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Department Details | Employee Management System</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/employees.css" />
+    <link rel="stylesheet" href="../css/department-details.css" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList"></ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Employee</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" placeholder="Search..." />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span class="theme-toggle__option"
+                ><i class="ri-sun-line"></i
+              ></span>
+              <span class="theme-toggle__option"
+                ><i class="ri-moon-line"></i
+              ></span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content" id="pageContent">
+          <!-- ============ SKELETON LOADER ============ -->
+          <div id="skeletonWrap" class="skeleton-wrap">
+            <div class="skeleton skeleton--hero"></div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+            </div>
+            <div class="skeleton skeleton--table"></div>
+          </div>
+
+          <!-- ============ ACTUAL CONTENT (hidden until loaded) ============ -->
+          <div id="realContent" class="dd-hidden">
+            <!-- Back link -->
+            <a href="./departments.html" class="dd-back-link">
+              <i class="ri-arrow-left-line"></i> Back to Departments
+            </a>
+
+            <!-- ===== HERO CARD ===== -->
+            <section class="card dd-hero">
+              <div class="dd-hero__top">
+                <div class="dd-hero__left">
+                  <div class="dd-hero__icon" id="ddIcon">
+                    <i class="ri-building-4-line"></i>
+                  </div>
+                  <div>
+                    <div class="dd-hero__title-row">
+                      <h2 id="ddName">Department</h2>
+                      <span class="status-badge active" id="ddStatusBadge"
+                        >Active</span
+                      >
+                    </div>
+                    <div class="dd-hero__chips">
+                      <span class="dd-chip" id="ddCodeChip">Code: —</span>
+                      <span class="dd-chip" id="ddCreatedChip"
+                        >Established: —</span
+                      >
+                    </div>
+                    <p class="dd-hero__desc" id="ddDescription">—</p>
+                  </div>
+                </div>
+
+                <div class="dd-hero__actions">
+                  <button class="btn btn--ghost" id="editDepartmentBtn">
+                    <i class="ri-pencil-line"></i> Edit Department
+                  </button>
+                  <button class="btn btn--danger" id="deleteDepartmentBtn">
+                    <i class="ri-delete-bin-line"></i> Delete Department
+                  </button>
+                </div>
+              </div>
+
+              <div class="dd-hero__info">
+                <div class="dd-info-row">
+                  <i class="ri-user-star-line"></i><span>Department Head</span
+                  ><strong id="ddHead">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-mail-line"></i><span>Email</span
+                  ><strong id="ddEmail">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-phone-line"></i><span>Phone</span
+                  ><strong id="ddPhone">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-map-pin-line"></i><span>Location</span
+                  ><strong id="ddLocation">—</strong>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===== STATISTICS ===== -->
+            <section class="stats-grid" id="ddStatsGrid"></section>
+
+            <!-- ===== EMPLOYEES + DEPARTMENT INFO ===== -->
+            <div class="dd-grid">
+              <section class="card dd-employees-card">
+                <div class="dd-employees__head">
+                  <h3>Employees in Department</h3>
+                  <div class="dd-employees__controls">
+                    <div class="dd-search">
+                      <i class="ri-search-line"></i>
+                      <input
+                        type="text"
+                        id="ddEmployeeSearch"
+                        placeholder="Search employees..."
+                      />
+                    </div>
+                    <select id="ddStatusFilter" class="dd-select">
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="ddSortSelect" class="dd-select">
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                      <option value="joining">Joining Date</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="table-scroll">
+                  <table class="employees-table" id="ddEmployeesTable">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Employee ID</th>
+                        <th>Designation</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Joining Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ddEmployeesBody"></tbody>
+                  </table>
+                </div>
+
+                <div id="ddEmployeesEmpty" class="dd-empty-state dd-hidden">
+                  <i class="ri-team-line"></i>
+                  <h4>No Employees Found</h4>
+                  <p>This department doesn't have any employees yet.</p>
+                  <a
+                    href="./employees.html?action=add"
+                    class="btn btn--primary"
+                  >
+                    <i class="ri-user-add-line"></i> Add Employee
+                  </a>
+                </div>
+              </section>
+
+              <aside class="dd-side-col">
+                <section class="card">
+                  <div class="card__head"><h3>Department Information</h3></div>
+                  <ul class="dd-info-list">
+                    <li>
+                      <span>Department Name</span
+                      ><strong id="infoName">—</strong>
+                    </li>
+                    <li>
+                      <span>Department Code</span
+                      ><strong id="infoCode">—</strong>
+                    </li>
+                    <li>
+                      <span>Department Head</span
+                      ><strong id="infoHead">—</strong>
+                    </li>
+                    <li><span>Email</span><strong id="infoEmail">—</strong></li>
+                    <li><span>Phone</span><strong id="infoPhone">—</strong></li>
+                    <li>
+                      <span>Location</span><strong id="infoLocation">—</strong>
+                    </li>
+                    <li>
+                      <span>Status</span><strong id="infoStatus">—</strong>
+                    </li>
+                    <li>
+                      <span>Created Date</span
+                      ><strong id="infoCreated">—</strong>
+                    </li>
+                    <li>
+                      <span>Last Updated</span
+                      ><strong id="infoUpdated">—</strong>
+                    </li>
+                  </ul>
+                </section>
+
+                <section class="card">
+                  <div class="card__head">
+                    <h3>Current Projects</h3>
+                  </div>
+                  <div id="ddProjectsList"></div>
+                </section>
+              </aside>
+            </div>
+
+            <!-- ===== RECENT ACTIVITY + QUICK ACTIONS ===== -->
+            <div class="dd-grid">
+              <section class="card">
+                <div class="card__head"><h3>Recent Activity</h3></div>
+                <ul class="dd-timeline" id="ddActivityList"></ul>
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                  <a
+                    href="./employees.html?action=add"
+                    class="quick-action-btn blue"
+                  >
+                    <i class="ri-user-add-line"></i><span>Add Employee</span>
+                    <i class="ri-arrow-right-s-line arrow"></i>
+                  </a>
+                  <button
+                    type="button"
+                    class="quick-action-btn purple"
+                    id="qaEditDept"
+                  >
+                    <i class="ri-pencil-line"></i><span>Edit Department</span>
+                    <i class="ri-arrow-right-s-line arrow"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-action-btn green"
+                    id="qaExport"
+                  >
+                    <i class="ri-download-2-line"></i
+                    ><span>Export Employees</span>
+                    <i class="ri-arrow-right-s-line arrow"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-action-btn orange"
+                    id="qaDelete"
+                  >
+                    <i class="ri-delete-bin-line"></i
+                    ><span>Delete Department</span>
+                    <i class="ri-arrow-right-s-line arrow"></i>
+                  </button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============ EDIT DEPARTMENT MODAL ============ -->
+    <div class="modal-overlay" id="editDeptModalOverlay">
+      <div class="modal">
+        <div class="modal__head">
+          <h3>Edit Department</h3>
+          <button class="modal__close" id="closeEditDeptModalBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="editDeptForm" class="modal__form" novalidate>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="deptName"
+                >Department Name</label
+              >
+              <input
+                id="deptName"
+                class="form-field__input"
+                type="text"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="deptCode"
+                >Department Code</label
+              >
+              <input
+                id="deptCode"
+                class="form-field__input"
+                type="text"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="deptHead"
+                >Department Head</label
+              >
+              <input id="deptHead" class="form-field__input" type="text" />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="deptEmail">Email</label>
+              <input id="deptEmail" class="form-field__input" type="email" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="deptPhone">Phone</label>
+              <input id="deptPhone" class="form-field__input" type="tel" />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="deptLocation"
+                >Location</label
+              >
+              <input id="deptLocation" class="form-field__input" type="text" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="deptStatus">Status</label>
+              <select id="deptStatus" class="form-field__input" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="form-field"></div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label" for="deptDescription"
+              >Description</label
+            >
+            <textarea
+              id="deptDescription"
+              class="form-field__input"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" id="cancelEditDeptBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn--primary" id="saveDeptBtn">
+              <span id="saveDeptBtnText">Update Department</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ DELETE CONFIRM MODAL ============ -->
+    <div class="modal-overlay" id="deleteDeptModalOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__head">
+          <h3>Delete Department</h3>
+          <button
+            class="modal__close"
+            id="closeDeleteDeptModalBtn"
+            type="button"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <p class="modal__text">
+          Are you sure you want to delete
+          <strong id="deleteDeptName">this department</strong>? This action
+          cannot be undone and will not delete its employees.
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="cancelDeleteDeptBtn">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn--danger"
+            id="confirmDeleteDeptBtn"
+          >
+            <i class="ri-delete-bin-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/department-details.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

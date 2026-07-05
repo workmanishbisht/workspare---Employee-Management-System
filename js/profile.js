@@ -189,12 +189,14 @@ import {
       }`;
     }
     if (verifiedEl) verifiedEl.style.display = user.emailVerified ? "" : "none";
-    if (photoEl && user.photoURL) photoEl.src = user.photoURL;
+
+    const photoSrc = user.photoURL || "";
+    if (photoEl && photoSrc) photoEl.src = photoSrc;
 
     const sidebarAvatar = $("#sidebarAvatar");
     const topbarAvatar = $("#topbarAvatar");
-    if (sidebarAvatar && user.photoURL) sidebarAvatar.src = user.photoURL;
-    if (topbarAvatar && user.photoURL) topbarAvatar.src = user.photoURL;
+    if (sidebarAvatar && photoSrc) sidebarAvatar.src = photoSrc;
+    if (topbarAvatar && photoSrc) topbarAvatar.src = photoSrc;
 
     const sidebarName = $("#sidebarUserName");
     const sidebarRole = $("#sidebarUserRole");
@@ -421,9 +423,17 @@ import {
 
     Object.keys(currentUser).forEach((key) => {
       if (key === "employment") return;
+      if (key === "skills") return;
       const field = form.elements.namedItem(key);
       if (field) field.value = currentUser[key] ?? "";
     });
+
+    const skillsField = form.elements.namedItem("skills");
+    if (skillsField) {
+      skillsField.value = Array.isArray(currentUser.skills)
+        ? currentUser.skills.join(", ")
+        : "";
+    }
 
     EMPLOYMENT_KEYS.forEach((key) => {
       const field = form.elements.namedItem(key);
@@ -455,12 +465,20 @@ import {
     const employmentUpdates = {};
 
     Object.keys(rawValues).forEach((key) => {
+      if (key === "skills") return;
       if (EMPLOYMENT_KEYS.includes(key)) {
         employmentUpdates[key] = rawValues[key];
       } else {
         topUpdates[key] = rawValues[key];
       }
     });
+
+    if (rawValues.skills !== undefined) {
+      topUpdates.skills = rawValues.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
 
     const firestoreUpdates = { ...topUpdates };
     Object.keys(employmentUpdates).forEach((key) => {
@@ -616,11 +634,16 @@ import {
       currentUid = fbUser.uid;
 
       const userDoc = await loadUserDoc(currentUid);
-      currentUser = userDoc || {
+
+      currentUser = {
         email: fbUser.email || "",
         emailVerified: fbUser.emailVerified,
         photoURL: fbUser.photoURL || "",
+        ...(userDoc || {}),
       };
+
+      currentUser.photoURL =
+        (userDoc && userDoc.photoURL) || fbUser.photoURL || "";
 
       renderAll(currentUser);
     });
