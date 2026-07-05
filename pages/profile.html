@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile | Employee Management System</title>
+
+    <!-- Shared dashboard theme variables + this page's styles -->
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/profile.css" />
+
+    <!-- Remix Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by JS -->
+          </ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <!-- ============ USER / PROFILE ============ -->
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+              id="sidebarAvatar"
+            />
+            <div class="user__info">
+              <p class="user__name" id="sidebarUserName">Loading…</p>
+              <p class="user__role" id="sidebarUserRole">—</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i>
+                <span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i>
+                <span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i>
+                <span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- overlay for mobile sidebar -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" placeholder="Search anything..." />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">3</span>
+            </button>
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              class="topbar__avatar"
+              id="topbarAvatar"
+              alt="User avatar"
+            />
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <a href="./dashboard.html" class="back-link">
+                <i class="ri-arrow-left-line"></i>
+                <span>Back to Dashboard</span>
+              </a>
+              <h2>My Profile</h2>
+              <p>Manage your personal and professional information.</p>
+            </div>
+            <button class="btn btn--primary" id="editProfileBtn">
+              <i class="ri-edit-2-line"></i>
+              Edit Profile
+            </button>
+          </div>
+
+          <div class="profile-layout">
+            <!-- ============ LEFT / MAIN COLUMN ============ -->
+            <div class="profile-main">
+              <!-- Hero card -->
+              <section class="card hero-card">
+                <div class="hero-card__photo-wrap">
+                  <img
+                    src="https://i.pravatar.cc/200?img=13"
+                    alt="Profile photo"
+                    class="hero-card__photo"
+                    id="profilePhoto"
+                  />
+                  <button
+                    class="hero-card__camera-btn"
+                    id="uploadPhotoBtn"
+                    type="button"
+                    aria-label="Change profile photo"
+                  >
+                    <i class="ri-camera-fill"></i>
+                  </button>
+                  <input type="file" id="photoInput" accept="image/*" hidden />
+                </div>
+
+                <div class="hero-card__info">
+                  <div class="hero-card__name-row">
+                    <h3 id="profileName">—</h3>
+                    <i
+                      class="ri-verified-badge-fill hero-card__verified"
+                      id="verifiedBadge"
+                      title="Verified account"
+                    ></i>
+                  </div>
+                  <p class="hero-card__title" id="profileJobTitle">—</p>
+
+                  <div class="hero-card__contact">
+                    <span
+                      ><i class="ri-mail-line"></i
+                      ><span id="profileEmail">—</span></span
+                    >
+                    <span
+                      ><i class="ri-phone-line"></i
+                      ><span id="profilePhone">—</span></span
+                    >
+                    <span
+                      ><i class="ri-map-pin-line"></i
+                      ><span id="profileLocation">—</span></span
+                    >
+                  </div>
+
+                  <div class="hero-card__chips">
+                    <div class="hero-chip">
+                      <span class="hero-chip__label">Employee ID</span>
+                      <span class="hero-chip__value" id="profileEmployeeId"
+                        >—</span
+                      >
+                    </div>
+                    <div class="hero-chip">
+                      <span class="hero-chip__label">Joining Date</span>
+                      <span class="hero-chip__value" id="profileJoiningDate"
+                        >—</span
+                      >
+                    </div>
+                    <div class="hero-chip">
+                      <span class="hero-chip__label">Status</span>
+                      <span
+                        class="status-pill status-pill--active"
+                        id="profileStatus"
+                        >Active</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Personal Information -->
+              <section class="card">
+                <div class="card__head">
+                  <h3><i class="ri-user-3-line"></i> Personal Information</h3>
+                </div>
+                <div class="info-grid" id="personalInfoGrid">
+                  <!-- injected by JS -->
+                </div>
+              </section>
+
+              <!-- Employment Details -->
+              <section class="card">
+                <div class="card__head">
+                  <h3>
+                    <i class="ri-briefcase-4-line"></i> Employment Details
+                  </h3>
+                </div>
+                <div class="info-grid" id="employmentInfoGrid">
+                  <!-- injected by JS -->
+                </div>
+              </section>
+
+              <!-- Address -->
+              <section class="card">
+                <div class="card__head">
+                  <h3><i class="ri-home-4-line"></i> Address</h3>
+                </div>
+                <div class="info-grid" id="addressInfoGrid">
+                  <!-- injected by JS -->
+                </div>
+              </section>
+            </div>
+
+            <!-- ============ RIGHT SIDEBAR ============ -->
+            <aside class="profile-side">
+              <!-- Profile completion -->
+              <section class="card completion-card">
+                <div class="completion-ring-wrap">
+                  <svg class="completion-ring" viewBox="0 0 120 120">
+                    <circle
+                      class="completion-ring__bg"
+                      cx="60"
+                      cy="60"
+                      r="52"
+                    />
+                    <circle
+                      class="completion-ring__fg"
+                      id="completionRingFg"
+                      cx="60"
+                      cy="60"
+                      r="52"
+                    />
+                  </svg>
+                  <div class="completion-ring__label">
+                    <strong id="completionPercent">0%</strong>
+                  </div>
+                </div>
+                <p class="completion-card__title">Complete your profile</p>
+                <p class="completion-card__sub" id="completionSub">
+                  Add more information to get 100%
+                </p>
+                <button class="btn btn--primary btn--block" id="completeNowBtn">
+                  Complete Now
+                </button>
+              </section>
+
+              <!-- Skills -->
+              <section class="card">
+                <div class="card__head">
+                  <h3>Skills</h3>
+                  <a href="#" class="link">View All</a>
+                </div>
+                <div class="skills-wrap" id="skillsWrap">
+                  <!-- injected by JS -->
+                </div>
+              </section>
+
+              <!-- Account settings -->
+              <section class="card">
+                <div class="card__head">
+                  <h3>Account Settings</h3>
+                </div>
+                <ul class="settings-list" id="settingsList">
+                  <!-- injected by JS -->
+                </ul>
+              </section>
+
+              <!-- Recent activity -->
+              <section class="card">
+                <div class="card__head">
+                  <h3>Recent Activity</h3>
+                  <a href="#" class="link">View All</a>
+                </div>
+                <ul class="profile-activity-list" id="profileActivityList">
+                  <!-- injected by JS -->
+                </ul>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============ EDIT PROFILE MODAL ============ -->
+    <div class="modal-overlay" id="editModalOverlay">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="editModalTitle"
+      >
+        <div class="modal__head">
+          <h3 id="editModalTitle">
+            <i class="ri-edit-2-line"></i> Edit Profile
+          </h3>
+          <button
+            class="icon-btn modal__close"
+            id="closeEditModal"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="editProfileForm" class="modal__body">
+          <p class="modal__section-title">Personal Information</p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>First Name</span>
+              <input type="text" name="firstName" required />
+            </label>
+            <label class="form-field">
+              <span>Last Name</span>
+              <input type="text" name="lastName" required />
+            </label>
+            <label class="form-field">
+              <span>Email Address</span>
+              <input type="email" name="email" required />
+            </label>
+            <label class="form-field">
+              <span>Phone Number</span>
+              <input type="tel" name="phone" />
+            </label>
+            <label class="form-field">
+              <span>Gender</span>
+              <select name="gender">
+                <option value="">Select…</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Date of Birth</span>
+              <input type="date" name="dob" />
+            </label>
+            <label class="form-field">
+              <span>Nationality</span>
+              <input type="text" name="nationality" />
+            </label>
+            <label class="form-field">
+              <span>Marital Status</span>
+              <select name="maritalStatus">
+                <option value="">Select…</option>
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="modal__section-title">Employment Details</p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Job Title</span>
+              <input type="text" name="jobTitle" />
+            </label>
+            <label class="form-field">
+              <span>Department</span>
+              <input type="text" name="department" />
+            </label>
+            <label class="form-field">
+              <span>Reporting Manager</span>
+              <input type="text" name="reportingManager" />
+            </label>
+            <label class="form-field">
+              <span>Employment Type</span>
+              <select name="employmentType">
+                <option value="">Select…</option>
+                <option value="Full Time">Full Time</option>
+                <option value="Part Time">Part Time</option>
+                <option value="Contract">Contract</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="modal__section-title">Address</p>
+          <div class="form-grid">
+            <label class="form-field form-field--full">
+              <span>Street Address</span>
+              <input type="text" name="addressLine1" />
+            </label>
+            <label class="form-field">
+              <span>City</span>
+              <input type="text" name="city" />
+            </label>
+            <label class="form-field">
+              <span>State</span>
+              <input type="text" name="state" />
+            </label>
+            <label class="form-field">
+              <span>Zip Code</span>
+              <input type="text" name="zipCode" />
+            </label>
+          </div>
+        </form>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="cancelEditBtn">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="editProfileForm"
+            class="btn btn--primary"
+            id="saveEditBtn"
+          >
+            <i class="ri-save-3-line"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- script files -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/profile.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

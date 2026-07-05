@@ -203,14 +203,17 @@ export function setupUserMenu() {
 
       switch (action) {
         case "profile":
-          console.log("Navigate to: View Profile");
+          window.location.href = "./profile.html";
           break;
+
         case "password":
-          console.log("Navigate to: Change Password");
+          window.location.href = "./change-password.html";
           break;
+
         case "help":
-          console.log("Navigate to: Help Center");
+          window.location.href = "./help.html";
           break;
+
         case "logout":
           handleLogout();
           break;

@@ -1,0 +1,561 @@
+/* ==========================================================
+   PROFILE PAGE — builds on top of dashboard.css variables
+========================================================== */
+
+.content {
+  padding-top: 14px;
+}
+
+.page-head {
+  margin-bottom: 4px;
+}
+
+/* ---------- Back to dashboard link (above page heading) ---------- */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--panel-light-text-muted);
+  white-space: nowrap;
+  margin-bottom: 10px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}
+
+.back-link i {
+  font-size: 16px;
+}
+
+.topbar__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--panel-light-border);
+}
+
+/* ---------- Two column profile layout ---------- */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.profile-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ---------- Hero card ---------- */
+.hero-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+  background: linear-gradient(160deg, var(--color-info-bg) 0%, var(--panel-light-bg) 55%);
+}
+
+.hero-card__photo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hero-card__photo {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--panel-light-bg);
+  box-shadow: var(--shadow-card);
+}
+
+.hero-card__camera-btn {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 3px solid var(--panel-light-bg);
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s;
+}
+
+.hero-card__camera-btn:hover {
+  transform: scale(1.08);
+}
+
+.hero-card__info {
+  flex: 1;
+  min-width: 260px;
+}
+
+.hero-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-card__name-row h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--panel-light-text);
+}
+
+.hero-card__verified {
+  color: var(--color-primary);
+  font-size: 20px;
+}
+
+.hero-card__title {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.hero-card__contact {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.hero-card__contact span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--panel-light-text-muted);
+  font-weight: 500;
+}
+
+.hero-card__contact i {
+  color: var(--color-primary);
+  font-size: 16px;
+}
+
+.hero-card__chips {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.hero-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-chip__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--panel-light-text-muted);
+  font-weight: 700;
+}
+
+.hero-chip__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--panel-light-text);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.status-pill--active {
+  background: var(--stat-green-bg);
+  color: var(--stat-green);
+}
+
+.status-pill--inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+/* ---------- Info grids (personal / employment / address) ---------- */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 32px;
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-field__label {
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  font-weight: 600;
+}
+
+.info-field__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--panel-light-text);
+}
+
+/* ---------- Profile completion ring ---------- */
+.completion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.completion-ring-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+}
+
+.completion-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.completion-ring__bg {
+  fill: none;
+  stroke: var(--panel-light-border);
+  stroke-width: 10;
+}
+
+.completion-ring__fg {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 326.7;
+  stroke-dashoffset: 326.7;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.completion-ring__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completion-ring__label strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--panel-light-text);
+}
+
+.completion-card__title {
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.completion-card__sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 18px;
+}
+
+/* ---------- Skills ---------- */
+.skills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-chip {
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--color-info-bg);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.skill-chip--more {
+  background: var(--panel-light-input-bg);
+  color: var(--panel-light-text-muted);
+}
+
+/* ---------- Account settings list ---------- */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-list__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 6px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--panel-light-text);
+  border-bottom: 1px solid var(--panel-light-border);
+}
+
+.settings-list__item:last-child {
+  border-bottom: none;
+}
+
+.settings-list__item:hover {
+  color: var(--color-primary);
+  background: var(--color-info-bg);
+}
+
+.settings-list__item i:first-child {
+  font-size: 17px;
+  color: var(--panel-light-text-muted);
+  width: 18px;
+}
+
+.settings-list__item:hover i:first-child {
+  color: var(--color-primary);
+}
+
+.settings-list__item span {
+  flex: 1;
+}
+
+.settings-list__item .chip-enabled {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-success);
+  background: var(--stat-green-bg);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.settings-list__item .ri-arrow-right-s-line {
+  color: var(--panel-light-text-muted);
+  font-size: 16px;
+}
+
+.settings-list__item--danger span,
+.settings-list__item--danger i:first-child {
+  color: var(--color-error);
+}
+
+/* ---------- Recent activity (profile) ---------- */
+.profile-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.profile-activity-item__dot {
+  margin-top: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.profile-activity-item__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--panel-light-text);
+}
+
+.profile-activity-item__time {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--panel-light-text-muted);
+}
+
+/* ==========================================================
+   EDIT PROFILE MODAL
+========================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 26, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-light-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--panel-light-border);
+  box-shadow: var(--shadow-pop);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--panel-light-border);
+  flex-shrink: 0;
+}
+
+.modal__head h3 {
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal__body {
+  padding: 24px 26px;
+  overflow-y: auto;
+}
+
+.modal__section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  margin: 22px 0 14px;
+}
+
+.modal__section-title:first-child {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
+.form-field span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--panel-light-text-muted);
+}
+
+.form-field input,
+.form-field select {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-light-border);
+  background: var(--panel-light-input-bg);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--panel-light-text);
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: var(--color-primary);
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 26px;
+  border-top: 1px solid var(--panel-light-border);
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+@media (max-width: 1180px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-card__contact,
+  .hero-card__chips {
+    justify-content: center;
+  }
+
+  .info-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .back-link span {
+    display: none;
+  }
+}
