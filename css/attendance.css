@@ -1,0 +1,252 @@
+.att-hidden {
+  display: none !important;
+}
+
+#attContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.att-stats-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* =========================================================
+   TOOLBAR (search + filters + export)
+========================================================= */
+.att-toolbar-card {
+  padding: 18px 24px;
+}
+
+.att-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.att-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+  flex: 1;
+  min-width: 240px;
+}
+
+.att-search i {
+  color: var(--panel-light-text-muted);
+}
+
+.att-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  width: 100%;
+  color: var(--panel-light-text);
+}
+
+.att-select {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-light-border);
+  background: var(--panel-light-input-bg);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--panel-light-text);
+  cursor: pointer;
+}
+
+.att-export-group {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.att-export-group .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+.att-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* =========================================================
+   STATUS BADGES (attendance-specific)
+========================================================= */
+.status-badge.present {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--color-success);
+}
+
+.status-badge.absent {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-error);
+}
+
+.status-badge.late {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.status-badge.halfday {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.status-badge.onleave {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+.att-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 24px;
+  gap: 8px;
+}
+
+.att-empty-state i {
+  font-size: 48px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 8px;
+}
+
+.att-empty-state h4 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.att-empty-state p {
+  font-size: 13px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   CALCULATION PREVIEW (modal)
+========================================================= */
+.att-calc-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  font-size: 13px;
+  color: var(--color-info-text);
+  height: 100%;
+}
+
+.att-calc-preview strong {
+  font-weight: 800;
+}
+
+/* =========================================================
+   SKELETON LOADER
+========================================================= */
+.att-skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.att-skeleton-wrap .skeleton-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+
+.att-skeleton-wrap .skeleton {
+  border-radius: 22px;
+  background: linear-gradient(
+    90deg,
+    var(--panel-light-input-bg) 25%,
+    var(--panel-light-border) 50%,
+    var(--panel-light-input-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: att-shimmer 1.4s infinite;
+}
+
+@keyframes att-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.att-skeleton-wrap .skeleton--stat {
+  height: 120px;
+}
+
+.att-skeleton-wrap .skeleton--table {
+  height: 400px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1400px) {
+  .att-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .att-skeleton-wrap .skeleton-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 991px) {
+  .att-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .att-export-group {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .att-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .att-skeleton-wrap .skeleton-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .att-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .att-skeleton-wrap .skeleton-row {
+    grid-template-columns: 1fr;
+  }
+}
