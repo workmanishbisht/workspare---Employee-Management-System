@@ -21,7 +21,7 @@
         <div class="sidebar__brand">
           <div class="brand__icon"><i class="ri-team-fill"></i></div>
           <div class="brand__text">
-            <h1>EMS</h1>
+            <h1>Workspare</h1>
             <p>Employee Management System</p>
           </div>
         </div>
@@ -99,8 +99,8 @@
                 class="user-menu__item user-menu__item--danger"
                 data-action="logout"
               >
-                <i class="ri-logout-box-r-line" style="color: #cf2626;"></i>
-                <span style="color: #cf2626;">Logout</span>
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
               </button>
             </li>
           </ul>
@@ -167,10 +167,11 @@
               </h2>
               <p>Here's what's happening in your organization today.</p>
             </div>
-            <div class="date-picker">
+            <label class="date-picker" for="dateInput">
               <i class="ri-calendar-2-line"></i>
               <span id="currentDate">04 July, 2026</span>
-            </div>
+              <input type="date" id="dateInput" class="date-picker__input" />
+            </label>
           </div>
 
           <!-- Stat cards -->
@@ -203,7 +204,7 @@
 
             <div class="card dept-card">
               <div class="card__head">
-                <h3>Employees by Department</h3>
+                <h3>Employees by Role</h3>
                 <i class="ri-sparkling-2-fill dept-card__sparkle"></i>
               </div>
               <div class="dept-card__body">
@@ -264,6 +265,7 @@
     <!-- script files -->
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script type="module" src="../js/layout.js"></script>
     <script type="module" src="../js/dashboard.js"></script>
     <script src="../js/theme.js"></script>
   </body>

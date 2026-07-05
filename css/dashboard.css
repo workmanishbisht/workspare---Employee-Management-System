@@ -73,6 +73,7 @@
   --space-12: 48px;
 
   --sidebar-width: 272px;
+  --sidebar-width-collapsed: 88px;
 
   --transition-fast: 0.18s ease;
   --transition-base: 0.28s ease;
@@ -188,6 +189,7 @@ img {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   min-height: 100vh;
+  transition: grid-template-columns var(--transition-base);
 }
 
 .main {
@@ -558,6 +560,46 @@ img {
 }
 
 /* =========================================================
+   SIDEBAR COLLAPSE (desktop, icon-only)
+========================================================= */
+.app.sidebar-collapsed {
+  grid-template-columns: var(--sidebar-width-collapsed) 1fr;
+}
+
+.sidebar-collapsed .sidebar {
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+.sidebar-collapsed .sidebar__brand {
+  justify-content: center;
+}
+
+.sidebar-collapsed .brand__text,
+.sidebar-collapsed .nav-item span,
+.sidebar-collapsed .sidebar__upgrade,
+.sidebar-collapsed .user__info,
+.sidebar-collapsed .user__chevron {
+  display: none;
+}
+
+.sidebar-collapsed .nav-item {
+  justify-content: center;
+  padding: 13px 0;
+}
+
+.sidebar-collapsed .sidebar__user {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar-collapsed .user-menu {
+  left: calc(100% + 10px);
+  bottom: 0;
+  width: 240px;
+}
+
+/* =========================================================
    TOPBAR
 ========================================================= */
 .topbar {
@@ -575,7 +617,7 @@ img {
 }
 
 .topbar__menu {
-  display: none;
+  display: flex;
   width: 42px;
   height: 42px;
   align-items: center;
@@ -771,7 +813,11 @@ img {
   color: var(--panel-light-text-muted);
 }
 
+/* =========================================================
+   DATE PICKER
+========================================================= */
 .date-picker {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -782,10 +828,30 @@ img {
   box-shadow: var(--shadow-soft);
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.date-picker:hover {
+  border-color: var(--color-primary);
 }
 
 .date-picker i {
   color: var(--color-primary);
+  pointer-events: none;
+}
+
+.date-picker span {
+  pointer-events: none;
+}
+
+.date-picker__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
 }
 
 /* =========================================================
@@ -860,6 +926,24 @@ html.dark-theme .card:hover {
 
 .link:hover {
   text-decoration: underline;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+.empty-state {
+  font-size: 13px;
+  color: var(--panel-light-text-muted);
+  line-height: 1.6;
+  padding: 12px 0;
+}
+
+.empty-state code {
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 12px;
 }
 
 /* =========================================================
@@ -940,12 +1024,6 @@ html.dark-theme .stat-card:hover {
   background: var(--stat-orange);
 }
 
-.stat-card__menu {
-  font-size: 20px;
-  color: var(--panel-light-text-muted);
-  cursor: pointer;
-}
-
 .stat-card__label {
   font-size: 13px;
   color: var(--panel-light-text-muted);
@@ -981,11 +1059,8 @@ html.dark-theme .stat-card:hover {
 .stat-card__change.down {
   color: var(--color-error);
 }
-
-.stat-card__spark {
-  width: 84px;
-  height: 32px;
-  flex-shrink: 0;
+.stat-card__change.neutral {
+  color: var(--panel-light-text-muted);
 }
 
 /* =========================================================
@@ -1384,6 +1459,66 @@ html.dark-theme .stat-card:hover {
 }
 
 /* =========================================================
+   TOAST NOTIFICATION
+========================================================= */
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 360px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--panel-light-bg);
+  border: 1px solid var(--panel-light-border);
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast i {
+  flex-shrink: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.toast span {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--panel-light-text);
+  line-height: 1.5;
+}
+
+.toast-success {
+  border-left: 3px solid var(--color-success);
+}
+
+.toast-success i {
+  color: var(--color-success);
+}
+
+.toast-error {
+  border-left: 3px solid var(--color-error);
+}
+
+.toast-error i {
+  color: var(--color-error);
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 @media (max-width: 1400px) {
@@ -1410,7 +1545,8 @@ html.dark-theme .stat-card:hover {
 }
 
 @media (max-width: 991px) {
-  .app {
+  .app,
+  .app.sidebar-collapsed {
     grid-template-columns: 1fr;
   }
 
@@ -1430,16 +1566,20 @@ html.dark-theme .stat-card:hover {
     transform: translateX(0);
   }
 
+  .sidebar-collapsed .brand__text,
+  .sidebar-collapsed .nav-item span,
+  .sidebar-collapsed .sidebar__upgrade,
+  .sidebar-collapsed .user__info,
+  .sidebar-collapsed .user__chevron {
+    display: block;
+  }
+
   .main {
     width: 100%;
   }
 
   .topbar {
     padding: 0 20px;
-  }
-
-  .topbar__menu {
-    display: flex;
   }
 
   .content {

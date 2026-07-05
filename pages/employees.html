@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employees | Employee Management System</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/employees.css" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by JS -->
+          </ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Employee</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i>
+                <span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i>
+                <span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i>
+                <span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="employeeSearchInput"
+              placeholder="Search employees by name, email, department..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h2>Employees</h2>
+              <p>Manage every employee record in your organization.</p>
+            </div>
+            <button class="btn btn--primary" id="openAddEmployeeBtn">
+              <i class="ri-user-add-line"></i>
+              Add Employee
+            </button>
+          </div>
+
+          <!-- Employees table -->
+          <section class="card employees-table-card">
+            <div class="table-scroll">
+              <table class="employees-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Joining Date</th>
+                    <th>Salary</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="employeesTableBody">
+                  <!-- injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============ ADD / EDIT EMPLOYEE MODAL ============ -->
+    <div class="modal-overlay" id="employeeModalOverlay">
+      <div class="modal" id="employeeModal">
+        <div class="modal__head">
+          <h3 id="employeeModalTitle">Add Employee</h3>
+          <button class="modal__close" id="closeEmployeeModalBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="employeeForm" class="modal__form" novalidate>
+          <input type="hidden" id="employeeDocId" />
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="empFullName"
+                >Full Name</label
+              >
+              <input
+                id="empFullName"
+                class="form-field__input"
+                type="text"
+                placeholder="Enter full name"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="empEmail"
+                >Email Address</label
+              >
+              <input
+                id="empEmail"
+                class="form-field__input"
+                type="email"
+                placeholder="Enter email"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="empPhone">Phone</label>
+              <input
+                id="empPhone"
+                class="form-field__input"
+                type="tel"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="empDepartment"
+                >Department</label
+              >
+              <select id="empDepartment" class="form-field__input" required>
+                <option value="" disabled selected>Select department</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Design">Design</option>
+                <option value="Marketing">Marketing</option>
+                <option value="HR">HR</option>
+                <option value="Sales">Sales</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="empDesignation"
+                >Designation</label
+              >
+              <input
+                id="empDesignation"
+                class="form-field__input"
+                type="text"
+                placeholder="e.g. Software Engineer"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="empJoiningDate"
+                >Joining Date</label
+              >
+              <input
+                id="empJoiningDate"
+                class="form-field__input"
+                type="date"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="empSalary">Salary</label>
+              <input
+                id="empSalary"
+                class="form-field__input"
+                type="number"
+                min="0"
+                placeholder="Enter monthly salary"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="empStatus">Status</label>
+              <select id="empStatus" class="form-field__input" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="leave">On Leave</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label" for="empProfileImage"
+              >Profile Image URL (optional)</label
+            >
+            <input
+              id="empProfileImage"
+              class="form-field__input"
+              type="url"
+              placeholder="https://example.com/photo.jpg"
+            />
+          </div>
+
+          <div class="modal__actions">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              id="cancelEmployeeFormBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn--primary" id="saveEmployeeBtn">
+              <span id="saveEmployeeBtnText">Save Employee</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ DELETE CONFIRM MODAL ============ -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__head">
+          <h3>Remove Employee</h3>
+          <button class="modal__close" id="closeDeleteModalBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <p class="modal__text">
+          Are you sure you want to remove
+          <strong id="deleteEmployeeName">this employee</strong>? This action
+          cannot be undone.
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="cancelDeleteBtn">
+            Cancel
+          </button>
+          <button type="button" class="btn btn--danger" id="confirmDeleteBtn">
+            <i class="ri-delete-bin-line"></i>
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/employees.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>
