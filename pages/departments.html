@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Departments | Employee Management System</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/department.css" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList"></ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+              id="sidebarAvatar"
+            />
+            <div class="user__info">
+              <p class="user__name" id="sidebarUserName">Loading…</p>
+              <p class="user__role" id="sidebarUserRole">—</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button role="menuitem" class="user-menu__item" data-action="profile">
+                <i class="ri-user-3-line"></i>
+                <span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button role="menuitem" class="user-menu__item" data-action="password">
+                <i class="ri-lock-password-line"></i>
+                <span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button role="menuitem" class="user-menu__item" data-action="help">
+                <i class="ri-question-line"></i>
+                <span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button role="menuitem" class="user-menu__item user-menu__item--danger" data-action="logout">
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <header class="topbar">
+          <button class="icon-btn topbar__menu" id="menuToggle" aria-label="Toggle menu">
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="departmentSearchInput"
+              placeholder="Search departments by name, head, location..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle Theme">
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">3</span>
+            </button>
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              class="topbar__avatar"
+              id="topbarAvatar"
+              alt="User avatar"
+            />
+          </div>
+        </header>
+
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h2>Departments</h2>
+              <p>Manage all company departments, department heads, and employee distribution.</p>
+            </div>
+            <button class="btn btn--primary" id="addDepartmentBtn">
+              <i class="ri-add-line"></i>
+              Add Department
+            </button>
+          </div>
+
+          <!-- ============ STATS ============ -->
+          <div class="dept-stats-grid">
+            <div class="card stat-card">
+              <div class="stat-card__icon stat-card__icon--purple">
+                <i class="ri-building-4-line"></i>
+              </div>
+              <div class="stat-card__body">
+                <p class="stat-card__label">Total Departments</p>
+                <h3 class="stat-card__value" id="statTotalDepartments">0</h3>
+                <p class="stat-card__trend stat-card__trend--up" id="statTotalDepartmentsTrend">
+                  <i class="ri-arrow-up-line"></i> — from last month
+                </p>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card__icon stat-card__icon--green">
+                <i class="ri-group-line"></i>
+              </div>
+              <div class="stat-card__body">
+                <p class="stat-card__label">Total Employees</p>
+                <h3 class="stat-card__value" id="statTotalEmployees">0</h3>
+                <p class="stat-card__trend stat-card__trend--up" id="statTotalEmployeesTrend">
+                  <i class="ri-arrow-up-line"></i> — from last month
+                </p>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card__icon stat-card__icon--orange">
+                <i class="ri-checkbox-circle-line"></i>
+              </div>
+              <div class="stat-card__body">
+                <p class="stat-card__label">Active Departments</p>
+                <h3 class="stat-card__value" id="statActiveDepartments">0</h3>
+                <p class="stat-card__trend stat-card__trend--up" id="statActiveDepartmentsTrend">
+                  <i class="ri-arrow-up-line"></i> — from last month
+                </p>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card__icon stat-card__icon--blue">
+                <i class="ri-user-star-line"></i>
+              </div>
+              <div class="stat-card__body">
+                <p class="stat-card__label">Department Heads</p>
+                <h3 class="stat-card__value" id="statDepartmentHeads">0</h3>
+                <p class="stat-card__trend stat-card__trend--up" id="statDepartmentHeadsTrend">
+                  <i class="ri-arrow-up-line"></i> — from last month
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ TOOLBAR ============ -->
+          <div class="card dept-toolbar">
+            <div class="search-box search-box--inline">
+              <i class="ri-search-line"></i>
+              <input type="text" id="departmentTableSearch" placeholder="Search departments..." />
+            </div>
+
+            <label class="dept-filter">
+              <span>Status</span>
+              <select id="statusFilter">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </label>
+
+            <label class="dept-filter">
+              <span>Department Type</span>
+              <select id="typeFilter">
+                <option value="">All Types</option>
+              </select>
+            </label>
+
+            <label class="dept-filter">
+              <span>Sort By</span>
+              <select id="sortFilter">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="name-asc">Name (A–Z)</option>
+                <option value="name-desc">Name (Z–A)</option>
+                <option value="employees-desc">Most Employees</option>
+              </select>
+            </label>
+
+            <button class="btn btn--ghost" id="resetFiltersBtn">
+              <i class="ri-filter-off-line"></i>
+              Reset Filter
+            </button>
+          </div>
+
+          <!-- ============ TABLE ============ -->
+          <div class="card dept-table-card">
+            <div class="table-wrap">
+              <table class="dept-table">
+                <thead>
+                  <tr>
+                    <th>Department</th>
+                    <th>Department Head</th>
+                    <th>Employees</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th class="dept-table__actions-head">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="departmentsTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Skeleton loading -->
+            <div class="dept-skeleton" id="departmentsSkeleton">
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="dept-empty-state" id="departmentsEmptyState" hidden>
+              <div class="dept-empty-state__icon">
+                <i class="ri-building-4-line"></i>
+              </div>
+              <h3>No Departments Found</h3>
+              <p>Create your first department to get started.</p>
+              <button class="btn btn--primary" id="emptyStateAddBtn">
+                <i class="ri-add-line"></i>
+                Add Department
+              </button>
+            </div>
+
+            <!-- Pagination -->
+            <div class="dept-pagination" id="departmentsPagination">
+              <p class="dept-pagination__info" id="paginationInfo">Showing 0 of 0 departments</p>
+              <div class="dept-pagination__controls" id="paginationControls"></div>
+              <label class="dept-pagination__page-size">
+                <select id="pageSizeSelect">
+                  <option value="10">10 / page</option>
+                  <option value="25">25 / page</option>
+                  <option value="50">50 / page</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============ ADD / EDIT DEPARTMENT MODAL ============ -->
+    <div class="modal-overlay" id="departmentModalOverlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="departmentModalTitle">
+        <div class="modal__head">
+          <h3 id="departmentModalTitle">
+            <i class="ri-building-4-line"></i>
+            Add Department
+          </h3>
+          <button class="icon-btn modal__close" id="closeDepartmentModal" aria-label="Close">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="departmentForm" class="modal__body">
+          <input type="hidden" name="id" />
+
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Department Name</span>
+              <input type="text" name="departmentName" required placeholder="e.g. Engineering" />
+            </label>
+            <label class="form-field">
+              <span>Department Code</span>
+              <input type="text" name="departmentCode" required placeholder="e.g. ENG" />
+            </label>
+            <label class="form-field">
+              <span>Department Head</span>
+              <input type="text" name="departmentHead" placeholder="e.g. Rohan Kumar" />
+            </label>
+            <label class="form-field">
+              <span>Office Location</span>
+              <input type="text" name="location" placeholder="e.g. Bangalore, India" />
+            </label>
+            <label class="form-field">
+              <span>Department Email</span>
+              <input type="email" name="email" placeholder="e.g. engineering@company.com" />
+            </label>
+            <label class="form-field">
+              <span>Phone Number</span>
+              <input type="tel" name="phone" placeholder="e.g. +91 98765 43210" />
+            </label>
+            <label class="form-field">
+              <span>Status</span>
+              <select name="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Department Icon</span>
+              <select name="icon">
+                <option value="ri-code-s-slash-line">Engineering</option>
+                <option value="ri-team-line">HR / People</option>
+                <option value="ri-line-chart-line">Marketing</option>
+                <option value="ri-money-dollar-circle-line">Finance</option>
+                <option value="ri-pencil-ruler-2-line">Design</option>
+                <option value="ri-customer-service-2-line">Support</option>
+                <option value="ri-briefcase-4-line">General</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Department Color</span>
+              <select name="color">
+                <option value="#6d5bf6">Purple</option>
+                <option value="#ec4899">Pink</option>
+                <option value="#f97316">Orange</option>
+                <option value="#3b82f6">Blue</option>
+                <option value="#14b8a6">Teal</option>
+                <option value="#8b5cf6">Indigo</option>
+              </select>
+            </label>
+            <label class="form-field form-field--full">
+              <span>Description</span>
+              <input type="text" name="description" placeholder="Short description of the department" />
+            </label>
+          </div>
+        </form>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="cancelDepartmentBtn">Cancel</button>
+          <button type="submit" form="departmentForm" class="btn btn--primary" id="saveDepartmentBtn">
+            <i class="ri-save-3-line"></i>
+            Create Department
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DELETE DEPARTMENT CONFIRMATION MODAL ============ -->
+    <div class="modal-overlay modal-overlay--confirm" id="deleteDepartmentModalOverlay">
+      <div
+        class="modal modal--confirm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteDepartmentModalTitle"
+        aria-describedby="deleteDepartmentModalDesc"
+      >
+        <div class="confirm-modal__icon-wrap">
+          <i class="ri-delete-bin-6-line confirm-modal__icon"></i>
+        </div>
+
+        <h3 id="deleteDepartmentModalTitle" class="confirm-modal__title">Delete Department</h3>
+
+        <p id="deleteDepartmentModalDesc" class="confirm-modal__desc">
+          Are you sure you want to delete <strong id="deleteDepartmentName">this department</strong>?<br />
+          This action cannot be undone.
+        </p>
+
+        <div class="confirm-modal__actions">
+          <button type="button" class="btn btn--ghost btn--block" id="cancelDeleteDepartmentBtn">
+            No, Cancel
+          </button>
+          <button type="button" class="btn btn--danger btn--block" id="confirmDeleteDepartmentBtn">
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/department.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

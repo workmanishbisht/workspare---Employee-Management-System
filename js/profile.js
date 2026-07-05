@@ -1,6 +1,3 @@
-/* ==========================================================
-PROFILE.JS
-========================================================== */
 import { db } from "../firebase/firebase.js";
 import {
   doc,
@@ -34,7 +31,7 @@ import {
   /* =========================================================
      FIELDS TRACKED FOR PROFILE COMPLETION %
   ========================================================= */
-  const COMPLETION_FIELDS = [
+  const TOP_LEVEL_FIELDS = [
     "firstName",
     "lastName",
     "email",
@@ -43,18 +40,25 @@ import {
     "dob",
     "nationality",
     "maritalStatus",
-    "jobTitle",
-    "department",
-    "employeeId",
-    "joiningDate",
-    "employmentType",
-    "reportingManager",
     "addressLine1",
     "city",
     "state",
     "zipCode",
     "photoURL",
     "skills",
+  ];
+
+  const EMPLOYMENT_KEYS = [
+    "employeeId",
+    "department",
+    "designation",
+    "reportingManager",
+    "employmentType",
+    "joiningDate",
+    "role",
+    "status",
+    "officeLocation",
+    "currentProject",
   ];
 
   const ROLE_LABELS = {
@@ -100,12 +104,21 @@ import {
      PROFILE COMPLETION %
   ========================================================= */
   function computeCompletion(user) {
-    const filled = COMPLETION_FIELDS.filter((key) => {
-      const val = user[key];
+    const hasValue = (val) => {
       if (Array.isArray(val)) return val.length > 0;
       return val !== undefined && val !== null && String(val).trim() !== "";
-    }).length;
-    return Math.round((filled / COMPLETION_FIELDS.length) * 100);
+    };
+
+    const emp = user.employment || {};
+    const topFilled = TOP_LEVEL_FIELDS.filter((key) =>
+      hasValue(user[key]),
+    ).length;
+    const empFilled = EMPLOYMENT_KEYS.filter((key) =>
+      hasValue(emp[key]),
+    ).length;
+    const total = TOP_LEVEL_FIELDS.length + EMPLOYMENT_KEYS.length;
+
+    return Math.round(((topFilled + empFilled) / total) * 100);
   }
 
   function renderCompletion(percent) {
@@ -114,7 +127,7 @@ import {
     const sub = $("#completionSub");
     if (!fg || !label) return;
 
-    const circumference = 2 * Math.PI * 52; // r=52
+    const circumference = 2 * Math.PI * 52;
     const offset = circumference - (percent / 100) * circumference;
     fg.style.strokeDasharray = `${circumference}`;
     fg.style.strokeDashoffset = `${offset}`;
@@ -143,23 +156,25 @@ import {
     const verifiedEl = $("#verifiedBadge");
     const photoEl = $("#profilePhoto");
 
+    const emp = user.employment || {};
+
     const fullName =
       [user.firstName, user.lastName].filter(Boolean).join(" ") ||
       user.fullName ||
       "Unnamed Employee";
 
     if (nameEl) nameEl.textContent = fullName;
-    if (jobEl) jobEl.textContent = user.jobTitle || "No title set";
+    if (jobEl) jobEl.textContent = emp.designation || "No title set";
     if (emailEl) emailEl.textContent = user.email || "—";
     if (phoneEl) phoneEl.textContent = user.phone || "Not added";
     if (locationEl) {
       const loc = [user.city, user.state].filter(Boolean).join(", ");
       locationEl.textContent = loc || "Not added";
     }
-    if (empIdEl) empIdEl.textContent = user.employeeId || "—";
+    if (empIdEl) empIdEl.textContent = emp.employeeId || "—";
     if (joinEl) {
-      joinEl.textContent = user.joiningDate
-        ? new Date(user.joiningDate).toLocaleDateString("en-GB", {
+      joinEl.textContent = emp.joiningDate
+        ? new Date(emp.joiningDate).toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
             year: "numeric",
@@ -167,8 +182,8 @@ import {
         : "—";
     }
     if (statusEl) {
-      const active = (user.status || "active").toLowerCase() === "active";
-      statusEl.textContent = capitalize(user.status || "Active");
+      const active = (emp.status || "active").toLowerCase() === "active";
+      statusEl.textContent = capitalize(emp.status || "Active");
       statusEl.className = `status-pill ${
         active ? "status-pill--active" : "status-pill--inactive"
       }`;
@@ -176,7 +191,6 @@ import {
     if (verifiedEl) verifiedEl.style.display = user.emailVerified ? "" : "none";
     if (photoEl && user.photoURL) photoEl.src = user.photoURL;
 
-    // keep sidebar + topbar avatar in sync
     const sidebarAvatar = $("#sidebarAvatar");
     const topbarAvatar = $("#topbarAvatar");
     if (sidebarAvatar && user.photoURL) sidebarAvatar.src = user.photoURL;
@@ -186,7 +200,8 @@ import {
     const sidebarRole = $("#sidebarUserRole");
     if (sidebarName) sidebarName.textContent = fullName;
     if (sidebarRole)
-      sidebarRole.textContent = ROLE_LABELS[user.role] || capitalize(user.role || "Employee");
+      sidebarRole.textContent =
+        ROLE_LABELS[emp.role] || capitalize(emp.role || "Employee");
   }
 
   /* =========================================================
@@ -229,24 +244,30 @@ import {
   }
 
   function renderEmploymentInfo(user) {
+    const emp = user.employment || {};
     renderInfoGrid("#employmentInfoGrid", [
-      { label: "Department", value: user.department },
-      { label: "Designation", value: user.jobTitle },
-      { label: "Employee ID", value: user.employeeId },
-      { label: "Reporting Manager", value: user.reportingManager },
-      { label: "Employment Type", value: user.employmentType },
+      { label: "Department", value: emp.department },
+      { label: "Designation", value: emp.designation },
+      { label: "Employee ID", value: emp.employeeId },
+      { label: "Reporting Manager", value: emp.reportingManager },
+      { label: "Employment Type", value: emp.employmentType },
       {
         label: "Joining Date",
-        value: user.joiningDate
-          ? new Date(user.joiningDate).toLocaleDateString("en-GB", {
+        value: emp.joiningDate
+          ? new Date(emp.joiningDate).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
             })
           : "",
       },
-      { label: "Status", value: capitalize(user.status || "Active") },
-      { label: "Role", value: ROLE_LABELS[user.role] || capitalize(user.role || "Employee") },
+      { label: "Status", value: capitalize(emp.status || "Active") },
+      {
+        label: "Role",
+        value: ROLE_LABELS[emp.role] || capitalize(emp.role || "Employee"),
+      },
+      { label: "Office Location", value: emp.officeLocation },
+      { label: "Current Project", value: emp.currentProject },
     ]);
   }
 
@@ -289,16 +310,29 @@ import {
     if (!list) return;
 
     const items = [
-      { icon: "ri-lock-password-line", label: "Change Password", action: "password" },
+      {
+        icon: "ri-lock-password-line",
+        label: "Change Password",
+        action: "password",
+      },
       {
         icon: "ri-shield-keyhole-line",
         label: "Two-Factor Authentication",
         action: "2fa",
         chip: user.twoFactorEnabled ? "Enabled" : null,
       },
-      { icon: "ri-mail-settings-line", label: "Email Notifications", action: "notifications" },
+      {
+        icon: "ri-mail-settings-line",
+        label: "Email Notifications",
+        action: "notifications",
+      },
       { icon: "ri-eye-off-line", label: "Privacy Settings", action: "privacy" },
-      { icon: "ri-delete-bin-6-line", label: "Delete Account", action: "delete", danger: true },
+      {
+        icon: "ri-delete-bin-6-line",
+        label: "Delete Account",
+        action: "delete",
+        danger: true,
+      },
     ];
 
     list.innerHTML = items
@@ -316,18 +350,19 @@ import {
       .join("");
 
     list.querySelectorAll("[data-settings-action]").forEach((btn) => {
-      btn.addEventListener("click", () => handleSettingsAction(btn.dataset.settingsAction));
+      btn.addEventListener("click", () =>
+        handleSettingsAction(btn.dataset.settingsAction),
+      );
     });
   }
 
   function handleSettingsAction(action) {
+    if (action === "password") {
+      window.location.href = "./change-password.html";
+      return;
+    }
     if (action === "delete") {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete your account? This cannot be undone.",
-      );
-      if (confirmed) {
-        showToast("error", "Account deletion isn't wired up yet — connect this to your backend flow.");
-      }
+      openDeleteModal();
       return;
     }
     showToast("success", "This setting is coming soon.");
@@ -382,10 +417,17 @@ import {
     const form = $("#editProfileForm");
     if (!overlay || !form) return;
 
-    // populate form with current values
+    const emp = currentUser.employment || {};
+
     Object.keys(currentUser).forEach((key) => {
+      if (key === "employment") return;
       const field = form.elements.namedItem(key);
       if (field) field.value = currentUser[key] ?? "";
+    });
+
+    EMPLOYMENT_KEYS.forEach((key) => {
+      const field = form.elements.namedItem(key);
+      if (field) field.value = emp[key] ?? "";
     });
 
     overlay.classList.add("open");
@@ -404,9 +446,25 @@ import {
     const form = e.target;
     const saveBtn = $("#saveEditBtn");
     const formData = new FormData(form);
-    const updates = {};
+    const rawValues = {};
     formData.forEach((value, key) => {
-      updates[key] = value.trim();
+      rawValues[key] = value.trim();
+    });
+
+    const topUpdates = {};
+    const employmentUpdates = {};
+
+    Object.keys(rawValues).forEach((key) => {
+      if (EMPLOYMENT_KEYS.includes(key)) {
+        employmentUpdates[key] = rawValues[key];
+      } else {
+        topUpdates[key] = rawValues[key];
+      }
+    });
+
+    const firestoreUpdates = { ...topUpdates };
+    Object.keys(employmentUpdates).forEach((key) => {
+      firestoreUpdates[`employment.${key}`] = employmentUpdates[key];
     });
 
     if (saveBtn) {
@@ -414,7 +472,7 @@ import {
       saveBtn.innerHTML = `<i class="ri-loader-4-line"></i> Saving…`;
     }
 
-    const ok = await saveUserDoc(currentUid, updates);
+    const ok = await saveUserDoc(currentUid, firestoreUpdates);
 
     if (saveBtn) {
       saveBtn.disabled = false;
@@ -423,7 +481,11 @@ import {
 
     if (!ok) return;
 
-    currentUser = { ...currentUser, ...updates };
+    currentUser = {
+      ...currentUser,
+      ...topUpdates,
+      employment: { ...(currentUser.employment || {}), ...employmentUpdates },
+    };
     renderAll(currentUser);
     closeEditModal();
     showToast("success", "Profile updated successfully.");
@@ -445,9 +507,52 @@ import {
       if (e.target === overlay) closeEditModal();
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeEditModal();
+      if (e.key === "Escape" && overlay?.classList.contains("open")) {
+        closeEditModal();
+      }
     });
     form?.addEventListener("submit", handleEditSubmit);
+  }
+
+  /* =========================================================
+     DELETE ACCOUNT CONFIRMATION MODAL
+  ========================================================= */
+  function openDeleteModal() {
+    const overlay = $("#deleteAccountModalOverlay");
+    if (!overlay) return;
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDeleteModal() {
+    const overlay = $("#deleteAccountModalOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function handleConfirmDelete() {
+    closeDeleteModal();
+    showToast("error", "Delete Account feature coming soon.");
+  }
+
+  function setupDeleteModal() {
+    const overlay = $("#deleteAccountModalOverlay");
+    const cancelBtn = $("#cancelDeleteAccountBtn");
+    const confirmBtn = $("#confirmDeleteAccountBtn");
+
+    cancelBtn?.addEventListener("click", closeDeleteModal);
+    confirmBtn?.addEventListener("click", handleConfirmDelete);
+
+    overlay?.addEventListener("click", (e) => {
+      if (e.target === overlay) closeDeleteModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay?.classList.contains("open")) {
+        closeDeleteModal();
+      }
+    });
   }
 
   /* =========================================================
@@ -467,7 +572,10 @@ import {
       try {
         showToast("success", "Uploading photo…");
         const storage = getStorage();
-        const fileRef = ref(storage, `profile-photos/${currentUid}/${Date.now()}-${file.name}`);
+        const fileRef = ref(
+          storage,
+          `profile-photos/${currentUid}/${Date.now()}-${file.name}`,
+        );
         await uploadBytes(fileRef, file);
         const url = await getDownloadURL(fileRef);
 
@@ -480,7 +588,10 @@ import {
         }
       } catch (error) {
         console.error("Photo upload failed:", error);
-        showToast("error", "Could not upload photo. Check Firebase Storage rules/config.");
+        showToast(
+          "error",
+          "Could not upload photo. Check Firebase Storage rules/config.",
+        );
       } finally {
         fileInput.value = "";
       }
@@ -496,11 +607,12 @@ import {
     setupUserMenu();
     setupSidebarToggle();
     setupEditModal();
+    setupDeleteModal();
     setupPhotoUpload();
 
     const auth = getAuth();
     onAuthStateChanged(auth, async (fbUser) => {
-      if (!fbUser) return; // guardAndLoadUser already handles redirect-to-login
+      if (!fbUser) return;
       currentUid = fbUser.uid;
 
       const userDoc = await loadUserDoc(currentUid);

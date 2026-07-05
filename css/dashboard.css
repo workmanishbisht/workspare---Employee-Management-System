@@ -338,7 +338,6 @@ img {
     var(--color-primary-light)
   );
   color: #fff;
-  box-shadow: var(--shadow-btn);
 }
 
 /* Upgrade card */
@@ -754,7 +753,6 @@ img {
     var(--color-primary-dark)
   );
   color: #fff;
-  box-shadow: 0 8px 18px rgba(108, 92, 231, 0.35);
 }
 
 .theme-toggle:hover {

@@ -66,7 +66,11 @@
   align-items: flex-start;
   gap: var(--space-8);
   flex-wrap: wrap;
-  background: linear-gradient(160deg, var(--color-info-bg) 0%, var(--panel-light-bg) 55%);
+  background: linear-gradient(
+    160deg,
+    var(--color-info-bg) 0%,
+    var(--panel-light-bg) 55%
+  );
 }
 
 .hero-card__photo-wrap {
@@ -90,7 +94,11 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
   color: #fff;
   display: flex;
   align-items: center;
@@ -421,7 +429,9 @@
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
 }
 
 .modal-overlay.open {
@@ -530,6 +540,97 @@
 }
 
 /* ==========================================================
+   DELETE ACCOUNT CONFIRMATION MODAL
+========================================================== */
+.modal-overlay--confirm {
+  background: rgba(10, 8, 26, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal--confirm {
+  max-width: 400px;
+  padding: 32px 28px 28px;
+  border-radius: 24px;
+  align-items: center;
+  text-align: center;
+  background: var(--panel-light-bg);
+  border: 1px solid var(--panel-light-border);
+  box-shadow: var(--shadow-pop);
+}
+
+.modal-overlay--confirm .modal--confirm {
+  transform: translateY(10px) scale(0.96);
+  opacity: 0;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.modal-overlay--confirm.open .modal--confirm {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.confirm-modal__icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.12);
+  margin-bottom: 20px;
+}
+
+.confirm-modal__icon {
+  font-size: 34px;
+  color: var(--color-error);
+}
+
+.confirm-modal__title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--panel-light-text);
+}
+
+.confirm-modal__desc {
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--panel-light-text-muted);
+  font-weight: 500;
+}
+
+.confirm-modal__actions {
+  margin-top: 26px;
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.confirm-modal__actions .btn {
+  flex: 1;
+}
+
+.btn--danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-btn);
+}
+
+.btn--danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.28);
+}
+
+.btn--block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ==========================================================
    RESPONSIVE
 ========================================================== */
 @media (max-width: 1180px) {
@@ -557,5 +658,16 @@
 
   .back-link span {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal--confirm {
+    max-width: 92vw;
+    padding: 28px 20px 22px;
+  }
+
+  .confirm-modal__actions {
+    flex-direction: column-reverse;
   }
 }

@@ -17,15 +17,76 @@ import {
 export const LOGIN_PATH = "../index.html";
 
 export const NAV_ITEMS = [
-  { label: "Dashboard", icon: "ri-dashboard-line", href: "./dashboard.html" },
-  { label: "Employees", icon: "ri-user-3-line", href: "./employees.html" },
-  { label: "Departments", icon: "ri-building-4-line", href: "#" },
-  { label: "Attendance", icon: "ri-calendar-check-line", href: "#" },
-  { label: "Leave Management", icon: "ri-send-plane-line", href: "#" },
-  { label: "Payroll", icon: "ri-bank-card-line", href: "#" },
-  { label: "Reports", icon: "ri-bar-chart-2-line", href: "#" },
-  { label: "Calendar", icon: "ri-calendar-2-line", href: "#" },
-  { label: "Settings", icon: "ri-settings-3-line", href: "#" },
+  {
+    label: "Dashboard",
+    icon: "ri-dashboard-line",
+    href: "./dashboard.html",
+  },
+  {
+    label: "Employees",
+    icon: "ri-user-3-line",
+    href: "./employees.html",
+  },
+  {
+    label: "Departments",
+    icon: "ri-building-4-line",
+    href: "./departments.html",
+  },
+  {
+    label: "Attendance",
+    icon: "ri-calendar-check-line",
+    href: "./attendance.html",
+  },
+  {
+    label: "Leave",
+    icon: "ri-logout-box-r-line",
+    href: "./leave.html",
+  },
+  {
+    label: "Payroll",
+    icon: "ri-bank-card-line",
+    href: "./payroll.html",
+  },
+  {
+    label: "Performance",
+    icon: "ri-line-chart-line",
+    href: "./performance.html",
+  },
+  {
+    label: "Recruitment",
+    icon: "ri-user-search-line",
+    href: "./recruitment.html",
+  },
+  {
+    label: "Reports",
+    icon: "ri-bar-chart-box-line",
+    href: "./reports.html",
+  },
+  {
+    label: "Calendar",
+    icon: "ri-calendar-2-line",
+    href: "./calendar.html",
+  },
+  {
+    label: "Documents",
+    icon: "ri-file-text-line",
+    href: "./documents.html",
+  },
+  {
+    label: "Notifications",
+    icon: "ri-notification-3-line",
+    href: "./notifications.html",
+  },
+  {
+    label: "Help Center",
+    icon: "ri-question-line",
+    href: "./help-center.html",
+  },
+  {
+    label: "Settings",
+    icon: "ri-settings-3-line",
+    href: "./settings.html",
+  },
 ];
 
 /* ==========================================================

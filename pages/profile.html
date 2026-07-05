@@ -421,16 +421,48 @@
           <p class="modal__section-title">Employment Details</p>
           <div class="form-grid">
             <label class="form-field">
-              <span>Job Title</span>
-              <input type="text" name="jobTitle" />
+              <span>Employee ID</span>
+              <input type="text" name="employeeId" placeholder="e.g. EMP001" />
             </label>
             <label class="form-field">
               <span>Department</span>
-              <input type="text" name="department" />
+              <select name="department">
+                <option value="">Select…</option>
+                <option value="Design">Design</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Product">Product</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales">Sales</option>
+                <option value="Human Resources">Human Resources</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations">Operations</option>
+                <option value="Customer Support">Customer Support</option>
+                <option value="Legal">Legal</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Designation</span>
+              <input
+                type="text"
+                name="designation"
+                placeholder="e.g. UI/UX Designer"
+              />
             </label>
             <label class="form-field">
               <span>Reporting Manager</span>
-              <input type="text" name="reportingManager" />
+              <input
+                type="text"
+                name="reportingManager"
+                list="reportingManagerList"
+                placeholder="Select or type a name"
+                autocomplete="off"
+              />
+              <datalist id="reportingManagerList">
+                <option value="Rohan Kumar"></option>
+                <option value="Priya Sharma"></option>
+                <option value="Amit Verma"></option>
+                <option value="Neha Singh"></option>
+              </datalist>
             </label>
             <label class="form-field">
               <span>Employment Type</span>
@@ -439,7 +471,47 @@
                 <option value="Full Time">Full Time</option>
                 <option value="Part Time">Part Time</option>
                 <option value="Contract">Contract</option>
+                <option value="Intern">Intern</option>
               </select>
+            </label>
+            <label class="form-field">
+              <span>Joining Date</span>
+              <input type="date" name="joiningDate" />
+            </label>
+            <label class="form-field">
+              <span>Role</span>
+              <select name="role">
+                <option value="">Select…</option>
+                <option value="admin">Admin</option>
+                <option value="hr">HR Manager</option>
+                <option value="manager">Team Manager</option>
+                <option value="employee">Employee</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Status</span>
+              <select name="status">
+                <option value="">Select…</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="On Leave">On Leave</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Office Location</span>
+              <input
+                type="text"
+                name="officeLocation"
+                placeholder="e.g. Dehradun, India"
+              />
+            </label>
+            <label class="form-field">
+              <span>Current Project</span>
+              <input
+                type="text"
+                name="currentProject"
+                placeholder="e.g. EMS Redesign"
+              />
             </label>
           </div>
 
@@ -480,6 +552,48 @@
         </div>
       </div>
     </div>
+
+
+    <!-- ============ DELETE ACCOUNT CONFIRMATION MODAL ============ -->
+<div class="modal-overlay modal-overlay--confirm" id="deleteAccountModalOverlay">
+  <div
+    class="modal modal--confirm"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="deleteAccountModalTitle"
+    aria-describedby="deleteAccountModalDesc"
+  >
+    <div class="confirm-modal__icon-wrap">
+      <i class="ri-delete-bin-6-line confirm-modal__icon"></i>
+    </div>
+
+    <h3 id="deleteAccountModalTitle" class="confirm-modal__title">
+      Delete Account
+    </h3>
+
+    <p id="deleteAccountModalDesc" class="confirm-modal__desc">
+      Are you sure you want to delete your account?<br />
+      This action cannot be undone.
+    </p>
+
+    <div class="confirm-modal__actions">
+      <button
+        type="button"
+        class="btn btn--ghost btn--block"
+        id="cancelDeleteAccountBtn"
+      >
+        No, Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn--danger btn--block"
+        id="confirmDeleteAccountBtn"
+      >
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
 
     <!-- script files -->
     <script type="module" src="../js/layout.js"></script>
