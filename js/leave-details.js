@@ -84,7 +84,7 @@ import {
       const snap = await getDoc(doc(db, "leaveRequests", leaveId));
       if (!snap.exists()) {
         showToast("error", "Leave request not found.");
-        setTimeout(() => (window.location.href = "./leave-management.html"), 800);
+        setTimeout(() => (window.location.href = "./leave.html"), 800);
         return false;
       }
 
@@ -93,7 +93,7 @@ import {
     } catch (error) {
       console.error("Failed to load leave request:", error);
       showToast("error", "Could not load leave request.");
-      setTimeout(() => (window.location.href = "./leave-management.html"), 800);
+      setTimeout(() => (window.location.href = "./leave.html"), 800);
       return false;
     }
   }
