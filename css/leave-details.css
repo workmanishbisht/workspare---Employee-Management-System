@@ -1,0 +1,286 @@
+#ldContent {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+#ldContent .dd-grid {
+  gap: 30px;
+}
+
+#ldContent .lm-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+#ldContent .dd-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+.ld-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ld-header__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ld-header__actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.ld-btn-danger-ghost {
+  color: var(--color-error);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.ld-btn-danger-ghost:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--color-error);
+}
+
+.ld-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ld-title-row h2 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   HERO AVATAR
+========================================================= */
+.ld-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   INFO LIST 2-COLUMN
+========================================================= */
+.ld-info-list-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+}
+
+.ld-info-list-2col li {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.ld-info-list-2col li strong {
+  text-align: left;
+}
+
+/* =========================================================
+   REASON / ATTACHMENT BLOCKS
+========================================================= */
+.ld-reason-block {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-light-border);
+}
+
+.ld-reason-block span {
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ld-reason-block p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--panel-light-text);
+}
+
+.ld-attachment-block {
+  margin-top: 16px;
+}
+
+.ld-attachment-block .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   LEAVE BALANCE CARDS
+========================================================= */
+.ld-balance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ld-balance-card {
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+}
+
+.ld-balance-card__type {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.ld-balance-card__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  margin-bottom: 6px;
+}
+
+.ld-balance-card__row strong {
+  color: var(--panel-light-text);
+  font-weight: 700;
+}
+
+/* =========================================================
+   EMPLOYEE CARD (sidebar)
+========================================================= */
+.ld-employee-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+  transition: 0.2s;
+}
+
+.ld-employee-card:hover {
+  border-color: var(--color-primary);
+}
+
+.ld-employee-card img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ld-employee-card__name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ld-employee-card__meta {
+  font-size: 12px;
+  color: var(--panel-light-text-muted);
+  margin-top: 2px;
+}
+
+.ld-employee-card i:last-child {
+  margin-left: auto;
+  color: var(--panel-light-text-muted);
+}
+
+/* =========================================================
+   RECENT LEAVES LINK
+========================================================= */
+.ld-recent-link {
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.ld-recent-link:hover {
+  border-color: var(--color-primary);
+}
+
+/* =========================================================
+   PRINT
+========================================================= */
+@media print {
+  .sidebar,
+  .sidebar-overlay,
+  .topbar,
+  .no-print {
+    display: none !important;
+  }
+
+  .app {
+    display: block;
+  }
+
+  .main,
+  .content {
+    padding: 0;
+    width: 100%;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1180px) {
+  #ldContent .dd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ld-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ld-header__actions {
+    width: 100%;
+  }
+
+  .ld-header__actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .ld-info-list-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .ld-balance-grid {
+    grid-template-columns: 1fr;
+  }
+}
