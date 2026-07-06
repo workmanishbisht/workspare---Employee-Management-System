@@ -40,7 +40,7 @@ export const NAV_ITEMS = [
   {
     label: "Leave",
     icon: "ri-logout-box-r-line",
-    href: "./leave.html",
+    href: "./leave-management.html",
   },
   {
     label: "Payroll",

@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leave Management | Employee Management System</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/employees.css" />
+    <link rel="stylesheet" href="../css/attendance.css" />
+    <link rel="stylesheet" href="../css/leave-management.css" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList"></ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Employee</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" placeholder="Search..." />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span class="theme-toggle__option"
+                ><i class="ri-sun-line"></i
+              ></span>
+              <span class="theme-toggle__option"
+                ><i class="ri-moon-line"></i
+              ></span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h2>Leave Management</h2>
+              <p>Manage employee leave requests and approvals.</p>
+            </div>
+            <div class="page-head__actions">
+              <a href="./leave-calendar.html" class="btn btn--ghost">
+                <i class="ri-calendar-2-line"></i> Leave Calendar
+              </a>
+              <button class="btn btn--primary" id="openApplyLeaveBtn">
+                <i class="ri-add-line"></i> Apply Leave
+              </button>
+            </div>
+          </div>
+
+          <!-- ===== SKELETON ===== -->
+          <div id="lmSkeleton" class="att-skeleton-wrap">
+            <div class="skeleton-row">
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+              <div class="skeleton skeleton--stat"></div>
+            </div>
+            <div class="skeleton skeleton--table"></div>
+          </div>
+
+          <!-- ===== REAL CONTENT ===== -->
+          <div id="lmContent" class="att-hidden">
+            <!-- Stat cards -->
+            <section
+              class="stats-grid att-stats-grid"
+              id="lmStatsGrid"
+            ></section>
+
+            <!-- Main grid: table + sidebar -->
+            <div class="dd-grid">
+              <div class="lm-main-col">
+                <!-- Tabs -->
+                <section class="card lm-tabs-card">
+                  <div class="lm-tabs" id="lmTabs">
+                    <button class="lm-tab active" data-tab="all">
+                      All Requests
+                    </button>
+                    <button class="lm-tab" data-tab="Pending">Pending</button>
+                    <button class="lm-tab" data-tab="Approved">Approved</button>
+                    <button class="lm-tab" data-tab="Rejected">Rejected</button>
+                  </div>
+
+                  <div class="lm-toolbar">
+                    <div class="att-search">
+                      <i class="ri-search-line"></i>
+                      <input
+                        type="text"
+                        id="lmSearchInput"
+                        placeholder="Search by employee name, ID, department, leave type..."
+                      />
+                    </div>
+
+                    <select id="lmDepartmentFilter" class="att-select">
+                      <option value="all">All Departments</option>
+                    </select>
+
+                    <select id="lmLeaveTypeFilter" class="att-select">
+                      <option value="all">All Leave Types</option>
+                      <option value="Annual Leave">Annual Leave</option>
+                      <option value="Sick Leave">Sick Leave</option>
+                      <option value="Casual Leave">Casual Leave</option>
+                      <option value="Personal Leave">Personal Leave</option>
+                    </select>
+
+                    <input type="month" id="lmMonthFilter" class="att-select" />
+
+                    <select id="lmSortSelect" class="att-select">
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                    </select>
+
+                    <button class="btn btn--ghost" id="lmResetFiltersBtn">
+                      <i class="ri-refresh-line"></i> Reset
+                    </button>
+                  </div>
+                </section>
+
+                <!-- Table -->
+                <section class="card att-table-card">
+                  <div class="table-scroll">
+                    <table class="employees-table" id="lmTable">
+                      <thead>
+                        <tr>
+                          <th>Employee</th>
+                          <th>Leave Type</th>
+                          <th>Dates</th>
+                          <th>Duration</th>
+                          <th>Reason</th>
+                          <th>Status</th>
+                          <th>Applied On</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="lmTableBody"></tbody>
+                    </table>
+                  </div>
+
+                  <div id="lmEmptyState" class="att-empty-state att-hidden">
+                    <i class="ri-calendar-close-line"></i>
+                    <h4>No Leave Requests Found</h4>
+                    <p>Start by applying the first leave request.</p>
+                    <button class="btn btn--primary" id="lmEmptyApplyBtn">
+                      <i class="ri-add-line"></i> Apply Leave
+                    </button>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Right sidebar -->
+              <aside class="dd-side-col">
+                <section class="card">
+                  <div class="card__head"><h3>Leave Balance Overview</h3></div>
+                  <div id="lmLeaveBalanceList" class="lm-balance-list"></div>
+                </section>
+
+                <section class="card">
+                  <div class="card__head"><h3>Upcoming Leaves</h3></div>
+                  <div id="lmUpcomingList" class="lm-upcoming-list"></div>
+                </section>
+              </aside>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============ APPLY / EDIT LEAVE MODAL ============ -->
+    <div class="modal-overlay" id="lmModalOverlay">
+      <div class="modal">
+        <div class="modal__head">
+          <h3 id="lmModalTitle">Apply Leave</h3>
+          <button class="modal__close" id="lmModalCloseBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="lmForm" class="modal__form" novalidate>
+          <input type="hidden" id="lmDocId" />
+
+          <div class="form-field">
+            <label class="form-field__label" for="lmEmployeeSelect"
+              >Employee</label
+            >
+            <select id="lmEmployeeSelect" class="form-field__input" required>
+              <option value="" disabled selected>Select employee</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="lmLeaveType"
+                >Leave Type</label
+              >
+              <select id="lmLeaveType" class="form-field__input" required>
+                <option value="" disabled selected>Select leave type</option>
+                <option value="Annual Leave">Annual Leave</option>
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Casual Leave">Casual Leave</option>
+                <option value="Personal Leave">Personal Leave</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Duration</label>
+              <div class="att-calc-preview">
+                <span
+                  >Total: <strong id="lmDurationPreview">0 Days</strong></span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="lmStartDate"
+                >Start Date</label
+              >
+              <input
+                id="lmStartDate"
+                class="form-field__input"
+                type="date"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="lmEndDate">End Date</label>
+              <input
+                id="lmEndDate"
+                class="form-field__input"
+                type="date"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label" for="lmReason">Reason</label>
+            <textarea
+              id="lmReason"
+              class="form-field__input"
+              rows="3"
+              required
+              placeholder="Reason for leave"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-field__label" for="lmEmergencyContact"
+                >Emergency Contact (optional)</label
+              >
+              <input
+                id="lmEmergencyContact"
+                class="form-field__input"
+                type="tel"
+                placeholder="Contact number"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="lmAttachment"
+                >Attachment URL (optional)</label
+              >
+              <input
+                id="lmAttachment"
+                class="form-field__input"
+                type="url"
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+
+          <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" id="lmCancelBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn--primary" id="lmSaveBtn">
+              <span id="lmSaveBtnText">Submit Leave</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ APPROVE CONFIRM MODAL ============ -->
+    <div class="modal-overlay" id="lmApproveModalOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__head">
+          <h3>Approve Leave Request?</h3>
+          <button class="modal__close" id="lmApproveCloseBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <p class="modal__text">
+          Approve leave request for
+          <strong id="lmApproveName">this employee</strong>?
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="lmApproveCancelBtn">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn--primary"
+            id="lmApproveConfirmBtn"
+          >
+            <i class="ri-check-line"></i> Approve
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ REJECT MODAL ============ -->
+    <div class="modal-overlay" id="lmRejectModalOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__head">
+          <h3>Reject Leave Request</h3>
+          <button class="modal__close" id="lmRejectCloseBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <p class="modal__text">
+          Reject leave request for
+          <strong id="lmRejectName">this employee</strong>?
+        </p>
+        <div class="form-field">
+          <label class="form-field__label" for="lmRejectReason"
+            >Reason (optional)</label
+          >
+          <textarea
+            id="lmRejectReason"
+            class="form-field__input"
+            rows="3"
+            placeholder="Reason for rejection"
+          ></textarea>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="lmRejectCancelBtn">
+            Cancel
+          </button>
+          <button type="button" class="btn btn--danger" id="lmRejectConfirmBtn">
+            <i class="ri-close-line"></i> Reject
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DELETE CONFIRM MODAL ============ -->
+    <div class="modal-overlay" id="lmDeleteModalOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__head">
+          <h3>Delete Leave Request</h3>
+          <button class="modal__close" id="lmDeleteCloseBtn" type="button">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <p class="modal__text">
+          Are you sure you want to delete this leave request for
+          <strong id="lmDeleteName">this employee</strong>? This action cannot
+          be undone.
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="lmDeleteCancelBtn">
+            Cancel
+          </button>
+          <button type="button" class="btn btn--danger" id="lmDeleteConfirmBtn">
+            <i class="ri-delete-bin-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/leave-management.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

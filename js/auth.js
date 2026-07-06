@@ -32,10 +32,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ==========================================================
-   PATHS
+   CONSTANTS
 ========================================================== */
 
 const DASHBOARD_PATH = "./pages/dashboard.html";
+
+// NOTE (dev phase): Only the "admin" role is supported right now.
+// Employee/HR roles will be introduced later without touching this flow.
+const ADMIN_ROLE = "admin";
 
 /* ==========================================================
    DOM ELEMENTS
@@ -51,8 +55,15 @@ const fullNameInput = document.getElementById("fullNameInput");
 const signupEmailInput = document.getElementById("signupEmailInput");
 const signupPasswordInput = document.getElementById("signupPasswordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
-const roleSelect = document.getElementById("roleSelect");
 const companyInput = document.getElementById("companyInput");
+// Role dropdown removed for admin-only dev phase (kept as a no-op lookup
+// in case it still exists in older markup that hasn't been updated yet).
+const roleSelect = document.getElementById("roleSelect");
+if (roleSelect) {
+  const roleField = roleSelect.closest(".form-group") || roleSelect;
+  roleField.style.display = "none";
+  roleSelect.removeAttribute("required");
+}
 
 const forgotForm = document.getElementById("forgotForm");
 const forgotEmailInput = document.getElementById("forgotEmailInput");
@@ -86,30 +97,62 @@ function showToast(type, message) {
 }
 
 /* ==========================================================
-   FIRESTORE USER HELPER
+   FIRESTORE USER HELPER (Admin-only, dev phase)
 ========================================================== */
 
-async function createUserDocument(user, provider, extraData = {}) {
+/**
+ * createOrUpdateAdminUser
+ * ------------------------
+ * Ensures a Firestore users/{uid} document exists for the given user and
+ * that it always carries role: "admin".
+ *
+ * - If the document already exists: only `updatedAt` (and role, defensively)
+ *   are touched. Existing profile info is never overwritten.
+ * - If the document does not exist: a new admin document is created.
+ *
+ * This is the single source of truth for user-document creation and should
+ * be reused by signup, email login, Google login, Microsoft login, and the
+ * redirect-result handler.
+ */
+async function createOrUpdateAdminUser(user, provider, extraData = {}) {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
-    if (userSnap.exists()) return;
+    if (userSnap.exists()) {
+      // Document already exists — don't clobber profile info.
+      // Just make sure role stays "admin" and bump updatedAt.
+      await setDoc(
+        userRef,
+        {
+          role: ADMIN_ROLE,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+      return;
+    }
 
     await setDoc(userRef, {
       uid: user.uid,
       fullName: extraData.fullName || user.displayName || "",
       email: user.email || "",
-      role: extraData.role || "employee",
-      company: extraData.company || "",
-      provider,
       photoURL: user.photoURL || "",
+      provider,
+      role: ADMIN_ROLE,
+      company: extraData.company || "",
       emailVerified: user.emailVerified,
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
   } catch (error) {
     console.error("Firestore Error:", error);
-    showToast("error", "Unable to save user data.");
+
+    if (error.code === "permission-denied") {
+      showToast("error", "Permission denied while saving user data.");
+    } else {
+      showToast("error", "Unable to save user data.");
+    }
   }
 }
 
@@ -171,6 +214,8 @@ if (loginForm) {
         return;
       }
 
+      await createOrUpdateAdminUser(user, "email");
+
       showToast("success", "Login Successful");
       goToDashboard();
     } catch (error) {
@@ -190,6 +235,9 @@ if (loginForm) {
         case "auth/too-many-requests":
           message = "Too many attempts. Try again later.";
           break;
+        case "auth/network-request-failed":
+          message = "Please check your internet connection.";
+          break;
         default:
           message = error.message;
       }
@@ -200,7 +248,7 @@ if (loginForm) {
 }
 
 /* ==========================================================
-   EMAIL SIGNUP
+   EMAIL SIGNUP (Admin-only)
 ========================================================== */
 
 if (signupForm) {
@@ -211,10 +259,9 @@ if (signupForm) {
     const email = signupEmailInput.value.trim();
     const password = signupPasswordInput.value;
     const confirmPassword = confirmPasswordInput.value;
-    const role = roleSelect.value;
-    const company = companyInput.value.trim();
+    const company = companyInput ? companyInput.value.trim() : "";
 
-    if (!fullName || !email || !password || !confirmPassword || !role) {
+    if (!fullName || !email || !password || !confirmPassword) {
       showToast("error", "Please fill all required fields.");
       return;
     }
@@ -237,7 +284,8 @@ if (signupForm) {
       );
       const user = userCredential.user;
 
-      await createUserDocument(user, "email", { fullName, role, company });
+      // Every signup during this dev phase is an Admin account.
+      await createOrUpdateAdminUser(user, "email", { fullName, company });
       await sendEmailVerification(user);
 
       showToast(
@@ -246,9 +294,6 @@ if (signupForm) {
       );
 
       signupForm.reset();
-      if (roleSelect) roleSelect.selectedIndex = 0;
-
-      document.dispatchEvent(new CustomEvent("role-select:reset"));
 
       await signOut(auth);
 
@@ -282,13 +327,15 @@ if (signupForm) {
 }
 
 /* ==========================================================
-   GOOGLE & MICROSOFT AUTHENTICATION
+   GOOGLE & MICROSOFT AUTHENTICATION (Admin-only)
 ========================================================== */
 
 async function socialLogin(provider, providerName) {
   try {
     const result = await signInWithPopup(auth, provider);
-    await createUserDocument(result.user, providerName);
+
+    // Social logins also default to Admin during this dev phase.
+    await createOrUpdateAdminUser(result.user, providerName);
 
     showToast("success", `${providerName} Login Successful`);
     goToDashboard();
@@ -309,6 +356,11 @@ async function socialLogin(provider, providerName) {
       return;
     }
 
+    if (error.code === "auth/network-request-failed") {
+      showToast("error", "Please check your internet connection.");
+      return;
+    }
+
     showToast("error", error.message);
   }
 }
@@ -324,7 +376,7 @@ microsoftButtons.forEach((button) => {
 });
 
 /* ==========================================================
-   REDIRECT RESULT
+   REDIRECT RESULT (Admin-only)
 ========================================================== */
 
 async function checkRedirectLogin() {
@@ -334,7 +386,8 @@ async function checkRedirectLogin() {
 
     const providerName =
       result.providerId === "google.com" ? "Google" : "Microsoft";
-    await createUserDocument(result.user, providerName);
+
+    await createOrUpdateAdminUser(result.user, providerName);
 
     showToast("success", "Login Successful");
     goToDashboard();
@@ -370,7 +423,17 @@ if (forgotForm) {
       document.body.dataset.view = "forgot";
       document.dispatchEvent(new CustomEvent("password-reset:sent"));
     } catch (error) {
-      showToast("error", error.message);
+      let message = error.message;
+
+      if (error.code === "auth/network-request-failed") {
+        message = "Please check your internet connection.";
+      } else if (error.code === "auth/invalid-email") {
+        message = "Invalid email address.";
+      } else if (error.code === "auth/user-not-found") {
+        message = "No account found with this email.";
+      }
+
+      showToast("error", message);
     }
   });
 }

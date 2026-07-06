@@ -133,7 +133,17 @@
 .lm-balance-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 30px;
+}
+
+.lm-balance-item {
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--panel-light-border);
+}
+
+.lm-balance-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .lm-balance-item__head {
@@ -141,7 +151,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .lm-balance-item__head span {
@@ -158,12 +168,13 @@
 .lm-balance-item__bar {
   height: 8px;
   border-radius: 999px;
-  background: var(--panel-light-input-bg);
+  background: var(--panel-light-border);
   overflow: hidden;
 }
 
 .lm-balance-item__fill {
   height: 100%;
+  min-width: 4px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
 }
