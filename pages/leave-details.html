@@ -63,25 +63,42 @@
 
           <ul class="user-menu" id="userMenu" role="menu">
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="profile">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
                 <i class="ri-user-3-line"></i><span>View Profile</span>
               </button>
             </li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="password">
-                <i class="ri-lock-password-line"></i><span>Change Password</span>
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
               </button>
             </li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="help">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
                 <i class="ri-question-line"></i><span>Help Center</span>
               </button>
             </li>
             <li class="user-menu__divider" role="separator"></li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item user-menu__item--danger" data-action="logout">
-                <i class="ri-logout-box-r-line" style="color: #cf2626;"></i>
-                <span style="color: #cf2626;">Logout</span>
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
               </button>
             </li>
           </ul>
@@ -93,7 +110,11 @@
       <!-- ============ MAIN ============ -->
       <div class="main">
         <header class="topbar">
-          <button class="icon-btn topbar__menu" id="menuToggle" aria-label="Toggle menu">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
             <i class="ri-menu-line"></i>
           </button>
 
@@ -104,9 +125,18 @@
           </div>
 
           <div class="topbar__right">
-            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle Theme">
-              <span class="theme-toggle__option"><i class="ri-sun-line"></i></span>
-              <span class="theme-toggle__option"><i class="ri-moon-line"></i></span>
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option"
+                ><i class="ri-sun-line"></i
+              ></span>
+              <span id="themeToggleDark" class="theme-toggle__option"
+                ><i class="ri-moon-line"></i
+              ></span>
             </button>
             <button class="icon-btn has-badge" aria-label="Notifications">
               <i class="ri-notification-3-line"></i>
@@ -149,7 +179,10 @@
                 <button class="btn btn--ghost" id="ldPrintBtn">
                   <i class="ri-printer-line"></i> Print
                 </button>
-                <button class="btn btn--ghost ld-btn-danger-ghost" id="ldDeleteBtn">
+                <button
+                  class="btn btn--ghost ld-btn-danger-ghost"
+                  id="ldDeleteBtn"
+                >
                   <i class="ri-delete-bin-line"></i> Delete
                 </button>
               </div>
@@ -157,18 +190,27 @@
 
             <div class="ld-title-row">
               <h2>Leave Details</h2>
-              <span id="ldRequestNumber" class="dd-chip">Leave Request #LR-0000</span>
+              <span id="ldRequestNumber" class="dd-chip"
+                >Leave Request #LR-0000</span
+              >
             </div>
 
             <!-- ===== HERO CARD ===== -->
             <section class="card dd-hero">
               <div class="dd-hero__top">
                 <div class="dd-hero__left">
-                  <img id="ldEmployeePhoto" class="ld-avatar" src="" alt="Employee" />
+                  <img
+                    id="ldEmployeePhoto"
+                    class="ld-avatar"
+                    src=""
+                    alt="Employee"
+                  />
                   <div>
                     <div class="dd-hero__title-row">
                       <h2 id="ldEmployeeName">—</h2>
-                      <span class="status-badge pending" id="ldStatusBadge">Pending</span>
+                      <span class="status-badge pending" id="ldStatusBadge"
+                        >Pending</span
+                      >
                     </div>
                     <div class="dd-hero__chips">
                       <span class="dd-chip" id="ldEmployeeIdChip">ID: —</span>
@@ -180,10 +222,22 @@
               </div>
 
               <div class="dd-hero__info">
-                <div class="dd-info-row"><i class="ri-user-star-line"></i><span>Reporting Manager</span><strong id="ldManager">—</strong></div>
-                <div class="dd-info-row"><i class="ri-mail-line"></i><span>Email</span><strong id="ldEmail">—</strong></div>
-                <div class="dd-info-row"><i class="ri-phone-line"></i><span>Phone</span><strong id="ldPhone">—</strong></div>
-                <div class="dd-info-row"><i class="ri-map-pin-line"></i><span>Location</span><strong id="ldLocation">—</strong></div>
+                <div class="dd-info-row">
+                  <i class="ri-user-star-line"></i><span>Reporting Manager</span
+                  ><strong id="ldManager">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-mail-line"></i><span>Email</span
+                  ><strong id="ldEmail">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-phone-line"></i><span>Phone</span
+                  ><strong id="ldPhone">—</strong>
+                </div>
+                <div class="dd-info-row">
+                  <i class="ri-map-pin-line"></i><span>Location</span
+                  ><strong id="ldLocation">—</strong>
+                </div>
               </div>
             </section>
 
@@ -193,19 +247,40 @@
                 <section class="card">
                   <div class="card__head"><h3>Leave Information</h3></div>
                   <ul class="dd-info-list ld-info-list-2col">
-                    <li><span>Leave Type</span><strong id="infoLeaveType">—</strong></li>
-                    <li><span>Duration</span><strong id="infoDuration">—</strong></li>
-                    <li><span>Start Date</span><strong id="infoStartDate">—</strong></li>
-                    <li><span>End Date</span><strong id="infoEndDate">—</strong></li>
-                    <li><span>Applied On</span><strong id="infoAppliedOn">—</strong></li>
-                    <li><span>Emergency Contact</span><strong id="infoEmergencyContact">—</strong></li>
+                    <li>
+                      <span>Leave Type</span
+                      ><strong id="infoLeaveType">—</strong>
+                    </li>
+                    <li>
+                      <span>Duration</span><strong id="infoDuration">—</strong>
+                    </li>
+                    <li>
+                      <span>Start Date</span
+                      ><strong id="infoStartDate">—</strong>
+                    </li>
+                    <li>
+                      <span>End Date</span><strong id="infoEndDate">—</strong>
+                    </li>
+                    <li>
+                      <span>Applied On</span
+                      ><strong id="infoAppliedOn">—</strong>
+                    </li>
+                    <li>
+                      <span>Emergency Contact</span
+                      ><strong id="infoEmergencyContact">—</strong>
+                    </li>
                   </ul>
                   <div class="ld-reason-block">
                     <span>Reason</span>
                     <p id="infoReason">—</p>
                   </div>
                   <div class="ld-attachment-block" id="ldAttachmentBlock">
-                    <a id="infoAttachment" href="#" target="_blank" class="btn btn--ghost">
+                    <a
+                      id="infoAttachment"
+                      href="#"
+                      target="_blank"
+                      class="btn btn--ghost"
+                    >
                       <i class="ri-attachment-2"></i> View Attachment
                     </a>
                   </div>
@@ -214,11 +289,26 @@
                 <section class="card">
                   <div class="card__head"><h3>Approval Information</h3></div>
                   <ul class="dd-info-list ld-info-list-2col">
-                    <li><span>Current Status</span><strong id="infoCurrentStatus">—</strong></li>
-                    <li><span>Approved By</span><strong id="infoApprovedBy">—</strong></li>
-                    <li><span>Approved Date</span><strong id="infoApprovedDate">—</strong></li>
-                    <li><span>Rejected By</span><strong id="infoRejectedBy">—</strong></li>
-                    <li><span>Rejected Date</span><strong id="infoRejectedDate">—</strong></li>
+                    <li>
+                      <span>Current Status</span
+                      ><strong id="infoCurrentStatus">—</strong>
+                    </li>
+                    <li>
+                      <span>Approved By</span
+                      ><strong id="infoApprovedBy">—</strong>
+                    </li>
+                    <li>
+                      <span>Approved Date</span
+                      ><strong id="infoApprovedDate">—</strong>
+                    </li>
+                    <li>
+                      <span>Rejected By</span
+                      ><strong id="infoRejectedBy">—</strong>
+                    </li>
+                    <li>
+                      <span>Rejected Date</span
+                      ><strong id="infoRejectedDate">—</strong>
+                    </li>
                   </ul>
                   <div class="ld-reason-block" id="ldRejectionReasonBlock">
                     <span>Rejection Reason</span>
@@ -244,15 +334,28 @@
                   <a href="#" id="ldEmployeeCardLink" class="ld-employee-card">
                     <img id="ldSideEmployeePhoto" src="" alt="Employee" />
                     <div>
-                      <p class="ld-employee-card__name" id="ldSideEmployeeName">—</p>
-                      <p class="ld-employee-card__meta" id="ldSideEmployeeMeta">—</p>
+                      <p class="ld-employee-card__name" id="ldSideEmployeeName">
+                        —
+                      </p>
+                      <p class="ld-employee-card__meta" id="ldSideEmployeeMeta">
+                        —
+                      </p>
                     </div>
                     <i class="ri-arrow-right-s-line"></i>
                   </a>
-                  <ul class="dd-info-list" style="margin-top: 16px;">
-                    <li><span>Employee ID</span><strong id="sideEmployeeId">—</strong></li>
-                    <li><span>Department</span><strong id="sideDepartment">—</strong></li>
-                    <li><span>Designation</span><strong id="sideDesignation">—</strong></li>
+                  <ul class="dd-info-list" style="margin-top: 16px">
+                    <li>
+                      <span>Employee ID</span
+                      ><strong id="sideEmployeeId">—</strong>
+                    </li>
+                    <li>
+                      <span>Department</span
+                      ><strong id="sideDepartment">—</strong>
+                    </li>
+                    <li>
+                      <span>Designation</span
+                      ><strong id="sideDesignation">—</strong>
+                    </li>
                   </ul>
                 </section>
 
@@ -269,34 +372,65 @@
                 <section class="card">
                   <div class="card__head"><h3>Company Leave Policy</h3></div>
                   <ul class="dd-info-list">
-                    <li><span>Annual Leave</span><strong>20 days / year</strong></li>
-                    <li><span>Sick Leave</span><strong>10 days / year</strong></li>
-                    <li><span>Casual Leave</span><strong>10 days / year</strong></li>
-                    <li><span>Personal Leave</span><strong>5 days / year</strong></li>
+                    <li>
+                      <span>Annual Leave</span><strong>20 days / year</strong>
+                    </li>
+                    <li>
+                      <span>Sick Leave</span><strong>10 days / year</strong>
+                    </li>
+                    <li>
+                      <span>Casual Leave</span><strong>10 days / year</strong>
+                    </li>
+                    <li>
+                      <span>Personal Leave</span><strong>5 days / year</strong>
+                    </li>
                   </ul>
                 </section>
 
                 <section class="card no-print">
-                  <div class="card__head"><h3><i class="ri-flashlight-fill"></i> Quick Actions</h3></div>
+                  <div class="card__head">
+                    <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                  </div>
                   <div class="quick-actions">
-                    <button type="button" class="quick-action-btn green" id="qaApprove">
+                    <button
+                      type="button"
+                      class="quick-action-btn green"
+                      id="qaApprove"
+                    >
                       <i class="ri-check-line"></i><span>Approve Leave</span>
                       <i class="ri-arrow-right-s-line arrow"></i>
                     </button>
-                    <button type="button" class="quick-action-btn orange" id="qaReject">
+                    <button
+                      type="button"
+                      class="quick-action-btn orange"
+                      id="qaReject"
+                    >
                       <i class="ri-close-line"></i><span>Reject Leave</span>
                       <i class="ri-arrow-right-s-line arrow"></i>
                     </button>
-                    <button type="button" class="quick-action-btn blue" id="qaEdit">
+                    <button
+                      type="button"
+                      class="quick-action-btn blue"
+                      id="qaEdit"
+                    >
                       <i class="ri-pencil-line"></i><span>Edit Leave</span>
                       <i class="ri-arrow-right-s-line arrow"></i>
                     </button>
-                    <button type="button" class="quick-action-btn purple" id="qaPrint">
+                    <button
+                      type="button"
+                      class="quick-action-btn purple"
+                      id="qaPrint"
+                    >
                       <i class="ri-printer-line"></i><span>Print</span>
                       <i class="ri-arrow-right-s-line arrow"></i>
                     </button>
-                    <button type="button" class="quick-action-btn indigo" id="qaDownload">
-                      <i class="ri-download-2-line"></i><span>Download PDF</span>
+                    <button
+                      type="button"
+                      class="quick-action-btn indigo"
+                      id="qaDownload"
+                    >
+                      <i class="ri-download-2-line"></i
+                      ><span>Download PDF</span>
                       <i class="ri-arrow-right-s-line arrow"></i>
                     </button>
                   </div>
@@ -320,7 +454,9 @@
 
         <form id="ldEditForm" class="modal__form" novalidate>
           <div class="form-field">
-            <label class="form-field__label" for="ldLeaveType">Leave Type</label>
+            <label class="form-field__label" for="ldLeaveType"
+              >Leave Type</label
+            >
             <select id="ldLeaveType" class="form-field__input" required>
               <option value="Annual Leave">Annual Leave</option>
               <option value="Sick Leave">Sick Leave</option>
@@ -333,33 +469,60 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label class="form-field__label" for="ldStartDate">Start Date</label>
-              <input id="ldStartDate" class="form-field__input" type="date" required />
+              <label class="form-field__label" for="ldStartDate"
+                >Start Date</label
+              >
+              <input
+                id="ldStartDate"
+                class="form-field__input"
+                type="date"
+                required
+              />
             </div>
             <div class="form-field">
               <label class="form-field__label" for="ldEndDate">End Date</label>
-              <input id="ldEndDate" class="form-field__input" type="date" required />
+              <input
+                id="ldEndDate"
+                class="form-field__input"
+                type="date"
+                required
+              />
             </div>
           </div>
 
           <div class="form-field">
             <label class="form-field__label" for="ldReason">Reason</label>
-            <textarea id="ldReason" class="form-field__input" rows="3" required></textarea>
+            <textarea
+              id="ldReason"
+              class="form-field__input"
+              rows="3"
+              required
+            ></textarea>
           </div>
 
           <div class="form-row">
             <div class="form-field">
-              <label class="form-field__label" for="ldEmergencyContact">Emergency Contact</label>
-              <input id="ldEmergencyContact" class="form-field__input" type="tel" />
+              <label class="form-field__label" for="ldEmergencyContact"
+                >Emergency Contact</label
+              >
+              <input
+                id="ldEmergencyContact"
+                class="form-field__input"
+                type="tel"
+              />
             </div>
             <div class="form-field">
-              <label class="form-field__label" for="ldAttachment">Attachment URL</label>
+              <label class="form-field__label" for="ldAttachment"
+                >Attachment URL</label
+              >
               <input id="ldAttachment" class="form-field__input" type="url" />
             </div>
           </div>
 
           <div class="modal__actions">
-            <button type="button" class="btn btn--ghost" id="ldEditCancelBtn">Cancel</button>
+            <button type="button" class="btn btn--ghost" id="ldEditCancelBtn">
+              Cancel
+            </button>
             <button type="submit" class="btn btn--primary">Update Leave</button>
           </div>
         </form>
@@ -375,10 +538,19 @@
             <i class="ri-close-line"></i>
           </button>
         </div>
-        <p class="modal__text">Approve this leave request for <strong id="ldApproveName">this employee</strong>?</p>
+        <p class="modal__text">
+          Approve this leave request for
+          <strong id="ldApproveName">this employee</strong>?
+        </p>
         <div class="modal__actions">
-          <button type="button" class="btn btn--ghost" id="ldApproveCancelBtn">Cancel</button>
-          <button type="button" class="btn btn--primary" id="ldApproveConfirmBtn">
+          <button type="button" class="btn btn--ghost" id="ldApproveCancelBtn">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn--primary"
+            id="ldApproveConfirmBtn"
+          >
             <i class="ri-check-line"></i> Approve
           </button>
         </div>
@@ -394,13 +566,24 @@
             <i class="ri-close-line"></i>
           </button>
         </div>
-        <p class="modal__text">Reject this leave request for <strong id="ldRejectName">this employee</strong>?</p>
+        <p class="modal__text">
+          Reject this leave request for
+          <strong id="ldRejectName">this employee</strong>?
+        </p>
         <div class="form-field">
-          <label class="form-field__label" for="ldRejectReason">Reason (optional)</label>
-          <textarea id="ldRejectReason" class="form-field__input" rows="3"></textarea>
+          <label class="form-field__label" for="ldRejectReason"
+            >Reason (optional)</label
+          >
+          <textarea
+            id="ldRejectReason"
+            class="form-field__input"
+            rows="3"
+          ></textarea>
         </div>
         <div class="modal__actions">
-          <button type="button" class="btn btn--ghost" id="ldRejectCancelBtn">Cancel</button>
+          <button type="button" class="btn btn--ghost" id="ldRejectCancelBtn">
+            Cancel
+          </button>
           <button type="button" class="btn btn--danger" id="ldRejectConfirmBtn">
             <i class="ri-close-line"></i> Reject
           </button>
@@ -417,9 +600,14 @@
             <i class="ri-close-line"></i>
           </button>
         </div>
-        <p class="modal__text">Are you sure you want to delete this leave request? This action cannot be undone.</p>
+        <p class="modal__text">
+          Are you sure you want to delete this leave request? This action cannot
+          be undone.
+        </p>
         <div class="modal__actions">
-          <button type="button" class="btn btn--ghost" id="ldDeleteCancelBtn">Cancel</button>
+          <button type="button" class="btn btn--ghost" id="ldDeleteCancelBtn">
+            Cancel
+          </button>
           <button type="button" class="btn btn--danger" id="ldDeleteConfirmBtn">
             <i class="ri-delete-bin-line"></i> Delete
           </button>
@@ -427,6 +615,7 @@
       </div>
     </div>
 
+    <script type="module" src="../js/layout.js"></script>
     <script type="module" src="../js/leave-details.js"></script>
     <script src="../js/theme.js"></script>
   </body>

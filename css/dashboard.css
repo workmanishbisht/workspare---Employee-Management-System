@@ -746,13 +746,13 @@ img {
   font-size: 18px;
 }
 
-.theme-toggle__option--active {
+.theme-toggle .theme-toggle__option--active {
   background: linear-gradient(
     135deg,
     var(--color-primary),
     var(--color-primary-dark)
-  );
-  color: #fff;
+  ) !important;
+  color: #fff !important;
 }
 
 .theme-toggle:hover {
