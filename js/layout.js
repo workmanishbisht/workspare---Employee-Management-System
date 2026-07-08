@@ -202,11 +202,17 @@ export function applyUserToUI(userData) {
 
   if (nameEl) nameEl.textContent = userData.fullName;
   if (roleEl) roleEl.textContent = capitalize(userData.role);
-  if (avatarEl && userData.photoURL) {
-    avatarEl.src = userData.photoURL;
-  } else if (avatarEl) {
-    const initials = encodeURIComponent(userData.fullName.slice(0, 2));
-    avatarEl.src = `https://ui-avatars.com/api/?name=${initials}&background=6c5ce7&color=fff`;
+
+  const initials = encodeURIComponent(userData.fullName.slice(0, 2));
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${initials}&background=6c5ce7&color=fff`;
+
+  if (avatarEl) {
+    avatarEl.referrerPolicy = "no-referrer";
+    avatarEl.onerror = () => {
+      avatarEl.onerror = null;
+      avatarEl.src = fallbackAvatar;
+    };
+    avatarEl.src = userData.photoURL || fallbackAvatar;
   }
 
   const welcomeNameEl = $("#userName");

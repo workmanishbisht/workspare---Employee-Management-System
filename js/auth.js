@@ -22,6 +22,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
   signOut,
+  OAuthProvider,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -36,9 +37,6 @@ import {
 ========================================================== */
 
 const DASHBOARD_PATH = "./pages/dashboard.html";
-
-// NOTE (dev phase): Only the "admin" role is supported right now.
-// Employee/HR roles will be introduced later without touching this flow.
 const ADMIN_ROLE = "admin";
 
 /* ==========================================================
@@ -56,8 +54,6 @@ const signupEmailInput = document.getElementById("signupEmailInput");
 const signupPasswordInput = document.getElementById("signupPasswordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
 const companyInput = document.getElementById("companyInput");
-// Role dropdown removed for admin-only dev phase (kept as a no-op lookup
-// in case it still exists in older markup that hasn't been updated yet).
 const roleSelect = document.getElementById("roleSelect");
 if (roleSelect) {
   const roleField = roleSelect.closest(".form-group") || roleSelect;
@@ -97,39 +93,58 @@ function showToast(type, message) {
 }
 
 /* ==========================================================
+   MICROSOFT PROFILE PHOTO (via Microsoft Graph API)
+========================================================== */
+
+async function fetchMicrosoftPhoto(accessToken) {
+  if (!accessToken) return "";
+
+  try {
+    const res = await fetch(
+      "https://graph.microsoft.com/v1.0/me/photo/$value",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+
+    if (!res.ok) return "";
+
+    const blob = await res.blob();
+
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.warn("Microsoft photo fetch skipped:", error.message);
+    return "";
+  }
+}
+
+/* ==========================================================
    FIRESTORE USER HELPER (Admin-only, dev phase)
 ========================================================== */
 
-/**
- * createOrUpdateAdminUser
- * ------------------------
- * Ensures a Firestore users/{uid} document exists for the given user and
- * that it always carries role: "admin".
- *
- * - If the document already exists: only `updatedAt` (and role, defensively)
- *   are touched. Existing profile info is never overwritten.
- * - If the document does not exist: a new admin document is created.
- *
- * This is the single source of truth for user-document creation and should
- * be reused by signup, email login, Google login, Microsoft login, and the
- * redirect-result handler.
- */
 async function createOrUpdateAdminUser(user, provider, extraData = {}) {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
+    const resolvedPhotoURL = extraData.photoURL || user.photoURL || "";
+
     if (userSnap.exists()) {
-      // Document already exists — don't clobber profile info.
-      // Just make sure role stays "admin" and bump updatedAt.
-      await setDoc(
-        userRef,
-        {
-          role: ADMIN_ROLE,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true },
-      );
+      const updatePayload = {
+        role: ADMIN_ROLE,
+        updatedAt: serverTimestamp(),
+      };
+
+      if (resolvedPhotoURL) {
+        updatePayload.photoURL = resolvedPhotoURL;
+      }
+
+      await setDoc(userRef, updatePayload, { merge: true });
       return;
     }
 
@@ -137,7 +152,7 @@ async function createOrUpdateAdminUser(user, provider, extraData = {}) {
       uid: user.uid,
       fullName: extraData.fullName || user.displayName || "",
       email: user.email || "",
-      photoURL: user.photoURL || "",
+      photoURL: resolvedPhotoURL,
       provider,
       role: ADMIN_ROLE,
       company: extraData.company || "",
@@ -284,7 +299,6 @@ if (signupForm) {
       );
       const user = userCredential.user;
 
-      // Every signup during this dev phase is an Admin account.
       await createOrUpdateAdminUser(user, "email", { fullName, company });
       await sendEmailVerification(user);
 
@@ -333,9 +347,18 @@ if (signupForm) {
 async function socialLogin(provider, providerName) {
   try {
     const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-    // Social logins also default to Admin during this dev phase.
-    await createOrUpdateAdminUser(result.user, providerName);
+    let photoURL = user.photoURL || "";
+
+    if (providerName === "Microsoft") {
+      const credential = OAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
+      const graphPhoto = await fetchMicrosoftPhoto(accessToken);
+      if (graphPhoto) photoURL = graphPhoto;
+    }
+
+    await createOrUpdateAdminUser(user, providerName, { photoURL });
 
     showToast("success", `${providerName} Login Successful`);
     goToDashboard();
@@ -387,7 +410,16 @@ async function checkRedirectLogin() {
     const providerName =
       result.providerId === "google.com" ? "Google" : "Microsoft";
 
-    await createOrUpdateAdminUser(result.user, providerName);
+    let photoURL = result.user.photoURL || "";
+
+    if (providerName === "Microsoft") {
+      const credential = OAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
+      const graphPhoto = await fetchMicrosoftPhoto(accessToken);
+      if (graphPhoto) photoURL = graphPhoto;
+    }
+
+    await createOrUpdateAdminUser(result.user, providerName, { photoURL });
 
     showToast("success", "Login Successful");
     goToDashboard();
