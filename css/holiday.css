@@ -135,7 +135,7 @@
    STATS GRID (4 cards + mini sparkline)
 ========================================================= */
 .stats-grid-holiday {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stat-card-top {
@@ -210,10 +210,13 @@
 
 /* =========================================================
    MAIN GRID — left content column + right sidebar
+   (minmax(0, ...) prevents the classic CSS-Grid overflow bug
+   where 1fr tracks refuse to shrink below their content's
+   natural width, pushing the sidebar column off-screen)
 ========================================================= */
 .holiday-main-grid {
   display: grid;
-  grid-template-columns: 2.4fr 1fr;
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
   gap: var(--space-6, 24px);
   align-items: start;
 }
@@ -223,6 +226,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6, 24px);
+  min-width: 0;
 }
 
 /* =========================================================
@@ -287,7 +291,8 @@
   background: var(--stat-orange);
 }
 .legend-swatch.weekend {
-  background: var(--panel-light-border);
+  background: var(--panel-light-text-muted);
+  opacity: 0.35;
 }
 .legend-swatch.today {
   border: 2px solid var(--color-primary);
@@ -296,7 +301,7 @@
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -321,8 +326,8 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--panel-light-text);
-  background: var(--panel-light-input-bg);
-  border: 1px solid transparent;
+  background: var(--panel-light-bg);
+  border: 1px solid var(--panel-light-border);
   transition: var(--transition-fast);
   cursor: default;
   position: relative;
@@ -331,29 +336,38 @@
 .calendar-cell:hover {
   border-color: var(--color-primary);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-btn);
 }
 
 .calendar-cell.empty {
   background: transparent;
+  border-color: transparent;
 }
 .calendar-cell.weekend {
-  background: rgba(148, 163, 184, 0.12);
+  background: var(--panel-light-input-bg);
   color: var(--panel-light-text-muted);
+  border-style: dashed;
 }
 .calendar-cell.today {
   border: 2px solid var(--color-primary);
+  background: var(--stat-purple-bg);
+  color: var(--color-primary-dark);
+  font-weight: 800;
 }
 
 .calendar-cell.national {
   background: var(--stat-purple-bg);
+  border-color: var(--stat-purple-bg);
   color: var(--color-primary-dark);
 }
 .calendar-cell.festival {
   background: var(--stat-blue-bg);
+  border-color: var(--stat-blue-bg);
   color: var(--stat-blue);
 }
 .calendar-cell.optional {
   background: var(--stat-orange-bg);
+  border-color: var(--stat-orange-bg);
   color: var(--stat-orange);
 }
 
@@ -373,7 +387,6 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding-bottom: 20px;
   border-bottom: 1px solid var(--panel-light-border);
   margin: -24px -24px 0;
   padding: 20px 22px;
@@ -458,6 +471,14 @@
   background: var(--panel-light-input-bg);
   white-space: nowrap;
   z-index: 2;
+  cursor: default;
+}
+
+.data-table thead th[data-sort] {
+  cursor: pointer;
+}
+.data-table thead th[data-sort]:hover {
+  color: var(--color-primary);
 }
 
 .data-table thead th i {
@@ -590,6 +611,13 @@
   margin: 4px 0 16px;
 }
 
+.recent-list-empty {
+  font-size: 12.5px;
+  color: var(--panel-light-text-muted);
+  text-align: center;
+  padding: 18px 8px;
+}
+
 /* ----- skeleton ----- */
 .skeleton-table {
   display: flex;
@@ -656,7 +684,7 @@
 ========================================================= */
 .charts-grid-holiday {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   gap: var(--space-6, 24px);
 }
 
@@ -905,7 +933,7 @@
   padding: 20px;
 }
 .modal-overlay[hidden] {
-  display: none;
+  display: none !important;
 }
 
 .modal {
@@ -1001,7 +1029,7 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
 }
 .form-group {
@@ -1041,7 +1069,7 @@
 
 .checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 12px;
   border-radius: var(--radius-sm);
@@ -1067,20 +1095,20 @@
 ========================================================= */
 @media (max-width: 1400px) {
   .stats-grid-holiday {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 1280px) {
   .holiday-main-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .charts-grid-holiday {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 768px) {
   .stats-grid-holiday {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .page-header {
     flex-direction: column;
@@ -1097,9 +1125,9 @@
     min-width: 0;
   }
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .checkbox-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

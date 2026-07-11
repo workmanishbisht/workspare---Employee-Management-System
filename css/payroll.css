@@ -128,7 +128,11 @@
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
   color: #fff;
   box-shadow: var(--shadow-btn);
 }
@@ -196,11 +200,21 @@
   color: #fff;
   flex-shrink: 0;
 }
-.stat-icon-primary { background: var(--color-primary); }
-.stat-icon-success { background: var(--color-success); }
-.stat-icon-info     { background: var(--stat-blue); }
-.stat-icon-warning  { background: var(--stat-orange); }
-.stat-icon-danger   { background: var(--color-error); }
+.stat-icon-primary {
+  background: var(--color-primary);
+}
+.stat-icon-success {
+  background: var(--color-success);
+}
+.stat-icon-info {
+  background: var(--stat-blue);
+}
+.stat-icon-warning {
+  background: var(--stat-orange);
+}
+.stat-icon-danger {
+  background: var(--color-error);
+}
 
 .stat-label {
   font-size: 12.5px;
@@ -515,7 +529,11 @@
   font-size: 12px;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
 }
 
 .emp-info {
@@ -542,10 +560,22 @@
   font-size: 11.5px;
   font-weight: 700;
 }
-.status-badge--paid       { background: rgba(16, 185, 129, 0.12); color: var(--color-success); }
-.status-badge--pending    { background: rgba(245, 158, 11, 0.14); color: var(--stat-orange); }
-.status-badge--processing { background: rgba(59, 130, 246, 0.14); color: var(--stat-blue); }
-.status-badge--failed     { background: rgba(239, 68, 68, 0.12); color: var(--color-error); }
+.status-badge--paid {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-success);
+}
+.status-badge--pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--stat-orange);
+}
+.status-badge--processing {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--stat-blue);
+}
+.status-badge--failed {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-error);
+}
 
 .row-actions {
   display: flex;
@@ -566,7 +596,9 @@
   color: var(--panel-light-text-muted);
   transition: var(--transition-fast);
 }
-.row-action-btn i { font-size: 15px; }
+.row-action-btn i {
+  font-size: 15px;
+}
 .row-action-btn:hover {
   color: var(--color-primary);
   border-color: var(--color-primary);
@@ -595,24 +627,24 @@
   margin: 4px 0 16px;
 }
 
-/* ----- skeleton (table) ----- */
+/* =========================================================
+   PAYROLL SKELETON — LAYOUT ONLY
+   ----------------------------------------------------------
+   Shimmer animation/gradient lives once in dashboard.css
+   (loaded globally, shared class ".skeleton-block"). This
+   rule only sizes/positions the payroll table's skeleton
+   rows — no gradient or @keyframes duplicated here.
+========================================================= */
 .skeleton-table {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .skeleton-row {
+  display: block;
   height: 52px;
   border-radius: 12px;
-  display: block;
-  background: linear-gradient(
-    90deg,
-    var(--skeleton-base, #e4e4e7) 25%,
-    var(--skeleton-highlight, #f4f4f5) 37%,
-    var(--skeleton-base, #e4e4e7) 63%
-  );
-  background-size: 800px 100%;
-  animation: hrms-shimmer 1.4s ease-in-out infinite;
 }
 
 /* =========================================================
@@ -707,8 +739,12 @@
   box-shadow: var(--shadow-pop);
 }
 
-.modal-lg { max-width: 680px; }
-.modal-sm { max-width: 420px; }
+.modal-lg {
+  max-width: 680px;
+}
+.modal-sm {
+  max-width: 420px;
+}
 
 .modal-header {
   display: flex;
@@ -871,29 +907,55 @@
    RESPONSIVE
 ========================================================= */
 @media (max-width: 1400px) {
-  .stats-grid-payroll { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid-payroll {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1200px) {
-  .overview-grid { grid-template-columns: 1fr; }
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 991px) {
-  .stats-grid-payroll { grid-template-columns: repeat(2, 1fr); }
-  .form-grid { grid-template-columns: 1fr; }
+  .stats-grid-payroll {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .stats-grid-payroll { grid-template-columns: 1fr; }
-  .table-card-head { flex-direction: column; align-items: stretch; }
-  .table-card-actions .search-box { min-width: 0; }
-  .page-header { flex-direction: column; align-items: stretch; }
-  .page-header-actions { justify-content: flex-start; }
-  .dropdown-menu { left: 0; right: 0; min-width: 0; }
+  .stats-grid-payroll {
+    grid-template-columns: 1fr;
+  }
+  .table-card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .table-card-actions .search-box {
+    min-width: 0;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .page-header-actions {
+    justify-content: flex-start;
+  }
+  .dropdown-menu {
+    left: 0;
+    right: 0;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 576px) {
-  .modal-body, .modal-header, .modal-footer {
+  .modal-body,
+  .modal-header,
+  .modal-footer {
     padding-left: 18px;
     padding-right: 18px;
   }

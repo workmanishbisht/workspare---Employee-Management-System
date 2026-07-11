@@ -13,7 +13,7 @@
   </head>
   <body>
     <div class="app">
-      <!-- ============ SIDEBAR (reused — same markup as dashboard.html) ============ -->
+      <!-- ============ SIDEBAR ============ -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar__brand">
           <div class="brand__icon"><i class="ri-team-fill"></i></div>
@@ -107,7 +107,7 @@
 
       <!-- ============ MAIN ============ -->
       <div class="main">
-        <!-- ============ TOPBAR (reused — same markup as dashboard.html) ============ -->
+        <!-- ============ TOPBAR ============ -->
         <header class="topbar" id="navbar">
           <button
             class="icon-btn topbar__menu"
@@ -453,13 +453,13 @@
               </div>
             </div>
 
-            <!-- ===== SKELETON LOADING STATE ===== -->
+            <!-- ===== SKELETON LOADING STATE (shown while payroll loads) ===== -->
             <div class="skeleton-table" id="payrollSkeleton">
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
             </div>
 
             <div id="payrollTableContent" hidden>
