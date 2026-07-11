@@ -4,6 +4,11 @@
   gap: 30px;
 }
 
+/* #lmContent */
+#lmContent[hidden] {
+  display: none;
+}
+
 .page-head__actions {
   display: flex;
   gap: 12px;
@@ -176,7 +181,11 @@
   height: 100%;
   min-width: 4px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
 }
 
 /* =========================================================
@@ -220,10 +229,40 @@
 }
 
 /* =========================================================
+   LEAVE MANAGEMENT SKELETON — LAYOUT ONLY
+========================================================= */
+.lm-skeleton-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.skeleton-lm-main {
+  display: block;
+  height: 480px;
+  border-radius: 22px;
+}
+
+.skeleton-lm-side {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.skeleton-lm-side-card {
+  height: 220px;
+  border-radius: 22px;
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 @media (max-width: 1180px) {
   #lmContent .dd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lm-skeleton-grid {
     grid-template-columns: 1fr;
   }
 }

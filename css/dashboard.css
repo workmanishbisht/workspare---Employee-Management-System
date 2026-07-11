@@ -861,6 +861,7 @@ img {
   border: 1px solid var(--panel-light-border);
   border-radius: 22px;
   padding: 24px;
+  margin: 20px 0px;
   box-shadow: var(--shadow-card);
   overflow: visible;
   transition:
@@ -1516,6 +1517,92 @@ html.dark-theme .stat-card:hover {
   color: var(--color-error);
 }
 
+/* ==========================================
+   GLOBAL SKELETON
+   ----------------------------------------------------------
+   Shared shimmer engine used by EVERY page (dashboard.css is
+   loaded on every page, so this is the single source of truth
+   for the animation). Module CSS files only ever add
+   layout/sizing rules — never another @keyframes or gradient.
+========================================== */
+
+@keyframes hrms-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton-block {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #e4e4e7) 25%,
+    var(--skeleton-highlight, #f4f4f5) 37%,
+    var(--skeleton-base, #e4e4e7) 63%
+  );
+  background-size: 800px 100%;
+  animation: hrms-shimmer 1.4s ease-in-out infinite;
+}
+
+.dark-theme .skeleton-block {
+  --skeleton-base: #2a2a30;
+  --skeleton-highlight: #38383f;
+}
+
+[id$="Skeleton"][hidden],
+[class$="-skeleton-wrap"][hidden] {
+  display: none !important;
+}
+
+/* ==========================================
+   DASHBOARD SKELETON — LAYOUT ONLY
+   ----------------------------------------------------------
+   Sizing/positioning for the dashboard's own skeleton wrap.
+   No animation or gradient here — that lives in the shared
+   block above.
+========================================== */
+.dash-skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.skeleton-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.skeleton-stat-card {
+  height: 150px;
+  border-radius: 22px;
+}
+
+.skeleton-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.skeleton-chart-card {
+  height: 360px;
+  border-radius: 22px;
+}
+
+.skeleton-bottom {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.skeleton-bottom-card {
+  height: 300px;
+  border-radius: 22px;
+}
 
 /* =========================================================
    RESPONSIVE
@@ -1530,11 +1617,18 @@ html.dark-theme .stat-card:hover {
   .charts-grid {
     grid-template-columns: 1.7fr 1fr;
   }
+
+  .skeleton-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skeleton-charts {
+    grid-template-columns: 1.7fr 1fr;
+  }
 }
 
 /* ---------- Tablet Landscape ---------- */
 @media (max-width: 1180px) {
-
   .charts-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
@@ -1555,7 +1649,7 @@ html.dark-theme .stat-card:hover {
   }
 
   .birthdays-list {
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .user-menu {
@@ -1563,223 +1657,224 @@ html.dark-theme .stat-card:hover {
     bottom: calc(100% + 10px) !important;
     width: 100% !important;
   }
+
+  .skeleton-charts,
+  .skeleton-bottom {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- Tablet ---------- */
-@media (max-width:991px){
-
+@media (max-width: 991px) {
   .app,
-  .app.sidebar-collapsed{
-    grid-template-columns:1fr;
+  .app.sidebar-collapsed {
+    grid-template-columns: 1fr;
   }
 
-  .sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:280px;
-    height:100vh;
-    transform:translateX(-100%);
-    transition:.35s;
-    z-index:950;
-    box-shadow:0 20px 60px rgba(0,0,0,.18);
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: 0.35s;
+    z-index: 950;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
   }
 
-  .sidebar.open{
-    transform:translateX(0);
+  .sidebar.open {
+    transform: translateX(0);
   }
 
   .sidebar-collapsed .brand__text,
   .sidebar-collapsed .nav-item span,
   .sidebar-collapsed .sidebar__upgrade,
   .sidebar-collapsed .user__info,
-  .sidebar-collapsed .user__chevron{
-    display:block;
+  .sidebar-collapsed .user__chevron {
+    display: block;
   }
 
-  .main{
-    width:100%;
+  .main {
+    width: 100%;
   }
 
-  .topbar{
-    padding:0 20px;
+  .topbar {
+    padding: 0 20px;
   }
 
-  .content{
-    padding:22px;
+  .content {
+    padding: 22px;
   }
 
-  .overview-card .chart-wrap{
-    height:320px;
+  .overview-card .chart-wrap {
+    height: 320px;
   }
-
 }
 
 /* ---------- Mobile ---------- */
-@media (max-width:768px){
-
-  .topbar{
-    gap:12px;
-    padding:0 16px;
+@media (max-width: 768px) {
+  .topbar {
+    gap: 12px;
+    padding: 0 16px;
   }
 
-  .search-box{
-    display:none;
+  .search-box {
+    display: none;
   }
 
-  .page-head{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:18px;
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
   }
 
-  .page-head h2{
-    font-size:28px;
-    line-height:1.3;
+  .page-head h2 {
+    font-size: 28px;
+    line-height: 1.3;
   }
 
-  .stats-grid{
-    grid-template-columns:1fr;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  .birthdays-list{
-    grid-template-columns:1fr;
+  .birthdays-list {
+    grid-template-columns: 1fr;
   }
 
   /* ===== Employee Overview ===== */
 
-  .overview-card .card__head{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:14px;
+  .overview-card .card__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
   }
 
-  .overview-card .dropdown{
-    width:100%;
+  .overview-card .dropdown {
+    width: 100%;
   }
 
-  .overview-card .dropdown__btn{
-    width:100%;
-    justify-content:space-between;
+  .overview-card .dropdown__btn {
+    width: 100%;
+    justify-content: space-between;
   }
 
-  .overview-card .chart-wrap{
-    height:260px;
+  .overview-card .chart-wrap {
+    height: 260px;
   }
 
-  #overviewChart{
-    width:100%!important;
-    height:100%!important;
+  #overviewChart {
+    width: 100% !important;
+    height: 100% !important;
   }
 
   /* ===== Department Card ===== */
 
-  .dept-card__body{
-    gap:18px;
+  .dept-card__body {
+    gap: 18px;
   }
 
-  .donut-wrap{
-    width:180px;
-    height:180px;
+  .donut-wrap {
+    width: 180px;
+    height: 180px;
   }
 
-  .dept-legend{
-    gap:10px;
+  .dept-legend {
+    gap: 10px;
   }
 
+  .skeleton-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- Small Mobile ---------- */
-@media (max-width:576px){
-
-  .content{
-    padding:16px;
+@media (max-width: 576px) {
+  .content {
+    padding: 16px;
   }
 
-  .card{
-    padding:18px;
-    border-radius:18px;
+  .card {
+    padding: 18px;
+    border-radius: 18px;
   }
 
-  .page-head h2{
-    font-size:24px;
+  .page-head h2 {
+    font-size: 24px;
   }
 
-  .date-picker{
-    width:100%;
-    justify-content:center;
+  .date-picker {
+    width: 100%;
+    justify-content: center;
   }
 
-  .theme-toggle{
-    width:76px;
-    height:40px;
+  .theme-toggle {
+    width: 76px;
+    height: 40px;
   }
 
-  .theme-toggle__option{
-    width:30px;
-    height:30px;
+  .theme-toggle__option {
+    width: 30px;
+    height: 30px;
   }
 
   /* ===== Overview ===== */
 
-  .overview-card .card__head h3{
-    font-size:16px;
+  .overview-card .card__head h3 {
+    font-size: 16px;
   }
 
-  .overview-card .chart-wrap{
-    height:220px;
+  .overview-card .chart-wrap {
+    height: 220px;
   }
 
-  .dropdown__menu{
-    width:100%;
-    left:0;
-    right:0;
+  .dropdown__menu {
+    width: 100%;
+    left: 0;
+    right: 0;
   }
 
   /* ===== Department ===== */
 
-  .donut-wrap{
-    width:160px;
-    height:160px;
+  .donut-wrap {
+    width: 160px;
+    height: 160px;
   }
-
 }
 
 /* ---------- Extra Small ---------- */
-@media (max-width:420px){
-
-  .content{
-    padding:14px;
+@media (max-width: 420px) {
+  .content {
+    padding: 14px;
   }
 
-  .topbar{
-    padding:0 12px;
+  .topbar {
+    padding: 0 12px;
   }
 
-  .icon-btn{
-    width:40px;
-    height:40px;
+  .icon-btn {
+    width: 40px;
+    height: 40px;
   }
 
-  .theme-toggle{
-    width:72px;
+  .theme-toggle {
+    width: 72px;
   }
 
-  .page-head h2{
-    font-size:22px;
+  .page-head h2 {
+    font-size: 22px;
   }
 
-  .card{
-    padding:16px;
+  .card {
+    padding: 16px;
   }
 
-  .overview-card .chart-wrap{
-    height:200px;
+  .overview-card .chart-wrap {
+    height: 200px;
   }
 
-  .donut-wrap{
-    width:145px;
-    height:145px;
+  .donut-wrap {
+    width: 145px;
+    height: 145px;
   }
-
 }

@@ -275,3 +275,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   EMPLOYEES SKELETON — LAYOUT ONLY
+========================================================= */
+.emp-skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-toolbar {
+  height: 48px;
+  width: 240px;
+  border-radius: 999px;
+}
+
+.skeleton-row {
+  height: 64px;
+  border-radius: 14px;
+}
+
+@media (max-width: 640px) {
+  .skeleton-toolbar {
+    width: 100%;
+  }
+}

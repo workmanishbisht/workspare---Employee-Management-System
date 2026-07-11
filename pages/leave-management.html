@@ -162,20 +162,26 @@
             </div>
           </div>
 
-          <!-- ===== SKELETON ===== -->
+          <!-- ===== SKELETON (shown while leave requests load) ===== -->
           <div id="lmSkeleton" class="att-skeleton-wrap">
-            <div class="skeleton-row">
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
+            <div class="skeleton-stats-row">
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
             </div>
-            <div class="skeleton skeleton--table"></div>
+            <div class="lm-skeleton-grid">
+              <span class="skeleton-block skeleton-lm-main"></span>
+              <div class="skeleton-lm-side">
+                <span class="skeleton-block skeleton-lm-side-card"></span>
+                <span class="skeleton-block skeleton-lm-side-card"></span>
+              </div>
+            </div>
           </div>
 
-          <!-- ===== REAL CONTENT ===== -->
-          <div id="lmContent" class="att-hidden">
+          <!-- ===== REAL CONTENT (hidden while loading) ===== -->
+          <div id="lmContent" hidden>
             <!-- Stat cards -->
             <section
               class="stats-grid att-stats-grid"

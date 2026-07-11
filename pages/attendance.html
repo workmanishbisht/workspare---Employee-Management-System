@@ -156,20 +156,20 @@
             </button>
           </div>
 
-          <!-- ===== SKELETON ===== -->
+          <!-- ===== SKELETON (shown while attendance loads) ===== -->
           <div id="attSkeleton" class="att-skeleton-wrap">
-            <div class="skeleton-row">
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
-              <div class="skeleton skeleton--stat"></div>
+            <div class="skeleton-stats-row">
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
+              <span class="skeleton-block skeleton-stat"></span>
             </div>
-            <div class="skeleton skeleton--table"></div>
+            <span class="skeleton-block skeleton-table"></span>
           </div>
 
-          <!-- ===== REAL CONTENT ===== -->
-          <div id="attContent" class="att-hidden">
+          <!-- ===== REAL CONTENT (hidden while loading) ===== -->
+          <div id="attContent" hidden>
             <!-- Stat cards -->
             <section
               class="stats-grid att-stats-grid"

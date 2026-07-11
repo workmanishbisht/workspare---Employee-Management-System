@@ -16,6 +16,8 @@ import {
   guardAndLoadUser,
   setupUserMenu,
   setupSidebarToggle,
+  showSkeleton,
+  hideSkeleton,
 } from "./layout.js";
 
 (function () {
@@ -143,8 +145,7 @@ import {
         renderStats();
         renderAttendance();
 
-        $("#attSkeleton").classList.add("att-hidden");
-        $("#attContent").classList.remove("att-hidden");
+        hideSkeleton("attSkeleton", "attContent");
       },
       (error) => {
         console.error("Failed to load attendance:", error);
@@ -654,6 +655,8 @@ import {
     renderNav();
     setupUserMenu();
     setupSidebarToggle();
+
+    showSkeleton("attSkeleton", "attContent");
 
     await loadEmployeesForSelect();
     loadAttendance();

@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holidays · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/holiday.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by renderNav() -->
+          </ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- ============ TOPBAR (reused) ============ -->
+        <header class="topbar" id="navbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option"
+                ><i class="ri-sun-line"></i
+              ></span>
+              <span id="themeToggleDark" class="theme-toggle__option"
+                ><i class="ri-moon-line"></i
+              ></span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============ PAGE CONTENT ============ -->
+        <main class="content" id="holidaysPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Holiday Management</h1>
+              <p>
+                Manage company holidays, festivals, optional holidays, and
+                regional holiday calendars.
+              </p>
+            </div>
+
+            <div class="page-header-actions">
+              <div class="select-pill">
+                <i class="ri-calendar-line"></i>
+                <select id="yearSelect"></select>
+              </div>
+              <div class="select-pill">
+                <i class="ri-map-pin-line"></i>
+                <select id="locationSelect">
+                  <option value="">All Locations</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="addHolidayBtn">
+                <i class="ri-add-line"></i> Add Holiday
+              </button>
+            </div>
+          </div>
+
+          <!-- ---------- STATISTICS CARDS ---------- -->
+          <section
+            class="stats-grid stats-grid-holiday"
+            id="statsGrid"
+            aria-live="polite"
+          >
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-primary">
+                  <i class="ri-calendar-2-fill"></i>
+                </div>
+                <span class="stat-label">Total Holidays</span>
+              </div>
+              <h3 class="stat-value" id="statTotalHolidays">0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub">This Year</span>
+                <svg
+                  class="stat-spark"
+                  id="sparkTotal"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-success">
+                  <i class="ri-flashlight-fill"></i>
+                </div>
+                <span class="stat-label">Upcoming</span>
+              </div>
+              <h3 class="stat-value" id="statUpcoming">0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub">In Next 30 Days</span>
+                <svg
+                  class="stat-spark"
+                  id="sparkUpcoming"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-briefcase-4-fill"></i>
+                </div>
+                <span class="stat-label">Working Days</span>
+              </div>
+              <h3 class="stat-value" id="statWorkingDays">0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub">This Year</span>
+                <svg
+                  class="stat-spark"
+                  id="sparkWorking"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-sun-cloudy-fill"></i>
+                </div>
+                <span class="stat-label">Weekend Days</span>
+              </div>
+              <h3 class="stat-value" id="statWeekends">0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub">This Year</span>
+                <svg
+                  class="stat-spark"
+                  id="sparkWeekend"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------- MAIN GRID: left content + right sidebar ---------- -->
+          <div class="holiday-main-grid">
+            <div class="holiday-left-col">
+              <!-- ---------- CALENDAR PREVIEW ---------- -->
+              <section class="card">
+                <div class="calendar-card-head">
+                  <h3>Holiday Calendar</h3>
+                  <div class="calendar-nav">
+                    <button class="icon-btn-sm" id="calPrevBtn">
+                      <i class="ri-arrow-left-s-line"></i>
+                    </button>
+                    <span class="calendar-nav-label" id="calMonthLabel"
+                      >July 2026</span
+                    >
+                    <button class="icon-btn-sm" id="calNextBtn">
+                      <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="calendar-legend">
+                  <span
+                    ><span class="legend-swatch national"></span>National</span
+                  >
+                  <span
+                    ><span class="legend-swatch festival"></span>Festival</span
+                  >
+                  <span
+                    ><span class="legend-swatch optional"></span>Optional</span
+                  >
+                  <span
+                    ><span class="legend-swatch weekend"></span>Weekend</span
+                  >
+                  <span><span class="legend-swatch today"></span>Today</span>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+              </section>
+
+              <!-- ---------- HOLIDAY LIST ---------- -->
+              <section class="card table-card">
+                <div class="table-card-head">
+                  <h3>Holiday List</h3>
+                  <div class="table-card-actions">
+                    <div class="search-box">
+                      <i class="ri-search-line"></i>
+                      <input
+                        type="text"
+                        id="holidaySearchInput"
+                        placeholder="Search holiday..."
+                        autocomplete="off"
+                      />
+                    </div>
+
+                    <div class="dropdown-wrap">
+                      <button
+                        class="icon-btn-sm"
+                        id="filtersBtn"
+                        title="Filters"
+                      >
+                        <i class="ri-filter-3-line"></i>
+                      </button>
+                      <div class="dropdown-menu" id="filtersMenu" hidden>
+                        <div class="form-group">
+                          <label for="filterCategory">Category</label>
+                          <select id="filterCategory" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="National">National</option>
+                            <option value="Festival">Festival</option>
+                            <option value="Optional">Optional</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="filterLocation">Location</label>
+                          <select id="filterLocation" class="filter-select">
+                            <option value="">All Locations</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="filterStatus">Status</label>
+                          <select id="filterStatus" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </div>
+                        <button
+                          class="btn btn-ghost btn-sm"
+                          id="resetFiltersBtn"
+                        >
+                          <i class="ri-refresh-line"></i> Reset Filters
+                        </button>
+                      </div>
+                    </div>
+
+                    <button class="icon-btn-sm" id="exportBtn" title="Export">
+                      <i class="ri-download-2-line"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- ===== SKELETON ===== -->
+                <div class="skeleton-table" id="holidaySkeleton">
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                </div>
+
+                <div id="holidayTableContent" hidden>
+                  <div class="table-responsive" id="holidayTableWrap">
+                    <table class="data-table" id="holidayTable">
+                      <thead>
+                        <tr>
+                          <th data-sort="date">
+                            Date <i class="ri-arrow-up-down-line"></i>
+                          </th>
+                          <th data-sort="name">
+                            Holiday Name <i class="ri-arrow-up-down-line"></i>
+                          </th>
+                          <th>Day</th>
+                          <th data-sort="category">
+                            Category <i class="ri-arrow-up-down-line"></i>
+                          </th>
+                          <th>Location</th>
+                          <th>Applicable Departments</th>
+                          <th>Status</th>
+                          <th class="col-actions">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="holidayTableBody"></tbody>
+                    </table>
+                  </div>
+
+                  <!-- ===== EMPTY STATE ===== -->
+                  <div class="empty-state" id="holidayEmptyState" hidden>
+                    <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+                      <circle
+                        cx="44"
+                        cy="44"
+                        r="44"
+                        fill="var(--stat-purple-bg)"
+                      />
+                      <rect
+                        x="22"
+                        y="26"
+                        width="44"
+                        height="36"
+                        rx="8"
+                        fill="#fff"
+                        stroke="var(--color-primary)"
+                        stroke-width="2.5"
+                      />
+                      <path
+                        d="M22 36h44"
+                        stroke="var(--color-primary)"
+                        stroke-width="2.5"
+                      />
+                      <path
+                        d="M30 22v10M58 22v10"
+                        stroke="var(--color-primary)"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                    <h3>No Holidays Found</h3>
+                    <p>Get started by adding a holiday to your calendar.</p>
+                    <button class="btn btn-primary" id="emptyStateAddBtn">
+                      <i class="ri-add-line"></i> Add Holiday
+                    </button>
+                  </div>
+
+                  <div class="table-pagination" id="holidayPagination">
+                    <span class="pagination-info" id="paginationInfo"></span>
+                    <div
+                      class="pagination-controls"
+                      id="paginationControls"
+                    ></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ---------- CHARTS ---------- -->
+              <section class="charts-grid-holiday">
+                <div class="card">
+                  <div class="chart-card-head">
+                    <h3>Holiday Distribution</h3>
+                  </div>
+                  <div class="donut-wrap">
+                    <div class="donut" id="categoryDonut">
+                      <div class="donut-center">
+                        <strong id="categoryDonutTotal">0</strong>
+                        <span>Total</span>
+                      </div>
+                    </div>
+                    <ul class="donut-legend" id="categoryLegend"></ul>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="chart-card-head">
+                    <h3>Monthly Holiday Timeline</h3>
+                  </div>
+                  <div class="bar-chart" id="timelineChart"></div>
+                </div>
+              </section>
+            </div>
+
+            <!-- ---------- RIGHT SIDEBAR ---------- -->
+            <aside class="side-col">
+              <section class="card">
+                <div class="card__head"><h3>Upcoming Holidays</h3></div>
+                <div id="upcomingList"></div>
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <h3><i class="ri-shield-check-line"></i> Holiday Policy</h3>
+                </div>
+                <div class="policy-list">
+                  <div class="policy-item">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <p>
+                      <strong>National &amp; Festival holidays</strong> are paid
+                      and apply to all locations unless overridden.
+                    </p>
+                  </div>
+                  <div class="policy-item">
+                    <i class="ri-information-line"></i>
+                    <p>
+                      <strong>Optional holidays</strong> can be claimed by
+                      employees against their leave balance.
+                    </p>
+                  </div>
+                  <div class="policy-item">
+                    <i class="ri-map-pin-line"></i>
+                    <p>
+                      <strong>Location-specific holidays</strong> apply only to
+                      employees mapped to that office.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                  <button class="quick-action" id="qaAddHoliday">
+                    <span
+                      class="quick-action-icon"
+                      style="background: var(--color-primary)"
+                      ><i class="ri-add-line"></i
+                    ></span>
+                    <span>Add Holiday</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" id="qaImport">
+                    <span
+                      class="quick-action-icon"
+                      style="background: var(--stat-blue)"
+                      ><i class="ri-upload-2-line"></i
+                    ></span>
+                    <span>Import Holidays</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" id="qaExportCal">
+                    <span
+                      class="quick-action-icon"
+                      style="background: var(--stat-green)"
+                      ><i class="ri-calendar-check-line"></i
+                    ></span>
+                    <span>Export Calendar</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" id="qaSyncGoogle">
+                    <span
+                      class="quick-action-icon"
+                      style="background: var(--stat-orange)"
+                      ><i class="ri-google-fill"></i
+                    ></span>
+                    <span>Sync Google Calendar</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" id="qaDownloadPdf">
+                    <span
+                      class="quick-action-icon"
+                      style="background: var(--stat-indigo)"
+                      ><i class="ri-file-pdf-2-line"></i
+                    ></span>
+                    <span>Download PDF</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       ADD / EDIT HOLIDAY MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="holidayModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="holidayModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="holidayModalTitle">Add Holiday</h3>
+          <button
+            class="modal-close"
+            id="closeHolidayModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="holidayForm" class="modal-body">
+          <input type="hidden" id="holidayDocId" value="" />
+
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="holidayNameInput">Holiday Name</label>
+              <input
+                type="text"
+                id="holidayNameInput"
+                placeholder="e.g. Republic Day"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="holidayDateInput">Date</label>
+              <input type="date" id="holidayDateInput" required />
+            </div>
+
+            <div class="form-group">
+              <label for="holidayCategorySelect">Category</label>
+              <select id="holidayCategorySelect" required>
+                <option value="National">National</option>
+                <option value="Festival">Festival</option>
+                <option value="Optional">Optional</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="holidayLocationSelect">Location</label>
+              <select id="holidayLocationSelect">
+                <option value="All Locations">All Locations</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label>Applicable Departments</label>
+              <div class="checkbox-grid" id="departmentCheckboxes">
+                <label class="checkbox-item">
+                  <input type="checkbox" value="All Departments" checked /> All
+                  Departments
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="holidayNotesInput">Notes</label>
+              <textarea
+                id="holidayNotesInput"
+                rows="2"
+                placeholder="Optional notes..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelHolidayModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveHolidayBtn">
+              <i class="ri-save-line"></i> Add Holiday
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       DELETE CONFIRMATION MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="deleteModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+      >
+        <div class="modal-body modal-body-center">
+          <div class="modal-icon modal-icon-danger">
+            <i class="ri-delete-bin-6-line"></i>
+          </div>
+          <h3 id="deleteModalTitle">Delete Holiday?</h3>
+          <p>
+            This will permanently remove
+            <strong id="deleteTargetName">this holiday</strong> from the
+            calendar. This action cannot be undone.
+          </p>
+        </div>
+        <div class="modal-footer modal-footer-center">
+          <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="ri-delete-bin-6-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SCRIPTS
+    ====================================================== -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/holidays.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

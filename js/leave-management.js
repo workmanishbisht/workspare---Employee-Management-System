@@ -1,4 +1,3 @@
-
 import { db } from "../firebase/firebase.js";
 import {
   collection,
@@ -17,6 +16,8 @@ import {
   guardAndLoadUser,
   setupUserMenu,
   setupSidebarToggle,
+  showSkeleton,
+  hideSkeleton,
 } from "./layout.js";
 
 (function () {
@@ -119,8 +120,7 @@ import {
         renderLeaveBalance();
         renderUpcomingLeaves();
 
-        $("#lmSkeleton").classList.add("att-hidden");
-        $("#lmContent").classList.remove("att-hidden");
+        hideSkeleton("lmSkeleton", "lmContent");
       },
       (error) => {
         console.error("Failed to load leave requests:", error);
@@ -703,6 +703,8 @@ import {
     renderNav();
     setupUserMenu();
     setupSidebarToggle();
+
+    showSkeleton("lmSkeleton", "lmContent");
 
     await loadEmployeesForSelect();
     loadLeaveRequests();

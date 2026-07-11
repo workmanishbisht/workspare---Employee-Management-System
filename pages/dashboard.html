@@ -162,7 +162,7 @@
           <div class="page-head">
             <div>
               <h2>
-                Welcome back, <span id="userName">Manish</span>!
+                Welcome back, <span id="userName" style="color: #6c5ce7;">Manish</span><span style="color: #6c5ce7;">!</span>
                 <!-- <span class="wave">👋</span> -->
               </h2>
               <p>Here's what's happening in your organization today.</p>
@@ -174,89 +174,112 @@
             </label>
           </div>
 
-          <!-- Stat cards -->
-          <section class="stats-grid" id="statsGrid">
-            <!-- injected by JS -->
-          </section>
-
-          <!-- Charts row -->
-          <section class="charts-grid">
-            <div class="card overview-card">
-              <div class="card__head">
-                <h3>Employee Overview</h3>
-                <div class="dropdown" id="overviewRangeDropdown">
-                  <button class="dropdown__btn">
-                    <span id="overviewRangeLabel">This Month</span>
-                    <i class="ri-arrow-down-s-line"></i>
-                  </button>
-                  <ul class="dropdown__menu">
-                    <li data-range="week">This Week</li>
-                    <li data-range="month" class="selected">This Month</li>
-                    <li data-range="quarter">This Quarter</li>
-                    <li data-range="year">This Year</li>
-                  </ul>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <canvas id="overviewChart"></canvas>
-              </div>
+          <!-- ============ SKELETON (shown while data loads) ============ -->
+          <div class="dash-skeleton-wrap" id="dashSkeleton">
+            <div class="skeleton-stats">
+              <span class="skeleton-block skeleton-stat-card"></span>
+              <span class="skeleton-block skeleton-stat-card"></span>
+              <span class="skeleton-block skeleton-stat-card"></span>
+              <span class="skeleton-block skeleton-stat-card"></span>
             </div>
 
-            <div class="card dept-card">
-              <div class="card__head">
-                <h3>Employees by Role</h3>
-                <i class="ri-sparkling-2-fill dept-card__sparkle"></i>
-              </div>
-              <div class="dept-card__body">
-                <div class="donut-wrap">
-                  <canvas id="deptChart"></canvas>
-                  <div class="donut-center">
-                    <strong id="donutTotal">0</strong>
-                    <span>Total</span>
+            <div class="skeleton-charts">
+              <span class="skeleton-block skeleton-chart-card"></span>
+              <span class="skeleton-block skeleton-chart-card"></span>
+            </div>
+
+            <div class="skeleton-bottom">
+              <span class="skeleton-block skeleton-bottom-card"></span>
+              <span class="skeleton-block skeleton-bottom-card"></span>
+            </div>
+          </div>
+
+          <!-- ============ REAL CONTENT (hidden while loading) ============ -->
+          <div id="dashContent" hidden>
+            <!-- Stat cards -->
+            <section class="stats-grid" id="statsGrid">
+              <!-- injected by JS -->
+            </section>
+
+            <!-- Charts row -->
+            <section class="charts-grid">
+              <div class="card overview-card">
+                <div class="card__head">
+                  <h3>Employee Overview</h3>
+                  <div class="dropdown" id="overviewRangeDropdown">
+                    <button class="dropdown__btn">
+                      <span id="overviewRangeLabel">This Month</span>
+                      <i class="ri-arrow-down-s-line"></i>
+                    </button>
+                    <ul class="dropdown__menu">
+                      <li data-range="week">This Week</li>
+                      <li data-range="month" class="selected">This Month</li>
+                      <li data-range="quarter">This Quarter</li>
+                      <li data-range="year">This Year</li>
+                    </ul>
                   </div>
                 </div>
-                <ul class="dept-legend" id="deptLegend">
-                  <!-- injected by JS -->
-                </ul>
+                <div class="chart-wrap">
+                  <canvas id="overviewChart"></canvas>
+                </div>
               </div>
-              <button class="btn btn--ghost btn--block">
-                View Full Report
-              </button>
-            </div>
-          </section>
 
-          <!-- Quick actions + Recent activity row is on the right column (see grid below) -->
-          <div class="bottom-grid">
-            <section class="card birthdays-card">
-              <div class="card__head">
-                <h3>Upcoming Birthdays &amp; Work Anniversaries</h3>
-                <a href="#" class="link">View all</a>
-              </div>
-              <div class="birthdays-list" id="birthdaysList">
-                <!-- injected by JS -->
+              <div class="card dept-card">
+                <div class="card__head">
+                  <h3>Employees by Role</h3>
+                  <i class="ri-sparkling-2-fill dept-card__sparkle"></i>
+                </div>
+                <div class="dept-card__body">
+                  <div class="donut-wrap">
+                    <canvas id="deptChart"></canvas>
+                    <div class="donut-center">
+                      <strong id="donutTotal">0</strong>
+                      <span>Total</span>
+                    </div>
+                  </div>
+                  <ul class="dept-legend" id="deptLegend">
+                    <!-- injected by JS -->
+                  </ul>
+                </div>
+                <button class="btn btn--ghost btn--block">
+                  View Full Report
+                </button>
               </div>
             </section>
 
-            <aside class="side-col">
-              <section class="card quick-actions-card">
+            <!-- Quick actions + Recent activity row is on the right column (see grid below) -->
+            <div class="bottom-grid">
+              <section class="card birthdays-card">
                 <div class="card__head">
-                  <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                  <h3>Upcoming Birthdays &amp; Work Anniversaries</h3>
+                  <a href="#" class="link">View all</a>
                 </div>
-                <div class="quick-actions" id="quickActions">
+                <div class="birthdays-list" id="birthdaysList">
                   <!-- injected by JS -->
                 </div>
               </section>
 
-              <section class="card activity-card">
-                <div class="card__head">
-                  <h3>Recent Activity</h3>
-                  <a href="#" class="link">View all</a>
-                </div>
-                <ul class="activity-list" id="activityList">
-                  <!-- injected by JS -->
-                </ul>
-              </section>
-            </aside>
+              <aside class="side-col">
+                <section class="card quick-actions-card">
+                  <div class="card__head">
+                    <h3><i class="ri-flashlight-fill"></i> Quick Actions</h3>
+                  </div>
+                  <div class="quick-actions" id="quickActions">
+                    <!-- injected by JS -->
+                  </div>
+                </section>
+
+                <section class="card activity-card">
+                  <div class="card__head">
+                    <h3>Recent Activity</h3>
+                    <a href="#" class="link">View all</a>
+                  </div>
+                  <ul class="activity-list" id="activityList">
+                    <!-- injected by JS -->
+                  </ul>
+                </section>
+              </aside>
+            </div>
           </div>
         </main>
       </div>

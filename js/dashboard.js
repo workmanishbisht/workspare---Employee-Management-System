@@ -14,6 +14,8 @@ import {
   guardAndLoadUser,
   setupUserMenu,
   setupSidebarToggle,
+  showSkeleton,
+  hideSkeleton,
 } from "../js/layout.js";
 
 (function () {
@@ -29,14 +31,24 @@ import {
       color: "blue",
       nav: "./employees.html?action=add",
     },
-    { label: "Add Department", icon: "ri-building-4-line", color: "green", nav: "#" },
+    {
+      label: "Add Department",
+      icon: "ri-building-4-line",
+      color: "green",
+      nav: "#",
+    },
     {
       label: "Mark Attendance",
       icon: "ri-calendar-check-line",
       color: "purple",
       nav: "#",
     },
-    { label: "Apply Leave", icon: "ri-send-plane-line", color: "orange", nav: "#" },
+    {
+      label: "Apply Leave",
+      icon: "ri-send-plane-line",
+      color: "orange",
+      nav: "#",
+    },
     {
       label: "Generate Report",
       icon: "ri-file-chart-2-line",
@@ -188,7 +200,15 @@ import {
           month: "short",
         });
       } else {
-        end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
+        end = new Date(
+          now.getFullYear(),
+          now.getMonth() - i + 1,
+          0,
+          23,
+          59,
+          59,
+          999,
+        );
         start = new Date(now.getFullYear(), now.getMonth() - i, 1);
         label = start.toLocaleDateString("en-US", { month: "short" });
       }
@@ -210,7 +230,9 @@ import {
   function buildRecentActivity(users) {
     return users
       .slice()
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+      .sort(
+        (a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0),
+      )
       .slice(0, 5)
       .map((u) => ({
         title: u.fullName || u.email || "New user",
@@ -539,6 +561,8 @@ import {
      INIT
   ========================================================= */
   async function init() {
+    showSkeleton("dashSkeleton", "dashContent");
+
     await guardAndLoadUser();
 
     allUsers = await fetchAllUsers();
@@ -554,6 +578,8 @@ import {
     setupUserMenu();
     setupSidebarToggle();
     renderOverviewChart("month");
+
+    hideSkeleton("dashSkeleton", "dashContent");
   }
 
   document.addEventListener("DOMContentLoaded", init);

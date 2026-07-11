@@ -18,6 +18,8 @@ import {
   guardAndLoadUser,
   setupUserMenu,
   setupSidebarToggle,
+  showSkeleton,
+  hideSkeleton,
 } from "../js/layout.js";
 
 (function () {
@@ -413,22 +415,21 @@ import {
   }
 
   /* =========================================================
-     LOADING STATES (skeleton cards + skeleton table)
+     LOADING STATES
+     ----------------------------------------------------------
+     Delegates entirely to the layout.js Skeleton Manager.
+     Stats block: #deptStatsSkeleton / #deptStatsGrid
+     Table block: #departmentsSkeleton / #departmentsTableWrap
   ========================================================= */
   function setLoading(isLoading) {
-    const statsSkeleton = $("#deptStatsSkeleton");
-    const statsGrid = $("#deptStatsGrid");
-    const tableSkeleton = $("#departmentsSkeleton");
-    const tableWrap = document.querySelector(".table-wrap");
-    const emptyState = $("#departmentsEmptyState");
-
-    if (statsSkeleton) statsSkeleton.classList.toggle("active", isLoading);
-    if (statsGrid) statsGrid.style.display = isLoading ? "none" : "";
-
-    if (tableSkeleton) tableSkeleton.classList.toggle("active", isLoading);
     if (isLoading) {
-      if (tableWrap) tableWrap.style.display = "none";
+      showSkeleton("deptStatsSkeleton", "deptStatsGrid");
+      showSkeleton("departmentsSkeleton", "departmentsTableWrap");
+      const emptyState = $("#departmentsEmptyState");
       if (emptyState) emptyState.hidden = true;
+    } else {
+      hideSkeleton("deptStatsSkeleton", "deptStatsGrid");
+      hideSkeleton("departmentsSkeleton", "departmentsTableWrap");
     }
   }
 

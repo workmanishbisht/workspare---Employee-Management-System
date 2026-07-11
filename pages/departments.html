@@ -142,7 +142,16 @@
           </div>
 
           <!-- ============ STATS ============ -->
-          <div class="dept-stats-grid">
+          <!-- Skeleton (shown while stats load) -->
+          <div class="dept-stats-skeleton" id="deptStatsSkeleton">
+            <span class="skeleton-block stat-skeleton-card"></span>
+            <span class="skeleton-block stat-skeleton-card"></span>
+            <span class="skeleton-block stat-skeleton-card"></span>
+            <span class="skeleton-block stat-skeleton-card"></span>
+          </div>
+
+          <!-- Real stats (hidden while loading) -->
+          <div class="dept-stats-grid" id="deptStatsGrid" hidden>
             <div class="card stat-card">
               <div class="stat-card__icon stat-card__icon--purple">
                 <i class="ri-building-4-line"></i>
@@ -239,7 +248,17 @@
 
           <!-- ============ TABLE ============ -->
           <div class="card dept-table-card">
-            <div class="table-wrap">
+            <!-- Skeleton loading (shown while departments load) -->
+            <div class="dept-skeleton" id="departmentsSkeleton">
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+              <span class="skeleton-block skeleton-row"></span>
+            </div>
+
+            <!-- Real table (hidden while loading) -->
+            <div class="table-wrap" id="departmentsTableWrap" hidden>
               <table class="dept-table">
                 <thead>
                   <tr>
@@ -254,15 +273,6 @@
                 </thead>
                 <tbody id="departmentsTableBody"></tbody>
               </table>
-            </div>
-
-            <!-- Skeleton loading -->
-            <div class="dept-skeleton" id="departmentsSkeleton">
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
             </div>
 
             <!-- Empty state -->

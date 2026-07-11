@@ -1,431 +1,736 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Payroll · Employee Management System</title>
-<link rel="stylesheet" href="../css/payroll.css" />
-
-<!-- Icons (already used across the app, e.g. toast icons in auth.js) -->
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-</head>
-<body>
-
-  <div class="app-shell">
-    <!-- ================= SIDEBAR (reused) ================= -->
-    <aside id="sidebar" class="sidebar"></aside>
-
-    <div class="app-main">
-
-      <!-- ================= NAVBAR (reused) ================= -->
-      <header id="navbar" class="navbar"></header>
-
-      <!-- ================= PAGE CONTENT ================= -->
-      <main class="page-content" id="payrollPage">
-
-        <!-- ---------- PAGE HEADER ---------- -->
-        <div class="page-header">
-          <div class="page-header-text">
-            <h1>Payroll</h1>
-            <p>Manage employee salaries, payslips and payroll processing.</p>
-          </div>
-
-          <div class="page-header-actions">
-            <button class="btn btn-outline" id="runMonthlyPayrollBtn">
-              <i class="ri-loop-right-line"></i>
-              Run Monthly Payroll
-            </button>
-            <button class="btn btn-primary" id="generatePayrollBtn">
-              <i class="ri-add-line"></i>
-              Generate Payroll
-            </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payroll · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/payroll.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused — same markup as dashboard.html) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
           </div>
         </div>
 
-        <!-- ---------- STATISTICS CARDS ---------- -->
-        <section class="stats-grid" id="statsGrid" aria-live="polite">
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by renderNav() -->
+          </ul>
+        </nav>
 
-          <div class="card stat-card">
-            <div class="stat-icon stat-icon-primary"><i class="ri-wallet-3-line"></i></div>
-            <div class="stat-body">
-              <span class="stat-label">Total Payroll</span>
-              <h3 class="stat-value" id="statTotalPayroll">₹0</h3>
-              <span class="stat-trend trend-up" id="statTotalPayrollTrend">
-                <i class="ri-arrow-up-line"></i> 0%
-              </span>
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
             </div>
-          </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
 
-          <div class="card stat-card">
-            <div class="stat-icon stat-icon-success"><i class="ri-user-received-2-line"></i></div>
-            <div class="stat-body">
-              <span class="stat-label">Employees Paid</span>
-              <h3 class="stat-value" id="statEmployeesPaid">0</h3>
-              <span class="stat-trend trend-up" id="statEmployeesPaidTrend">
-                <i class="ri-arrow-up-line"></i> 0%
-              </span>
-            </div>
-          </div>
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i>
+                <span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i>
+                <span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i>
+                <span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
 
-          <div class="card stat-card">
-            <div class="stat-icon stat-icon-warning"><i class="ri-time-line"></i></div>
-            <div class="stat-body">
-              <span class="stat-label">Pending Payments</span>
-              <h3 class="stat-value" id="statPendingPayments">0</h3>
-              <span class="stat-trend trend-down" id="statPendingPaymentsTrend">
-                <i class="ri-arrow-down-line"></i> 0%
-              </span>
-            </div>
-          </div>
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-          <div class="card stat-card">
-            <div class="stat-icon stat-icon-info"><i class="ri-bar-chart-2-line"></i></div>
-            <div class="stat-body">
-              <span class="stat-label">Average Salary</span>
-              <h3 class="stat-value" id="statAverageSalary">₹0</h3>
-              <span class="stat-trend trend-up" id="statAverageSalaryTrend">
-                <i class="ri-arrow-up-line"></i> 0%
-              </span>
-            </div>
-          </div>
-
-          <div class="card stat-card">
-            <div class="stat-icon stat-icon-danger"><i class="ri-calendar-2-line"></i></div>
-            <div class="stat-body">
-              <span class="stat-label">This Month Expense</span>
-              <h3 class="stat-value" id="statMonthExpense">₹0</h3>
-              <span class="stat-trend trend-up" id="statMonthExpenseTrend">
-                <i class="ri-arrow-up-line"></i> 0%
-              </span>
-            </div>
-          </div>
-
-        </section>
-
-        <!-- ---------- TOOLBAR: SEARCH + FILTERS ---------- -->
-        <section class="card table-toolbar">
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- ============ TOPBAR (reused — same markup as dashboard.html) ============ -->
+        <header class="topbar" id="navbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
 
           <div class="search-box">
             <i class="ri-search-line"></i>
             <input
               type="text"
-              id="payrollSearchInput"
-              placeholder="Search by employee name, ID or department..."
-              autocomplete="off"
+              id="searchInput"
+              placeholder="Search employees, departments..."
             />
+            <kbd>⌘ K</kbd>
           </div>
 
-          <div class="filter-bar">
-
-            <select id="filterDepartment" class="filter-select">
-              <option value="">All Departments</option>
-            </select>
-
-            <select id="filterStatus" class="filter-select">
-              <option value="">All Statuses</option>
-              <option value="Paid">Paid</option>
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-              <option value="Failed">Failed</option>
-            </select>
-
-            <select id="filterMonth" class="filter-select">
-              <option value="">All Months</option>
-              <option value="January">January</option>
-              <option value="February">February</option>
-              <option value="March">March</option>
-              <option value="April">April</option>
-              <option value="May">May</option>
-              <option value="June">June</option>
-              <option value="July">July</option>
-              <option value="August">August</option>
-              <option value="September">September</option>
-              <option value="October">October</option>
-              <option value="November">November</option>
-              <option value="December">December</option>
-            </select>
-
-            <select id="filterYear" class="filter-select">
-              <option value="">All Years</option>
-            </select>
-
-            <select id="sortPayroll" class="filter-select">
-              <option value="date-desc">Newest First</option>
-              <option value="date-asc">Oldest First</option>
-              <option value="salary-desc">Net Salary: High to Low</option>
-              <option value="salary-asc">Net Salary: Low to High</option>
-              <option value="name-asc">Employee Name (A-Z)</option>
-            </select>
-
-            <button class="btn btn-ghost" id="resetFiltersBtn">
-              <i class="ri-refresh-line"></i> Reset Filters
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
             </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
 
+        <!-- ============ PAGE CONTENT ============ -->
+        <main class="content" id="payrollPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Payroll</h1>
+              <p>Manage and process employee salaries with ease.</p>
+            </div>
+
+            <div class="page-header-actions">
+              <div class="period-select">
+                <i class="ri-calendar-line"></i>
+                <select id="periodMonthSelect"></select>
+                <select id="periodYearSelect"></select>
+                <i class="ri-arrow-down-s-line"></i>
+              </div>
+
+              <div class="split-btn">
+                <button class="btn btn-primary" id="runPayrollBtn">
+                  <i class="ri-play-fill"></i> Run Payroll
+                </button>
+                <button
+                  class="btn btn-primary split-btn-caret"
+                  id="runPayrollCaretBtn"
+                  aria-label="More actions"
+                >
+                  <i class="ri-arrow-down-s-line"></i>
+                </button>
+                <div
+                  class="dropdown-menu dropdown-menu-right"
+                  id="runPayrollMenu"
+                  hidden
+                >
+                  <button type="button" id="generatePayrollBtn">
+                    <i class="ri-add-line"></i> Generate Payroll
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="export-bar">
-            <button class="btn btn-outline btn-sm" id="exportCsvBtn"><i class="ri-file-text-line"></i> CSV</button>
-            <button class="btn btn-outline btn-sm" id="exportExcelBtn"><i class="ri-file-excel-2-line"></i> Excel</button>
-            <button class="btn btn-outline btn-sm" id="exportPdfBtn"><i class="ri-file-pdf-2-line"></i> PDF</button>
-          </div>
-
-        </section>
-
-        <!-- ---------- MAIN GRID: TABLE + RIGHT SIDEBAR ---------- -->
-        <section class="payroll-layout">
-
-          <!-- ===== PAYROLL TABLE ===== -->
-          <div class="card table-card">
-
-            <div class="table-responsive">
-              <table class="data-table" id="payrollTable">
-                <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Employee ID</th>
-                    <th>Department</th>
-                    <th>Designation</th>
-                    <th>Basic Salary</th>
-                    <th>Allowances</th>
-                    <th>Deductions</th>
-                    <th>Net Salary</th>
-                    <th>Status</th>
-                    <th>Payroll Month</th>
-                    <th>Payment Date</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-
-                <!-- Populated by renderPayroll() -->
-                <tbody id="payrollTableBody"></tbody>
-              </table>
+          <!-- ---------- STATISTICS CARDS ---------- -->
+          <section
+            class="stats-grid stats-grid-payroll"
+            id="statsGrid"
+            aria-live="polite"
+          >
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-primary">
+                  <i class="ri-wallet-3-line"></i>
+                </div>
+                <span class="stat-label">Total Payroll</span>
+              </div>
+              <h3 class="stat-value" id="statTotalPayroll">₹0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub" id="statTotalPayrollSub">—</span>
+                <svg
+                  class="stat-spark"
+                  id="statTotalPayrollSpark"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
             </div>
 
-            <!-- ===== SKELETON LOADING STATE ===== -->
-            <div class="skeleton-table" id="payrollSkeleton" hidden>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
-              <div class="skeleton-row"></div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-success">
+                  <i class="ri-team-line"></i>
+                </div>
+                <span class="stat-label">Total Employees</span>
+              </div>
+              <h3 class="stat-value" id="statTotalEmployees">0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub" id="statTotalEmployeesSub">—</span>
+                <svg
+                  class="stat-spark"
+                  id="statTotalEmployeesSpark"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
             </div>
 
-            <!-- ===== EMPTY STATE ===== -->
-            <div class="empty-state" id="payrollEmptyState" hidden>
-              <img src="./assets/illustrations/empty-payroll.svg" alt="" class="empty-state-illustration" />
-              <h3>No Payroll Records</h3>
-              <p>Get started by generating payroll for your employees.</p>
-              <button class="btn btn-primary" id="emptyStateGenerateBtn">
-                <i class="ri-add-line"></i> Generate Payroll
-              </button>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-bar-chart-2-line"></i>
+                </div>
+                <span class="stat-label">Average Salary</span>
+              </div>
+              <h3 class="stat-value" id="statAverageSalary">₹0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub" id="statAverageSalarySub">—</span>
+                <svg
+                  class="stat-spark"
+                  id="statAverageSalarySpark"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
             </div>
 
-            <div class="table-pagination" id="payrollPagination"></div>
-
-          </div>
-
-          <!-- ===== RIGHT SIDEBAR ===== -->
-          <aside class="payroll-side">
-
-            <div class="card side-card">
-              <h4>Payroll Summary</h4>
-              <ul class="summary-list" id="payrollSummaryList">
-                <li><span>Gross Payroll</span><strong id="summaryGross">₹0</strong></li>
-                <li><span>Total Deductions</span><strong id="summaryDeductions">₹0</strong></li>
-                <li><span>Net Payable</span><strong id="summaryNet">₹0</strong></li>
-              </ul>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-percent-line"></i>
+                </div>
+                <span class="stat-label">Deductions</span>
+              </div>
+              <h3 class="stat-value" id="statDeductions">₹0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub" id="statDeductionsSub">—</span>
+                <svg
+                  class="stat-spark"
+                  id="statDeductionsSpark"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
             </div>
 
-            <div class="card side-card">
-              <h4>Recent Payments</h4>
-              <ul class="recent-list" id="recentPaymentsList">
-                <!-- Populated dynamically -->
-              </ul>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-danger">
+                  <i class="ri-hand-coin-line"></i>
+                </div>
+                <span class="stat-label">Net Payroll</span>
+              </div>
+              <h3 class="stat-value" id="statNetPayroll">₹0</h3>
+              <div class="stat-card-foot">
+                <span class="stat-sub" id="statNetPayrollSub">—</span>
+                <svg
+                  class="stat-spark"
+                  id="statNetPayrollSpark"
+                  viewBox="0 0 100 32"
+                  preserveAspectRatio="none"
+                ></svg>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------- OVERVIEW ROW: CHART + DONUT + QUICK ACTIONS ---------- -->
+          <section class="overview-grid">
+            <div class="card overview-card">
+              <div class="overview-card-head">
+                <h4>Payroll Overview</h4>
+                <select
+                  id="chartYearSelect"
+                  class="filter-select filter-select-sm"
+                ></select>
+              </div>
+              <div class="bar-chart" id="payrollBarChart"></div>
             </div>
 
-            <div class="card side-card">
-              <h4>Upcoming Payroll</h4>
-              <div class="upcoming-payroll" id="upcomingPayroll">
-                <i class="ri-calendar-event-line"></i>
-                <div>
-                  <strong id="upcomingPayrollDate">-</strong>
-                  <span id="upcomingPayrollLabel">Next payroll run</span>
+            <div class="card overview-card">
+              <div class="overview-card-head">
+                <h4>Earnings Breakdown</h4>
+              </div>
+              <div class="donut-wrap">
+                <div class="donut" id="earningsDonut">
+                  <div class="donut-center">
+                    <strong id="earningsDonutTotal">₹0</strong>
+                    <span>Total Earnings</span>
+                  </div>
+                </div>
+                <ul class="donut-legend" id="earningsLegend"></ul>
+              </div>
+            </div>
+
+            <div class="card overview-card">
+              <div class="overview-card-head">
+                <h4>Quick Actions</h4>
+              </div>
+              <div class="quick-actions" id="quickActionsList">
+                <button
+                  class="quick-action"
+                  data-quick-action="salary-structure"
+                >
+                  <span class="quick-action-icon stat-icon-primary"
+                    ><i class="ri-briefcase-4-line"></i
+                  ></span>
+                  <span>Add Salary Structure</span>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+                <button class="quick-action" data-quick-action="bonus">
+                  <span class="quick-action-icon stat-icon-success"
+                    ><i class="ri-gift-line"></i
+                  ></span>
+                  <span>Add Bonus</span>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+                <button class="quick-action" data-quick-action="components">
+                  <span class="quick-action-icon stat-icon-info"
+                    ><i class="ri-stack-line"></i
+                  ></span>
+                  <span>Salary Components</span>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+                <button class="quick-action" data-quick-action="payslip">
+                  <span class="quick-action-icon stat-icon-warning"
+                    ><i class="ri-file-chart-line"></i
+                  ></span>
+                  <span>Generate Payslip</span>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+                <button class="quick-action" data-quick-action="reports">
+                  <span class="quick-action-icon stat-icon-danger"
+                    ><i class="ri-line-chart-line"></i
+                  ></span>
+                  <span>Payroll Reports</span>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------- EMPLOYEE PAYROLL TABLE ---------- -->
+          <section class="card table-card">
+            <div class="table-card-head">
+              <h4>Employee Payroll</h4>
+
+              <div class="table-card-actions">
+                <div class="search-box">
+                  <i class="ri-search-line"></i>
+                  <input
+                    type="text"
+                    id="payrollSearchInput"
+                    placeholder="Search employee..."
+                    autocomplete="off"
+                  />
+                </div>
+
+                <div class="split-btn">
+                  <button class="btn btn-outline" id="filtersBtn">
+                    <i class="ri-equalizer-line"></i> Filters
+                  </button>
+                  <div
+                    class="dropdown-menu dropdown-menu-right dropdown-menu-panel"
+                    id="filtersMenu"
+                    hidden
+                  >
+                    <div class="form-group">
+                      <label for="filterDepartment">Department</label>
+                      <select id="filterDepartment" class="filter-select">
+                        <option value="">All Departments</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="filterStatus">Status</label>
+                      <select id="filterStatus" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Failed">Failed</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="sortPayroll">Sort By</label>
+                      <select id="sortPayroll" class="filter-select">
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="salary-desc">
+                          Net Salary: High to Low
+                        </option>
+                        <option value="salary-asc">
+                          Net Salary: Low to High
+                        </option>
+                        <option value="name-asc">Employee Name (A-Z)</option>
+                      </select>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
+                      <i class="ri-refresh-line"></i> Reset Filters
+                    </button>
+                  </div>
+                </div>
+
+                <div class="split-btn">
+                  <button class="btn btn-outline" id="exportBtn">
+                    <i class="ri-download-2-line"></i> Export
+                  </button>
+                  <div
+                    class="dropdown-menu dropdown-menu-right"
+                    id="exportMenu"
+                    hidden
+                  >
+                    <button type="button" id="exportCsvBtn">
+                      <i class="ri-file-text-line"></i> Export as CSV
+                    </button>
+                    <button type="button" id="exportExcelBtn">
+                      <i class="ri-file-excel-2-line"></i> Export as Excel
+                    </button>
+                    <button type="button" id="exportPdfBtn">
+                      <i class="ri-file-pdf-2-line"></i> Export as PDF
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="card side-card">
-              <h4>Company Payroll Policy</h4>
-              <p class="policy-text">
-                Salaries are processed on the last working day of every month.
-                Payslips are generated automatically and shared with employees
-                once payment status is marked as Paid.
-              </p>
+            <!-- ===== SKELETON LOADING STATE ===== -->
+            <div class="skeleton-table" id="payrollSkeleton">
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
             </div>
 
-          </aside>
+            <div id="payrollTableContent" hidden>
+              <div class="table-responsive" id="payrollTableWrap">
+                <table class="data-table" id="payrollTable">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Employee ID</th>
+                      <th>Designation</th>
+                      <th>Gross Salary</th>
+                      <th>Deductions</th>
+                      <th>Net Salary</th>
+                      <th>Status</th>
+                      <th class="col-actions">Payslip</th>
+                    </tr>
+                  </thead>
+                  <tbody id="payrollTableBody"></tbody>
+                </table>
+              </div>
 
-        </section>
+              <!-- ===== EMPTY STATE ===== -->
+              <div class="empty-state" id="payrollEmptyState" hidden>
+                <h3>No Payroll Records</h3>
+                <p>Get started by generating payroll for your employees.</p>
+                <button class="btn btn-primary" id="emptyStateGenerateBtn">
+                  <i class="ri-add-line"></i> Generate Payroll
+                </button>
+              </div>
 
-      </main>
+              <div class="table-pagination" id="payrollPagination">
+                <span class="pagination-info" id="paginationInfo"></span>
+                <div class="pagination-controls" id="paginationControls"></div>
+                <select
+                  class="filter-select filter-select-sm"
+                  id="pageSizeSelect"
+                >
+                  <option value="5">5 / page</option>
+                  <option value="10">10 / page</option>
+                  <option value="25">25 / page</option>
+                  <option value="50">50 / page</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <!-- =====================================================
+    <!-- =====================================================
        GENERATE / EDIT PAYROLL MODAL (shared for both flows)
   ====================================================== -->
-  <div class="modal-overlay" id="payrollModalOverlay" hidden>
-    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="payrollModalTitle">
-
-      <div class="modal-header">
-        <h3 id="payrollModalTitle">Generate Payroll</h3>
-        <button class="modal-close" id="closePayrollModalBtn" aria-label="Close">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-
-      <form id="payrollForm" class="modal-body">
-
-        <input type="hidden" id="payrollDocId" value="" />
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label for="employeeSelect">Employee</label>
-            <select id="employeeSelect" required>
-              <option value="">Select Employee</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="payrollMonthSelect">Payroll Month</label>
-            <select id="payrollMonthSelect" required>
-              <option value="">Select Month</option>
-              <option value="January">January</option>
-              <option value="February">February</option>
-              <option value="March">March</option>
-              <option value="April">April</option>
-              <option value="May">May</option>
-              <option value="June">June</option>
-              <option value="July">July</option>
-              <option value="August">August</option>
-              <option value="September">September</option>
-              <option value="October">October</option>
-              <option value="November">November</option>
-              <option value="December">December</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="payrollYearInput">Payroll Year</label>
-            <input type="number" id="payrollYearInput" min="2020" max="2100" required />
-          </div>
-
-          <div class="form-group">
-            <label for="basicSalaryInput">Basic Salary</label>
-            <input type="number" id="basicSalaryInput" min="0" step="0.01" required />
-          </div>
-
-          <div class="form-group">
-            <label for="bonusInput">Bonus</label>
-            <input type="number" id="bonusInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="allowanceInput">Allowance</label>
-            <input type="number" id="allowanceInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="overtimeInput">Overtime Amount</label>
-            <input type="number" id="overtimeInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="taxInput">Tax</label>
-            <input type="number" id="taxInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="pfInput">Provident Fund</label>
-            <input type="number" id="pfInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="insuranceInput">Insurance</label>
-            <input type="number" id="insuranceInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="otherDeductionInput">Other Deductions</label>
-            <input type="number" id="otherDeductionInput" min="0" step="0.01" value="0" />
-          </div>
-
-          <div class="form-group form-group-full">
-            <label for="notesInput">Notes</label>
-            <textarea id="notesInput" rows="2" placeholder="Optional notes..."></textarea>
-          </div>
-
-        </div>
-
-        <!-- ===== AUTO CALCULATION SUMMARY ===== -->
-        <div class="calc-summary">
-          <div class="calc-row">
-            <span>Gross Salary</span>
-            <strong id="calcGrossSalary">₹0.00</strong>
-          </div>
-          <div class="calc-row">
-            <span>Total Deduction</span>
-            <strong id="calcTotalDeduction">₹0.00</strong>
-          </div>
-          <div class="calc-row calc-row-highlight">
-            <span>Net Salary</span>
-            <strong id="calcNetSalary">₹0.00</strong>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-ghost" id="cancelPayrollModalBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="savePayrollBtn">
-            <i class="ri-save-line"></i> Generate Payroll
+    <div class="modal-overlay" id="payrollModalOverlay" hidden>
+      <div
+        class="modal modal-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="payrollModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="payrollModalTitle">Generate Payroll</h3>
+          <button
+            class="modal-close"
+            id="closePayrollModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
           </button>
         </div>
 
-      </form>
-    </div>
-  </div>
+        <form id="payrollForm" class="modal-body">
+          <input type="hidden" id="payrollDocId" value="" />
 
-  <!-- =====================================================
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="employeeSelect">Employee</label>
+              <select id="employeeSelect" required>
+                <option value="">Select Employee</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="payrollMonthSelect">Payroll Month</label>
+              <select id="payrollMonthSelect" required>
+                <option value="">Select Month</option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="payrollYearInput">Payroll Year</label>
+              <input
+                type="number"
+                id="payrollYearInput"
+                min="2020"
+                max="2100"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="basicSalaryInput">Basic Salary</label>
+              <input
+                type="number"
+                id="basicSalaryInput"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="bonusInput">Bonus</label>
+              <input
+                type="number"
+                id="bonusInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="allowanceInput">Allowance</label>
+              <input
+                type="number"
+                id="allowanceInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="overtimeInput">Overtime Amount</label>
+              <input
+                type="number"
+                id="overtimeInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="taxInput">Tax</label>
+              <input
+                type="number"
+                id="taxInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="pfInput">Provident Fund</label>
+              <input type="number" id="pfInput" min="0" step="0.01" value="0" />
+            </div>
+
+            <div class="form-group">
+              <label for="insuranceInput">Insurance</label>
+              <input
+                type="number"
+                id="insuranceInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="otherDeductionInput">Other Deductions</label>
+              <input
+                type="number"
+                id="otherDeductionInput"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="notesInput">Notes</label>
+              <textarea
+                id="notesInput"
+                rows="2"
+                placeholder="Optional notes..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- ===== AUTO CALCULATION SUMMARY ===== -->
+          <div class="calc-summary">
+            <div class="calc-row">
+              <span>Gross Salary</span>
+              <strong id="calcGrossSalary">₹0.00</strong>
+            </div>
+            <div class="calc-row">
+              <span>Total Deduction</span>
+              <strong id="calcTotalDeduction">₹0.00</strong>
+            </div>
+            <div class="calc-row calc-row-highlight">
+              <span>Net Salary</span>
+              <strong id="calcNetSalary">₹0.00</strong>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelPayrollModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="savePayrollBtn">
+              <i class="ri-save-line"></i> Generate Payroll
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
        DELETE CONFIRMATION MODAL (no browser alert/confirm)
   ====================================================== -->
-  <div class="modal-overlay" id="deleteModalOverlay" hidden>
-    <div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-
-      <div class="modal-body modal-body-center">
-        <div class="modal-icon modal-icon-danger">
-          <i class="ri-delete-bin-6-line"></i>
+    <div class="modal-overlay" id="deleteModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+      >
+        <div class="modal-body modal-body-center">
+          <div class="modal-icon modal-icon-danger">
+            <i class="ri-delete-bin-6-line"></i>
+          </div>
+          <h3 id="deleteModalTitle">Delete Payroll Record?</h3>
+          <p>
+            This will permanently remove
+            <strong id="deleteTargetName">this payroll record</strong>
+            from the system. This action cannot be undone.
+          </p>
         </div>
-        <h3 id="deleteModalTitle">Delete Payroll Record?</h3>
-        <p>
-          This will permanently remove <strong id="deleteTargetName">this payroll record</strong>
-          from the system. This action cannot be undone.
-        </p>
-      </div>
 
-      <div class="modal-footer modal-footer-center">
-        <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
-        <button class="btn btn-danger" id="confirmDeleteBtn">
-          <i class="ri-delete-bin-6-line"></i> Delete
-        </button>
+        <div class="modal-footer modal-footer-center">
+          <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="ri-delete-bin-6-line"></i> Delete
+          </button>
+        </div>
       </div>
-
     </div>
-  </div>
 
-  <!-- =====================================================
+    <!-- =====================================================
        SCRIPTS
   ====================================================== -->
-  <script type="module" src="./payroll.js"></script>
-
-</body>
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/payroll.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
 </html>

@@ -15,30 +15,6 @@
   border: 2px solid var(--panel-light-border);
 }
 
-.dept-stats-skeleton {
-  display: none;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-6);
-  margin-bottom: var(--space-6);
-}
-
-.dept-stats-skeleton.active {
-  display: grid;
-}
-
-.stat-skeleton-card {
-  height: 96px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(
-    90deg,
-    var(--panel-light-input-bg) 25%,
-    var(--panel-light-border) 37%,
-    var(--panel-light-input-bg) 63%
-  );
-  background-size: 400% 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-}
-
 .dept-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -406,39 +382,6 @@
   color: var(--color-error);
 }
 
-.dept-skeleton {
-  display: none;
-  flex-direction: column;
-  gap: 14px;
-  padding: 20px;
-}
-
-.dept-skeleton.active {
-  display: flex;
-}
-
-.skeleton-row {
-  height: 56px;
-  border-radius: 12px;
-  background: linear-gradient(
-    90deg,
-    var(--panel-light-input-bg) 25%,
-    var(--panel-light-border) 37%,
-    var(--panel-light-input-bg) 63%
-  );
-  background-size: 400% 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-}
-
-@keyframes skeleton-shimmer {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
-}
-
 .dept-empty-state {
   display: flex;
   flex-direction: column;
@@ -749,6 +692,40 @@
 
 .confirm-modal__actions .btn {
   flex: 1;
+}
+
+/* =========================================================
+   DEPARTMENTS SKELETON — LAYOUT ONLY
+   ----------------------------------------------------------
+   Shimmer animation/gradient lives once in dashboard.css
+   (loaded globally, shared class ".skeleton-block"). This
+   block only sizes/positions the department-specific
+   skeleton placeholders. Visibility is controlled by
+   layout.js's showSkeleton()/hideSkeleton() via the
+   [hidden] attribute — no .active toggle class needed here.
+========================================================= */
+.dept-stats-skeleton {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.stat-skeleton-card {
+  height: 96px;
+  border-radius: var(--radius-lg);
+}
+
+.dept-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.skeleton-row {
+  height: 56px;
+  border-radius: 12px;
 }
 
 @media (max-width: 1180px) {

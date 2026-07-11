@@ -164,29 +164,43 @@
             </button>
           </div>
 
-          <!-- Employees table -->
-          <section class="card employees-table-card">
-            <div class="table-scroll">
-              <table class="employees-table">
-                <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Department</th>
-                    <th>Designation</th>
-                    <th>Joining Date</th>
-                    <th>Salary</th>
-                    <th>Status</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="employeesTableBody">
-                  <!-- injected by JS -->
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <!-- ============ SKELETON (shown while employees load) ============ -->
+          <div class="emp-skeleton-wrap" id="empSkeleton">
+            <span class="skeleton-block skeleton-toolbar"></span>
+            <span class="skeleton-block skeleton-row"></span>
+            <span class="skeleton-block skeleton-row"></span>
+            <span class="skeleton-block skeleton-row"></span>
+            <span class="skeleton-block skeleton-row"></span>
+            <span class="skeleton-block skeleton-row"></span>
+            <span class="skeleton-block skeleton-row"></span>
+          </div>
+
+          <!-- ============ REAL CONTENT (hidden while loading) ============ -->
+          <div id="empContent" hidden>
+            <!-- Employees table -->
+            <section class="card employees-table-card">
+              <div class="table-scroll">
+                <table class="employees-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Department</th>
+                      <th>Designation</th>
+                      <th>Joining Date</th>
+                      <th>Salary</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="employeesTableBody">
+                    <!-- injected by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </main>
       </div>
     </div>
@@ -357,6 +371,7 @@
       </div>
     </div>
 
+    <script type="module" src="../js/layout.js"></script>
     <script type="module" src="../js/employees.js"></script>
     <script src="../js/theme.js"></script>
   </body>

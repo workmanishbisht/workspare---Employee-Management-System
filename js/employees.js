@@ -17,6 +17,8 @@ import {
   guardAndLoadUser,
   setupUserMenu,
   setupSidebarToggle,
+  showSkeleton,
+  hideSkeleton,
 } from "../js/layout.js";
 
 (function () {
@@ -194,7 +196,9 @@ import {
   }
 
   function setupEmployeeModal() {
-    $("#openAddEmployeeBtn")?.addEventListener("click", () => openEmployeeModal(null));
+    $("#openAddEmployeeBtn")?.addEventListener("click", () =>
+      openEmployeeModal(null),
+    );
     $("#closeEmployeeModalBtn")?.addEventListener("click", closeEmployeeModal);
     $("#cancelEmployeeFormBtn")?.addEventListener("click", closeEmployeeModal);
 
@@ -217,7 +221,13 @@ import {
         profileImage: $("#empProfileImage").value.trim(),
       };
 
-      if (!formData.fullName || !formData.email || !formData.department || !formData.designation || !formData.joiningDate) {
+      if (
+        !formData.fullName ||
+        !formData.email ||
+        !formData.department ||
+        !formData.designation ||
+        !formData.joiningDate
+      ) {
         showToast("error", "Please fill all required fields.");
         return;
       }
@@ -229,7 +239,9 @@ import {
         await saveEmployee(formData, editingDocId);
         showToast(
           "success",
-          editingDocId ? "Employee updated successfully." : "Employee added successfully.",
+          editingDocId
+            ? "Employee updated successfully."
+            : "Employee added successfully.",
         );
         closeEmployeeModal();
         allEmployees = await fetchEmployees();
@@ -327,6 +339,8 @@ import {
      INIT
   ========================================================= */
   async function init() {
+    showSkeleton("empSkeleton", "empContent");
+
     await guardAndLoadUser();
 
     renderNav();
@@ -339,6 +353,8 @@ import {
 
     allEmployees = await fetchEmployees();
     renderTable(allEmployees);
+
+    hideSkeleton("empSkeleton", "empContent");
 
     handleQueryParams();
   }
