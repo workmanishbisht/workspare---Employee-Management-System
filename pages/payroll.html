@@ -107,7 +107,7 @@
 
       <!-- ============ MAIN ============ -->
       <div class="main">
-        <!-- ============ TOPBAR ============ -->
+        <!-- ============ TOPBAR  ============ -->
         <header class="topbar" id="navbar">
           <button
             class="icon-btn topbar__menu"
@@ -165,7 +165,7 @@
                 <i class="ri-calendar-line"></i>
                 <select id="periodMonthSelect"></select>
                 <select id="periodYearSelect"></select>
-                <i class="ri-arrow-down-s-line"></i>
+                <!-- <i class="ri-arrow-down-s-line"></i> -->
               </div>
 
               <div class="split-btn">
@@ -192,277 +192,287 @@
             </div>
           </div>
 
-          <!-- ---------- STATISTICS CARDS ---------- -->
-          <section
-            class="stats-grid stats-grid-payroll"
-            id="statsGrid"
-            aria-live="polite"
-          >
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-primary">
-                  <i class="ri-wallet-3-line"></i>
-                </div>
-                <span class="stat-label">Total Payroll</span>
-              </div>
-              <h3 class="stat-value" id="statTotalPayroll">₹0</h3>
-              <div class="stat-card-foot">
-                <span class="stat-sub" id="statTotalPayrollSub">—</span>
-                <svg
-                  class="stat-spark"
-                  id="statTotalPayrollSpark"
-                  viewBox="0 0 100 32"
-                  preserveAspectRatio="none"
-                ></svg>
-              </div>
+          <!-- ============ SKELETON (covers stats + overview + table
+               while payroll data loads) ============ -->
+          <div class="payroll-skeleton-wrap" id="payrollSkeleton">
+            <div class="skeleton-stats-row-payroll">
+              <span class="skeleton-block skeleton-stat-payroll"></span>
+              <span class="skeleton-block skeleton-stat-payroll"></span>
+              <span class="skeleton-block skeleton-stat-payroll"></span>
+              <span class="skeleton-block skeleton-stat-payroll"></span>
+              <span class="skeleton-block skeleton-stat-payroll"></span>
             </div>
-
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-success">
-                  <i class="ri-team-line"></i>
-                </div>
-                <span class="stat-label">Total Employees</span>
-              </div>
-              <h3 class="stat-value" id="statTotalEmployees">0</h3>
-              <div class="stat-card-foot">
-                <span class="stat-sub" id="statTotalEmployeesSub">—</span>
-                <svg
-                  class="stat-spark"
-                  id="statTotalEmployeesSpark"
-                  viewBox="0 0 100 32"
-                  preserveAspectRatio="none"
-                ></svg>
-              </div>
+            <div class="skeleton-overview-row">
+              <span class="skeleton-block skeleton-overview-card"></span>
+              <span class="skeleton-block skeleton-overview-card"></span>
+              <span class="skeleton-block skeleton-overview-card"></span>
             </div>
+            <span class="skeleton-block skeleton-table-card"></span>
+          </div>
 
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-info">
-                  <i class="ri-bar-chart-2-line"></i>
-                </div>
-                <span class="stat-label">Average Salary</span>
-              </div>
-              <h3 class="stat-value" id="statAverageSalary">₹0</h3>
-              <div class="stat-card-foot">
-                <span class="stat-sub" id="statAverageSalarySub">—</span>
-                <svg
-                  class="stat-spark"
-                  id="statAverageSalarySpark"
-                  viewBox="0 0 100 32"
-                  preserveAspectRatio="none"
-                ></svg>
-              </div>
-            </div>
-
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-warning">
-                  <i class="ri-percent-line"></i>
-                </div>
-                <span class="stat-label">Deductions</span>
-              </div>
-              <h3 class="stat-value" id="statDeductions">₹0</h3>
-              <div class="stat-card-foot">
-                <span class="stat-sub" id="statDeductionsSub">—</span>
-                <svg
-                  class="stat-spark"
-                  id="statDeductionsSpark"
-                  viewBox="0 0 100 32"
-                  preserveAspectRatio="none"
-                ></svg>
-              </div>
-            </div>
-
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-danger">
-                  <i class="ri-hand-coin-line"></i>
-                </div>
-                <span class="stat-label">Net Payroll</span>
-              </div>
-              <h3 class="stat-value" id="statNetPayroll">₹0</h3>
-              <div class="stat-card-foot">
-                <span class="stat-sub" id="statNetPayrollSub">—</span>
-                <svg
-                  class="stat-spark"
-                  id="statNetPayrollSpark"
-                  viewBox="0 0 100 32"
-                  preserveAspectRatio="none"
-                ></svg>
-              </div>
-            </div>
-          </section>
-
-          <!-- ---------- OVERVIEW ROW: CHART + DONUT + QUICK ACTIONS ---------- -->
-          <section class="overview-grid">
-            <div class="card overview-card">
-              <div class="overview-card-head">
-                <h4>Payroll Overview</h4>
-                <select
-                  id="chartYearSelect"
-                  class="filter-select filter-select-sm"
-                ></select>
-              </div>
-              <div class="bar-chart" id="payrollBarChart"></div>
-            </div>
-
-            <div class="card overview-card">
-              <div class="overview-card-head">
-                <h4>Earnings Breakdown</h4>
-              </div>
-              <div class="donut-wrap">
-                <div class="donut" id="earningsDonut">
-                  <div class="donut-center">
-                    <strong id="earningsDonutTotal">₹0</strong>
-                    <span>Total Earnings</span>
+          <!-- ============ REAL CONTENT (hidden while loading) ============ -->
+          <div id="payrollContent" hidden>
+            <!-- ---------- STATISTICS CARDS ---------- -->
+            <section
+              class="stats-grid stats-grid-payroll"
+              id="statsGrid"
+              aria-live="polite"
+            >
+              <div class="card stat-card">
+                <div class="stat-card-top">
+                  <div class="stat-icon stat-icon-primary">
+                    <i class="ri-wallet-3-line"></i>
                   </div>
+                  <span class="stat-label">Total Payroll</span>
                 </div>
-                <ul class="donut-legend" id="earningsLegend"></ul>
-              </div>
-            </div>
-
-            <div class="card overview-card">
-              <div class="overview-card-head">
-                <h4>Quick Actions</h4>
-              </div>
-              <div class="quick-actions" id="quickActionsList">
-                <button
-                  class="quick-action"
-                  data-quick-action="salary-structure"
-                >
-                  <span class="quick-action-icon stat-icon-primary"
-                    ><i class="ri-briefcase-4-line"></i
-                  ></span>
-                  <span>Add Salary Structure</span>
-                  <i class="ri-arrow-right-s-line"></i>
-                </button>
-                <button class="quick-action" data-quick-action="bonus">
-                  <span class="quick-action-icon stat-icon-success"
-                    ><i class="ri-gift-line"></i
-                  ></span>
-                  <span>Add Bonus</span>
-                  <i class="ri-arrow-right-s-line"></i>
-                </button>
-                <button class="quick-action" data-quick-action="components">
-                  <span class="quick-action-icon stat-icon-info"
-                    ><i class="ri-stack-line"></i
-                  ></span>
-                  <span>Salary Components</span>
-                  <i class="ri-arrow-right-s-line"></i>
-                </button>
-                <button class="quick-action" data-quick-action="payslip">
-                  <span class="quick-action-icon stat-icon-warning"
-                    ><i class="ri-file-chart-line"></i
-                  ></span>
-                  <span>Generate Payslip</span>
-                  <i class="ri-arrow-right-s-line"></i>
-                </button>
-                <button class="quick-action" data-quick-action="reports">
-                  <span class="quick-action-icon stat-icon-danger"
-                    ><i class="ri-line-chart-line"></i
-                  ></span>
-                  <span>Payroll Reports</span>
-                  <i class="ri-arrow-right-s-line"></i>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <!-- ---------- EMPLOYEE PAYROLL TABLE ---------- -->
-          <section class="card table-card">
-            <div class="table-card-head">
-              <h4>Employee Payroll</h4>
-
-              <div class="table-card-actions">
-                <div class="search-box">
-                  <i class="ri-search-line"></i>
-                  <input
-                    type="text"
-                    id="payrollSearchInput"
-                    placeholder="Search employee..."
-                    autocomplete="off"
-                  />
+                <h3 class="stat-value" id="statTotalPayroll">₹0</h3>
+                <div class="stat-card-foot">
+                  <span class="stat-sub" id="statTotalPayrollSub">—</span>
+                  <svg
+                    class="stat-spark"
+                    id="statTotalPayrollSpark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                  ></svg>
                 </div>
+              </div>
 
-                <div class="split-btn">
-                  <button class="btn btn-outline" id="filtersBtn">
-                    <i class="ri-equalizer-line"></i> Filters
-                  </button>
-                  <div
-                    class="dropdown-menu dropdown-menu-right dropdown-menu-panel"
-                    id="filtersMenu"
-                    hidden
+              <div class="card stat-card">
+                <div class="stat-card-top">
+                  <div class="stat-icon stat-icon-success">
+                    <i class="ri-team-line"></i>
+                  </div>
+                  <span class="stat-label">Total Employees</span>
+                </div>
+                <h3 class="stat-value" id="statTotalEmployees">0</h3>
+                <div class="stat-card-foot">
+                  <span class="stat-sub" id="statTotalEmployeesSub">—</span>
+                  <svg
+                    class="stat-spark"
+                    id="statTotalEmployeesSpark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                  ></svg>
+                </div>
+              </div>
+
+              <div class="card stat-card">
+                <div class="stat-card-top">
+                  <div class="stat-icon stat-icon-info">
+                    <i class="ri-bar-chart-2-line"></i>
+                  </div>
+                  <span class="stat-label">Average Salary</span>
+                </div>
+                <h3 class="stat-value" id="statAverageSalary">₹0</h3>
+                <div class="stat-card-foot">
+                  <span class="stat-sub" id="statAverageSalarySub">—</span>
+                  <svg
+                    class="stat-spark"
+                    id="statAverageSalarySpark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                  ></svg>
+                </div>
+              </div>
+
+              <div class="card stat-card">
+                <div class="stat-card-top">
+                  <div class="stat-icon stat-icon-warning">
+                    <i class="ri-percent-line"></i>
+                  </div>
+                  <span class="stat-label">Deductions</span>
+                </div>
+                <h3 class="stat-value" id="statDeductions">₹0</h3>
+                <div class="stat-card-foot">
+                  <span class="stat-sub" id="statDeductionsSub">—</span>
+                  <svg
+                    class="stat-spark"
+                    id="statDeductionsSpark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                  ></svg>
+                </div>
+              </div>
+
+              <div class="card stat-card">
+                <div class="stat-card-top">
+                  <div class="stat-icon stat-icon-danger">
+                    <i class="ri-hand-coin-line"></i>
+                  </div>
+                  <span class="stat-label">Net Payroll</span>
+                </div>
+                <h3 class="stat-value" id="statNetPayroll">₹0</h3>
+                <div class="stat-card-foot">
+                  <span class="stat-sub" id="statNetPayrollSub">—</span>
+                  <svg
+                    class="stat-spark"
+                    id="statNetPayrollSpark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                  ></svg>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- OVERVIEW ROW: CHART + DONUT + QUICK ACTIONS ---------- -->
+            <section class="overview-grid">
+              <div class="card overview-card">
+                <div class="overview-card-head">
+                  <h4>Payroll Overview</h4>
+                  <select
+                    id="chartYearSelect"
+                    class="filter-select filter-select-sm"
+                  ></select>
+                </div>
+                <div class="bar-chart" id="payrollBarChart"></div>
+              </div>
+
+              <div class="card overview-card">
+                <div class="overview-card-head">
+                  <h4>Earnings Breakdown</h4>
+                </div>
+                <div class="donut-wrap">
+                  <div class="donut" id="earningsDonut">
+                    <div class="donut-center">
+                      <strong id="earningsDonutTotal">₹0</strong>
+                      <span>Total Earnings</span>
+                    </div>
+                  </div>
+                  <ul class="donut-legend" id="earningsLegend"></ul>
+                </div>
+              </div>
+
+              <div class="card overview-card">
+                <div class="overview-card-head">
+                  <h4>Quick Actions</h4>
+                </div>
+                <div class="quick-actions" id="quickActionsList">
+                  <button
+                    class="quick-action"
+                    data-quick-action="salary-structure"
                   >
-                    <div class="form-group">
-                      <label for="filterDepartment">Department</label>
-                      <select id="filterDepartment" class="filter-select">
-                        <option value="">All Departments</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="filterStatus">Status</label>
-                      <select id="filterStatus" class="filter-select">
-                        <option value="">All Statuses</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Failed">Failed</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="sortPayroll">Sort By</label>
-                      <select id="sortPayroll" class="filter-select">
-                        <option value="date-desc">Newest First</option>
-                        <option value="date-asc">Oldest First</option>
-                        <option value="salary-desc">
-                          Net Salary: High to Low
-                        </option>
-                        <option value="salary-asc">
-                          Net Salary: Low to High
-                        </option>
-                        <option value="name-asc">Employee Name (A-Z)</option>
-                      </select>
-                    </div>
-                    <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
-                      <i class="ri-refresh-line"></i> Reset Filters
-                    </button>
-                  </div>
-                </div>
-
-                <div class="split-btn">
-                  <button class="btn btn-outline" id="exportBtn">
-                    <i class="ri-download-2-line"></i> Export
+                    <span class="quick-action-icon stat-icon-primary"
+                      ><i class="ri-briefcase-4-line"></i
+                    ></span>
+                    <span>Add Salary Structure</span>
+                    <i class="ri-arrow-right-s-line"></i>
                   </button>
-                  <div
-                    class="dropdown-menu dropdown-menu-right"
-                    id="exportMenu"
-                    hidden
-                  >
-                    <button type="button" id="exportCsvBtn">
-                      <i class="ri-file-text-line"></i> Export as CSV
+                  <button class="quick-action" data-quick-action="bonus">
+                    <span class="quick-action-icon stat-icon-success"
+                      ><i class="ri-gift-line"></i
+                    ></span>
+                    <span>Add Bonus</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" data-quick-action="components">
+                    <span class="quick-action-icon stat-icon-info"
+                      ><i class="ri-stack-line"></i
+                    ></span>
+                    <span>Salary Components</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" data-quick-action="payslip">
+                    <span class="quick-action-icon stat-icon-warning"
+                      ><i class="ri-file-chart-line"></i
+                    ></span>
+                    <span>Generate Payslip</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                  <button class="quick-action" data-quick-action="reports">
+                    <span class="quick-action-icon stat-icon-danger"
+                      ><i class="ri-line-chart-line"></i
+                    ></span>
+                    <span>Payroll Reports</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- EMPLOYEE PAYROLL TABLE ---------- -->
+            <section class="card table-card">
+              <div class="table-card-head">
+                <h4>Employee Payroll</h4>
+
+                <div class="table-card-actions">
+                  <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input
+                      type="text"
+                      id="payrollSearchInput"
+                      placeholder="Search employee..."
+                      autocomplete="off"
+                    />
+                  </div>
+
+                  <div class="split-btn">
+                    <button class="btn btn-outline" id="filtersBtn">
+                      <i class="ri-equalizer-line"></i> Filters
                     </button>
-                    <button type="button" id="exportExcelBtn">
-                      <i class="ri-file-excel-2-line"></i> Export as Excel
+                    <div
+                      class="dropdown-menu dropdown-menu-right dropdown-menu-panel"
+                      id="filtersMenu"
+                      hidden
+                    >
+                      <div class="form-group">
+                        <label for="filterDepartment">Department</label>
+                        <select id="filterDepartment" class="filter-select">
+                          <option value="">All Departments</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="filterStatus">Status</label>
+                        <select id="filterStatus" class="filter-select">
+                          <option value="">All Statuses</option>
+                          <option value="Paid">Paid</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Failed">Failed</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="sortPayroll">Sort By</label>
+                        <select id="sortPayroll" class="filter-select">
+                          <option value="date-desc">Newest First</option>
+                          <option value="date-asc">Oldest First</option>
+                          <option value="salary-desc">
+                            Net Salary: High to Low
+                          </option>
+                          <option value="salary-asc">
+                            Net Salary: Low to High
+                          </option>
+                          <option value="name-asc">Employee Name (A-Z)</option>
+                        </select>
+                      </div>
+                      <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
+                        <i class="ri-refresh-line"></i> Reset Filters
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="split-btn">
+                    <button class="btn btn-outline" id="exportBtn">
+                      <i class="ri-download-2-line"></i> Export
                     </button>
-                    <button type="button" id="exportPdfBtn">
-                      <i class="ri-file-pdf-2-line"></i> Export as PDF
-                    </button>
+                    <div
+                      class="dropdown-menu dropdown-menu-right"
+                      id="exportMenu"
+                      hidden
+                    >
+                      <button type="button" id="exportCsvBtn">
+                        <i class="ri-file-text-line"></i> Export as CSV
+                      </button>
+                      <button type="button" id="exportExcelBtn">
+                        <i class="ri-file-excel-2-line"></i> Export as Excel
+                      </button>
+                      <button type="button" id="exportPdfBtn">
+                        <i class="ri-file-pdf-2-line"></i> Export as PDF
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- ===== SKELETON LOADING STATE (shown while payroll loads) ===== -->
-            <div class="skeleton-table" id="payrollSkeleton">
-              <span class="skeleton-block skeleton-row"></span>
-              <span class="skeleton-block skeleton-row"></span>
-              <span class="skeleton-block skeleton-row"></span>
-              <span class="skeleton-block skeleton-row"></span>
-              <span class="skeleton-block skeleton-row"></span>
-            </div>
-
-            <div id="payrollTableContent" hidden>
               <div class="table-responsive" id="payrollTableWrap">
                 <table class="data-table" id="payrollTable">
                   <thead>
@@ -503,8 +513,8 @@
                   <option value="50">50 / page</option>
                 </select>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </main>
       </div>
     </div>

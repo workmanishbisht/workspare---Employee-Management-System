@@ -178,12 +178,12 @@ import {
         renderStatistics();
         renderBarChart();
         renderDonut();
-        hideSkeleton("payrollSkeleton", "payrollTableContent");
+        hideSkeleton("payrollSkeleton", "payrollContent");
       },
       (error) => {
         console.error("Failed to load payroll:", error);
         showToast("error", "Could not load payroll records.");
-        hideSkeleton("payrollSkeleton", "payrollTableContent");
+        hideSkeleton("payrollSkeleton", "payrollContent");
       },
     );
   }
@@ -987,7 +987,7 @@ import {
      INIT
   ========================================================= */
   async function init() {
-    showSkeleton("payrollSkeleton", "payrollTableContent");
+    showSkeleton("payrollSkeleton", "payrollContent");
 
     await guardAndLoadUser();
     renderNav();

@@ -628,26 +628,6 @@
 }
 
 /* =========================================================
-   PAYROLL SKELETON — LAYOUT ONLY
-   ----------------------------------------------------------
-   Shimmer animation/gradient lives once in dashboard.css
-   (loaded globally, shared class ".skeleton-block"). This
-   rule only sizes/positions the payroll table's skeleton
-   rows — no gradient or @keyframes duplicated here.
-========================================================= */
-.skeleton-table {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.skeleton-row {
-  display: block;
-  height: 52px;
-  border-radius: 12px;
-}
-
-/* =========================================================
    PAGINATION
 ========================================================= */
 .table-pagination {
@@ -904,10 +884,57 @@
 }
 
 /* =========================================================
+   PAYROLL SKELETON — LAYOUT ONLY
+   ----------------------------------------------------------
+   Shimmer animation/gradient lives once in dashboard.css
+   (loaded globally, shared class ".skeleton-block"). This
+   block only sizes/positions the payroll page's skeleton
+   shape — stat cards row, overview row (chart/donut/quick
+   actions), and the table — so shimmer covers the WHOLE
+   dynamic area of the page, not just the table.
+========================================================= */
+.payroll-skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+}
+
+.skeleton-stats-row-payroll {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-6, 24px);
+}
+
+.skeleton-stat-payroll {
+  height: 150px;
+  border-radius: 22px;
+}
+
+.skeleton-overview-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: var(--space-6, 24px);
+}
+
+.skeleton-overview-card {
+  height: 280px;
+  border-radius: 22px;
+}
+
+.skeleton-table-card {
+  display: block;
+  height: 480px;
+  border-radius: 22px;
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 @media (max-width: 1400px) {
   .stats-grid-payroll {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .skeleton-stats-row-payroll {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -916,10 +943,16 @@
   .overview-grid {
     grid-template-columns: 1fr;
   }
+  .skeleton-overview-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 991px) {
   .stats-grid-payroll {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skeleton-stats-row-payroll {
     grid-template-columns: repeat(2, 1fr);
   }
   .form-grid {
@@ -929,6 +962,9 @@
 
 @media (max-width: 768px) {
   .stats-grid-payroll {
+    grid-template-columns: 1fr;
+  }
+  .skeleton-stats-row-payroll {
     grid-template-columns: 1fr;
   }
   .table-card-head {

@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documents · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/documents.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by renderNav() -->
+          </ul>
+        </nav>
+
+        <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div>
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- ============ TOPBAR (reused) ============ -->
+        <header class="topbar" id="navbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, documents..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option"
+                ><i class="ri-sun-line"></i
+              ></span>
+              <span id="themeToggleDark" class="theme-toggle__option"
+                ><i class="ri-moon-line"></i
+              ></span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">5</span>
+            </button>
+            <button class="icon-btn" aria-label="Messages">
+              <i class="ri-message-3-line"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============ PAGE CONTENT ============ -->
+        <main class="content" id="documentsPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Documents</h1>
+              <p>Manage company documents securely and efficiently.</p>
+            </div>
+
+            <div class="page-header-actions">
+              <button class="btn btn-outline" id="newFolderBtn">
+                <i class="ri-folder-add-line"></i> New Folder
+              </button>
+              <button class="btn btn-primary" id="uploadDocumentBtn">
+                <i class="ri-upload-cloud-2-line"></i> Upload Document
+              </button>
+            </div>
+          </div>
+
+          <!-- ---------- STATISTICS CARDS ---------- -->
+          <section
+            class="stats-grid stats-grid-documents"
+            id="statsGrid"
+            aria-live="polite"
+          >
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-primary">
+                  <i class="ri-file-text-line"></i>
+                </div>
+                <span class="stat-label">Total Documents</span>
+              </div>
+              <h3 class="stat-value" id="statTotalDocuments">0</h3>
+              <span class="stat-trend trend-up" id="statTotalDocumentsTrend"
+                ><i class="ri-arrow-up-line"></i> 0%</span
+              >
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-folder-3-line"></i>
+                </div>
+                <span class="stat-label">Folders</span>
+              </div>
+              <h3 class="stat-value" id="statFolders">0</h3>
+              <span class="stat-trend trend-up" id="statFoldersTrend"
+                ><i class="ri-arrow-up-line"></i> 0%</span
+              >
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-success">
+                  <i class="ri-database-2-line"></i>
+                </div>
+                <span class="stat-label">Storage Used</span>
+              </div>
+              <h3 class="stat-value" id="statStorageUsed">0 MB</h3>
+              <span class="stat-trend trend-up" id="statStorageUsedTrend"
+                ><i class="ri-arrow-up-line"></i> 0%</span
+              >
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-download-2-line"></i>
+                </div>
+                <span class="stat-label">Downloads</span>
+              </div>
+              <h3 class="stat-value" id="statDownloads">0</h3>
+              <span class="stat-trend trend-up" id="statDownloadsTrend"
+                ><i class="ri-arrow-up-line"></i> 0%</span
+              >
+            </div>
+          </section>
+
+          <!-- ---------- SEARCH & FILTERS ---------- -->
+          <section class="card toolbar-card">
+            <div class="search-box search-box-wide">
+              <i class="ri-search-line"></i>
+              <input
+                type="text"
+                id="documentSearchInput"
+                placeholder="Search documents by name, type, or description..."
+                autocomplete="off"
+              />
+            </div>
+
+            <select id="filterType" class="filter-select">
+              <option value="">All Types</option>
+              <option value="PDF">PDF</option>
+              <option value="DOCX">DOCX</option>
+              <option value="XLSX">XLSX</option>
+              <option value="PPT">PPT</option>
+              <option value="PNG">PNG</option>
+              <option value="JPG">JPG</option>
+              <option value="ZIP">ZIP</option>
+            </select>
+
+            <select id="filterDepartment" class="filter-select">
+              <option value="">All Departments</option>
+            </select>
+
+            <select id="filterUploader" class="filter-select">
+              <option value="">All Uploaders</option>
+            </select>
+
+            <div class="dropdown-wrap">
+              <button class="btn btn-outline" id="moreFiltersBtn">
+                <i class="ri-equalizer-line"></i> More Filters
+              </button>
+              <div
+                class="dropdown-menu dropdown-menu-panel"
+                id="moreFiltersMenu"
+                hidden
+              >
+                <div class="form-group">
+                  <label for="filterDateRange">Date Range</label>
+                  <select id="filterDateRange" class="filter-select">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="filterStatus">Status</label>
+                  <select id="filterStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Archived">Archived</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="sortDocuments">Sort By</label>
+                  <select id="sortDocuments" class="filter-select">
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="size-desc">Size: Largest First</option>
+                    <option value="downloads-desc">Most Downloaded</option>
+                  </select>
+                </div>
+                <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
+                  <i class="ri-refresh-line"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------- MAIN GRID: folders panel + document table ---------- -->
+          <section class="documents-layout">
+            <!-- ===== FOLDERS PANEL ===== -->
+            <div class="card folders-card">
+              <div class="folders-card-head">
+                <h4>Folders</h4>
+                <button
+                  class="icon-btn-sm"
+                  id="addFolderBtn"
+                  title="New Folder"
+                >
+                  <i class="ri-add-line"></i>
+                </button>
+              </div>
+              <ul class="folder-list" id="folderList">
+                <li>
+                  <button class="folder-item active" data-folder="">
+                    <i class="ri-folder-open-line"></i>
+                    <span>All Documents</span>
+                    <strong id="folderCountAll">0</strong>
+                  </button>
+                </li>
+              </ul>
+              <div class="folder-list-dynamic" id="folderListDynamic"></div>
+              <ul class="folder-list folder-list-trash">
+                <li>
+                  <button
+                    class="folder-item folder-item-trash"
+                    data-folder="__trash__"
+                  >
+                    <i class="ri-delete-bin-6-line"></i>
+                    <span>Trash</span>
+                    <strong id="folderCountTrash">0</strong>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- ===== DOCUMENT TABLE ===== -->
+            <div class="card table-card">
+              <div class="bulk-bar" id="bulkBar" hidden>
+                <span id="bulkCount">0 selected</span>
+                <div class="bulk-actions">
+                  <button class="btn btn-ghost btn-sm" id="bulkDownloadBtn">
+                    <i class="ri-download-2-line"></i> Download
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="bulkMoveBtn">
+                    <i class="ri-folder-transfer-line"></i> Move
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="bulkDeleteBtn">
+                    <i class="ri-delete-bin-line"></i> Delete
+                  </button>
+                </div>
+              </div>
+
+              <!-- ===== SKELETON ===== -->
+              <div class="skeleton-table" id="documentsSkeleton">
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+              </div>
+
+              <div id="documentsTableContent" hidden>
+                <div class="table-responsive" id="documentsTableWrap">
+                  <table class="data-table" id="documentsTable">
+                    <thead>
+                      <tr>
+                        <th class="col-checkbox">
+                          <input type="checkbox" id="selectAllCheckbox" />
+                        </th>
+                        <th>Document Name</th>
+                        <th>Type</th>
+                        <th>Department</th>
+                        <th>Uploaded By</th>
+                        <th>Date</th>
+                        <th>Size</th>
+                        <th>Status</th>
+                        <th class="col-actions">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="documentsTableBody"></tbody>
+                  </table>
+                </div>
+
+                <!-- ===== EMPTY STATE ===== -->
+                <div class="empty-state" id="documentsEmptyState" hidden>
+                  <i class="ri-file-search-line empty-state-icon"></i>
+                  <h3>No Documents Found</h3>
+                  <p>Get started by uploading a document.</p>
+                  <button class="btn btn-primary" id="emptyStateUploadBtn">
+                    <i class="ri-upload-cloud-2-line"></i> Upload Document
+                  </button>
+                </div>
+
+                <div class="table-pagination" id="documentsPagination">
+                  <span class="pagination-info" id="paginationInfo"></span>
+                  <div
+                    class="pagination-controls"
+                    id="paginationControls"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       UPLOAD DOCUMENT MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="uploadModalOverlay" hidden>
+      <div
+        class="modal modal-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="uploadModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="uploadModalTitle">Upload Document</h3>
+          <button
+            class="modal-close"
+            id="closeUploadModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="uploadForm" class="modal-body">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="docFileInput">Choose File</label>
+              <div class="file-drop" id="fileDropZone">
+                <i class="ri-upload-cloud-2-line"></i>
+                <p id="fileDropLabel">Click to browse or drag a file here</p>
+                <input type="file" id="docFileInput" hidden />
+              </div>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="docNameInput">Document Name</label>
+              <input
+                type="text"
+                id="docNameInput"
+                placeholder="e.g. Employee Handbook 2026"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="docFolderSelect">Folder</label>
+              <select id="docFolderSelect">
+                <option value="">Uncategorized</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="docDepartmentSelect">Department</label>
+              <select id="docDepartmentSelect">
+                <option value="">All Departments</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="docTypeSelect">Document Type</label>
+              <select id="docTypeSelect">
+                <option value="PDF">PDF</option>
+                <option value="DOCX">DOCX</option>
+                <option value="XLSX">XLSX</option>
+                <option value="PPT">PPT</option>
+                <option value="PNG">PNG</option>
+                <option value="JPG">JPG</option>
+                <option value="ZIP">ZIP</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="docEmployeeSelect">Select Employee (Optional)</label>
+              <select id="docEmployeeSelect">
+                <option value="">None</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="docDescriptionInput">Description</label>
+              <textarea
+                id="docDescriptionInput"
+                rows="2"
+                placeholder="Optional description..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="docTagsInput">Tags</label>
+              <input
+                type="text"
+                id="docTagsInput"
+                placeholder="comma, separated, tags"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="docVisibilitySelect">Visibility</label>
+              <select id="docVisibilitySelect">
+                <option value="Everyone">Everyone</option>
+                <option value="My Department">My Department</option>
+                <option value="Only Me">Only Me</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="upload-progress" id="uploadProgressWrap" hidden>
+            <div class="upload-progress-track">
+              <div class="upload-progress-bar" id="uploadProgressBar"></div>
+            </div>
+            <span id="uploadProgressText">0%</span>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelUploadModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitUploadBtn">
+              <i class="ri-upload-cloud-2-line"></i> Upload
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       NEW FOLDER MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="folderModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="folderModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="folderModalTitle">New Folder</h3>
+          <button
+            class="modal-close"
+            id="closeFolderModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <form id="folderForm" class="modal-body">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="folderNameInput">Folder Name</label>
+              <input
+                type="text"
+                id="folderNameInput"
+                placeholder="e.g. Onboarding Kits"
+                required
+              />
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="folderDescriptionInput">Description</label>
+              <textarea
+                id="folderDescriptionInput"
+                rows="2"
+                placeholder="Optional description..."
+              ></textarea>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="folderParentSelect">Parent Folder</label>
+              <select id="folderParentSelect">
+                <option value="">None (Top Level)</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label>Folder Color</label>
+              <div class="color-swatches" id="folderColorPicker">
+                <label class="color-swatch" style="--swatch: #6c5ce7"
+                  ><input
+                    type="radio"
+                    name="folderColor"
+                    value="#6c5ce7"
+                    checked
+                /></label>
+                <label class="color-swatch" style="--swatch: #0984e3"
+                  ><input type="radio" name="folderColor" value="#0984e3"
+                /></label>
+                <label class="color-swatch" style="--swatch: #00b894"
+                  ><input type="radio" name="folderColor" value="#00b894"
+                /></label>
+                <label class="color-swatch" style="--swatch: #fdcb6e"
+                  ><input type="radio" name="folderColor" value="#fdcb6e"
+                /></label>
+                <label class="color-swatch" style="--swatch: #e17055"
+                  ><input type="radio" name="folderColor" value="#e17055"
+                /></label>
+                <label class="color-swatch" style="--swatch: #e84393"
+                  ><input type="radio" name="folderColor" value="#e84393"
+                /></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelFolderModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitFolderBtn">
+              <i class="ri-folder-add-line"></i> Create Folder
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       RENAME MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="renameModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="renameModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="renameModalTitle">Rename Document</h3>
+          <button
+            class="modal-close"
+            id="closeRenameModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="renameForm" class="modal-body">
+          <div class="form-group">
+            <label for="renameInput">Document Name</label>
+            <input type="text" id="renameInput" required />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelRenameBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="confirmRenameBtn">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       MOVE MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="moveModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="moveModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="moveModalTitle">Move Document</h3>
+          <button class="modal-close" id="closeMoveModalBtn" aria-label="Close">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="moveForm" class="modal-body">
+          <div class="form-group">
+            <label for="moveFolderSelect">Destination Folder</label>
+            <select id="moveFolderSelect">
+              <option value="">Uncategorized</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelMoveBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="confirmMoveBtn">
+              Move
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SHARE MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="shareModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shareModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="shareModalTitle">Share Document</h3>
+          <button
+            class="modal-close"
+            id="closeShareModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="shareLinkInput">Shareable Link</label>
+            <div class="share-link-row">
+              <input type="text" id="shareLinkInput" readonly />
+              <button class="btn btn-outline" id="copyShareLinkBtn">
+                <i class="ri-file-copy-line"></i> Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       DELETE CONFIRMATION MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="deleteModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+      >
+        <div class="modal-body modal-body-center">
+          <div class="modal-icon modal-icon-danger">
+            <i class="ri-delete-bin-6-line"></i>
+          </div>
+          <h3 id="deleteModalTitle">Delete Document?</h3>
+          <p>
+            This will move <strong id="deleteTargetName">this item</strong> to
+            Trash. <span id="deletePermanentNote"></span>
+          </p>
+        </div>
+        <div class="modal-footer modal-footer-center">
+          <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="ri-delete-bin-6-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SCRIPTS
+    ====================================================== -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/documents.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>
