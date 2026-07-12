@@ -1,0 +1,1445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/settings.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+        <nav class="sidebar__nav"><ul id="navList"></ul></nav>
+        <!-- <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div> -->
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i
+                ><span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">0</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="content" id="settingsPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Settings</h1>
+              <p>
+                Manage your organization, application, users, security and
+                system preferences.
+              </p>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn btn-outline" id="resetChangesBtn">
+                <i class="ri-refresh-line"></i> Reset Changes
+              </button>
+              <button class="btn btn-outline" id="exportSettingsBtn">
+                <i class="ri-download-2-line"></i> Export Settings
+              </button>
+              <button class="btn btn-primary" id="saveChangesBtn">
+                <i class="ri-save-line"></i> Save Changes
+              </button>
+            </div>
+          </div>
+
+          <!-- ---------- SETTINGS LAYOUT ---------- -->
+          <div class="settings-layout">
+            <!-- ===== LEFT NAV ===== -->
+            <aside class="card settings-nav-card">
+              <div class="settings-nav-list" id="settingsNavList">
+                <button class="settings-nav-item active" data-tab="general">
+                  <i class="ri-settings-3-line"></i> General
+                </button>
+                <button class="settings-nav-item" data-tab="organization">
+                  <i class="ri-building-4-line"></i> Organization
+                </button>
+                <button class="settings-nav-item" data-tab="roles">
+                  <i class="ri-shield-user-line"></i> Users &amp; Roles
+                </button>
+                <button class="settings-nav-item" data-tab="notifications">
+                  <i class="ri-notification-3-line"></i> Notifications
+                </button>
+                <button class="settings-nav-item" data-tab="security">
+                  <i class="ri-lock-2-line"></i> Security
+                </button>
+                <button class="settings-nav-item" data-tab="attendance">
+                  <i class="ri-calendar-check-line"></i> Attendance
+                </button>
+                <button class="settings-nav-item" data-tab="leave">
+                  <i class="ri-logout-box-r-line"></i> Leave
+                </button>
+                <button class="settings-nav-item" data-tab="payroll">
+                  <i class="ri-bank-card-line"></i> Payroll
+                </button>
+                <button class="settings-nav-item" data-tab="holiday">
+                  <i class="ri-sun-line"></i> Holiday
+                </button>
+                <button class="settings-nav-item" data-tab="documents">
+                  <i class="ri-file-text-line"></i> Documents
+                </button>
+                <button class="settings-nav-item" data-tab="appearance">
+                  <i class="ri-palette-line"></i> Appearance
+                </button>
+                <button class="settings-nav-item" data-tab="integrations">
+                  <i class="ri-plug-line"></i> Integrations
+                </button>
+                <button class="settings-nav-item" data-tab="apikeys">
+                  <i class="ri-key-2-line"></i> API Keys
+                </button>
+                <button class="settings-nav-item" data-tab="emailtemplates">
+                  <i class="ri-mail-settings-line"></i> Email Templates
+                </button>
+                <button class="settings-nav-item" data-tab="backup">
+                  <i class="ri-database-2-line"></i> Backup &amp; Restore
+                </button>
+                <button class="settings-nav-item" data-tab="auditlogs">
+                  <i class="ri-file-list-3-line"></i> Audit Logs
+                </button>
+                <button class="settings-nav-item" data-tab="about">
+                  <i class="ri-information-line"></i> About System
+                </button>
+              </div>
+            </aside>
+
+            <!-- ===== RIGHT CONTENT ===== -->
+            <section class="card settings-content-card">
+              <!-- ========== GENERAL ========== -->
+              <div class="settings-panel active" id="panel-general">
+                <div class="settings-panel-head">
+                  <h2>General Settings</h2>
+                  <p>Basic company information used across the system.</p>
+                </div>
+                <form id="generalForm">
+                  <div class="settings-section">
+                    <div class="logo-upload">
+                      <div class="logo-preview" id="logoPreview">
+                        <i class="ri-team-fill"></i>
+                      </div>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn btn-outline btn-sm"
+                          id="uploadLogoBtn"
+                        >
+                          <i class="ri-upload-2-line"></i> Upload Logo</button
+                        ><input
+                          type="file"
+                          id="logoFileInput"
+                          hidden
+                          accept="image/*"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="companyNameInput">Company Name</label
+                      ><input type="text" id="companyNameInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="companyEmailInput">Company Email</label
+                      ><input type="email" id="companyEmailInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="companyPhoneInput">Company Phone</label
+                      ><input type="tel" id="companyPhoneInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="companyWebsiteInput">Website</label
+                      ><input
+                        type="url"
+                        id="companyWebsiteInput"
+                        placeholder="https://"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="timezoneSelect">Timezone</label>
+                      <select id="timezoneSelect">
+                        <option>UTC</option>
+                        <option>Asia/Kolkata</option>
+                        <option>America/New_York</option>
+                        <option>Europe/London</option>
+                        <option>Asia/Dubai</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="dateFormatSelect">Date Format</label>
+                      <select id="dateFormatSelect">
+                        <option>DD/MM/YYYY</option>
+                        <option>MM/DD/YYYY</option>
+                        <option>YYYY-MM-DD</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="timeFormatSelect">Time Format</label>
+                      <select id="timeFormatSelect">
+                        <option>12-hour</option>
+                        <option>24-hour</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="languageSelect">Language</label>
+                      <select id="languageSelect">
+                        <option>English</option>
+                        <option>Hindi</option>
+                        <option>Spanish</option>
+                        <option>French</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="currencySelect">Currency</label>
+                      <select id="currencySelect">
+                        <option>INR (₹)</option>
+                        <option>USD ($)</option>
+                        <option>EUR (€)</option>
+                        <option>GBP (£)</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== ORGANIZATION ========== -->
+              <div class="settings-panel" id="panel-organization">
+                <div class="settings-panel-head">
+                  <h2>Organization Settings</h2>
+                  <p>Legal and structural details of your organization.</p>
+                </div>
+                <form id="organizationForm">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="orgNameInput">Organization Name</label
+                      ><input type="text" id="orgNameInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="orgIndustrySelect">Industry</label>
+                      <select id="orgIndustrySelect">
+                        <option>Technology</option>
+                        <option>Finance</option>
+                        <option>Healthcare</option>
+                        <option>Manufacturing</option>
+                        <option>Retail</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="orgRegNumberInput">Registration Number</label
+                      ><input type="text" id="orgRegNumberInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="orgTaxNumberInput">Tax Number</label
+                      ><input type="text" id="orgTaxNumberInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="orgWorkingDaysSelect">Working Days</label>
+                      <select id="orgWorkingDaysSelect">
+                        <option>Mon – Fri</option>
+                        <option>Mon – Sat</option>
+                        <option>All 7 Days</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="orgOfficeHoursInput">Office Hours</label
+                      ><input
+                        type="text"
+                        id="orgOfficeHoursInput"
+                        placeholder="9:00 AM – 6:00 PM"
+                      />
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="orgAddressInput">Address</label
+                      ><textarea id="orgAddressInput" rows="3"></textarea>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== USERS & ROLES ========== -->
+              <div class="settings-panel" id="panel-roles">
+                <div class="settings-panel-head">
+                  <h2>Users &amp; Roles</h2>
+                  <p>Define roles and assign granular permissions.</p>
+                </div>
+                <div class="toolbar-row">
+                  <div class="search-box search-box-wide">
+                    <i class="ri-search-line"></i
+                    ><input
+                      type="text"
+                      id="roleSearchInput"
+                      placeholder="Search roles..."
+                    />
+                  </div>
+                  <select id="filterRoleStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm" id="addRoleBtn">
+                    <i class="ri-add-line"></i> Add Role
+                  </button>
+                </div>
+                <div
+                  class="skeleton-block-settings skeleton-row-sm"
+                  id="rolesSkeleton"
+                ></div>
+                <div id="rolesContent" hidden>
+                  <div class="table-responsive">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>Role Name</th>
+                          <th>Permissions</th>
+                          <th>Users</th>
+                          <th>Status</th>
+                          <th class="col-actions">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="rolesTableBody"></tbody>
+                    </table>
+                  </div>
+                  <div class="empty-state" id="rolesEmptyState" hidden>
+                    <i class="ri-shield-user-line"></i>
+                    <h3>No Roles Found</h3>
+                    <p>Create a role to define access permissions.</p>
+                    <button class="btn btn-primary btn-sm" id="emptyRoleAddBtn">
+                      Add Role
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ========== NOTIFICATIONS ========== -->
+              <div class="settings-panel" id="panel-notifications">
+                <div class="settings-panel-head">
+                  <h2>Notification Settings</h2>
+                  <p>Control which notifications are sent and to whom.</p>
+                </div>
+                <form id="notificationsForm">
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Email Notifications</strong
+                      ><span>Send updates via email</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifEmail" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Push Notifications</strong
+                      ><span>Browser &amp; mobile push alerts</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifPush" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Birthday Notifications</strong
+                      ><span>Notify on employee birthdays</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifBirthday" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Holiday Notifications</strong
+                      ><span>Upcoming holiday reminders</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifHoliday" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Leave Notifications</strong
+                      ><span>Leave requests &amp; approvals</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifLeave" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Payroll Notifications</strong
+                      ><span>Payslip &amp; payroll run alerts</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifPayroll" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>System Notifications</strong
+                      ><span>Maintenance &amp; system alerts</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="notifSystem" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin-top: 16px; max-width: 260px"
+                  >
+                    <label for="reminderTimeInput">Reminder Time</label
+                    ><input type="time" id="reminderTimeInput" />
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== SECURITY ========== -->
+              <div class="settings-panel" id="panel-security">
+                <div class="settings-panel-head">
+                  <h2>Security Settings</h2>
+                  <p>Protect your organization's data and access.</p>
+                </div>
+                <form id="securityForm">
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Two-Factor Authentication</strong
+                      ><span>Require a second verification step</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="security2fa" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Login Alerts</strong
+                      ><span>Email me on new device login</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="securityLoginAlerts" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Auto Logout</strong
+                      ><span>Log out automatically when idle</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="securityAutoLogout" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="form-grid" style="margin-top: 16px">
+                    <div class="form-group">
+                      <label for="passwordPolicySelect">Password Policy</label>
+                      <select id="passwordPolicySelect">
+                        <option>Basic (min 6 characters)</option>
+                        <option>Strong (min 8, mixed case, number)</option>
+                        <option>Enterprise (min 12, symbols required)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="sessionTimeoutSelect">Session Timeout</label>
+                      <select id="sessionTimeoutSelect">
+                        <option>15 minutes</option>
+                        <option>30 minutes</option>
+                        <option>1 hour</option>
+                        <option>4 hours</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="allowedDevicesSelect">Allowed Devices</label>
+                      <select id="allowedDevicesSelect">
+                        <option>Unlimited</option>
+                        <option>1 device</option>
+                        <option>2 devices</option>
+                        <option>5 devices</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== ATTENDANCE ========== -->
+              <div class="settings-panel" id="panel-attendance">
+                <div class="settings-panel-head">
+                  <h2>Attendance Settings</h2>
+                  <p>Configure office hours and attendance rules.</p>
+                </div>
+                <form id="attendanceForm">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="officeStartInput">Office Start Time</label
+                      ><input type="time" id="officeStartInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="officeEndInput">Office End Time</label
+                      ><input type="time" id="officeEndInput" />
+                    </div>
+                    <div class="form-group">
+                      <label for="gracePeriodInput"
+                        >Late Grace Period (minutes)</label
+                      ><input type="number" id="gracePeriodInput" min="0" />
+                    </div>
+                    <div class="form-group">
+                      <label for="halfDayRuleSelect">Half Day Rules</label>
+                      <select id="halfDayRuleSelect">
+                        <option>Below 4 hours = Half Day</option>
+                        <option>Below 5 hours = Half Day</option>
+                        <option>Disabled</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="overtimeRuleSelect">Overtime Rules</label>
+                      <select id="overtimeRuleSelect">
+                        <option>1.5x after 8 hours</option>
+                        <option>2x after 8 hours</option>
+                        <option>Disabled</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="weekendSettingSelect">Weekend Settings</label>
+                      <select id="weekendSettingSelect">
+                        <option>Sat &amp; Sun Off</option>
+                        <option>Sun Only Off</option>
+                        <option>Alternate Saturdays</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== LEAVE ========== -->
+              <div class="settings-panel" id="panel-leave">
+                <div class="settings-panel-head">
+                  <h2>Leave Settings</h2>
+                  <p>Configure leave types, balances and approval flow.</p>
+                </div>
+                <form id="leaveSettingsForm">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="annualLeaveInput"
+                        >Annual Leave (days/year)</label
+                      ><input type="number" id="annualLeaveInput" min="0" />
+                    </div>
+                    <div class="form-group">
+                      <label for="sickLeaveInput">Sick Leave (days/year)</label
+                      ><input type="number" id="sickLeaveInput" min="0" />
+                    </div>
+                    <div class="form-group">
+                      <label for="casualLeaveInput"
+                        >Casual Leave (days/year)</label
+                      ><input type="number" id="casualLeaveInput" min="0" />
+                    </div>
+                    <div class="form-group">
+                      <label for="carryForwardSelect">Carry Forward</label>
+                      <select id="carryForwardSelect">
+                        <option>Not Allowed</option>
+                        <option>Up to 5 days</option>
+                        <option>Up to 10 days</option>
+                        <option>Unlimited</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="approvalWorkflowSelect"
+                        >Approval Workflow</label
+                      >
+                      <select id="approvalWorkflowSelect">
+                        <option>Single Approver (Manager)</option>
+                        <option>Two-Step (Manager + HR)</option>
+                        <option>Auto-Approve</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="balanceResetSelect"
+                        >Leave Balance Reset</label
+                      >
+                      <select id="balanceResetSelect">
+                        <option>Calendar Year (Jan 1)</option>
+                        <option>Financial Year (Apr 1)</option>
+                        <option>Joining Date Anniversary</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== PAYROLL ========== -->
+              <div class="settings-panel" id="panel-payroll">
+                <div class="settings-panel-head">
+                  <h2>Payroll Settings</h2>
+                  <p>Salary cycle, statutory rules and bonus configuration.</p>
+                </div>
+                <form id="payrollSettingsForm">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="salaryCycleSelect">Salary Cycle</label>
+                      <select id="salaryCycleSelect">
+                        <option>Monthly</option>
+                        <option>Bi-Weekly</option>
+                        <option>Weekly</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="payDateInput">Pay Date</label
+                      ><input
+                        type="number"
+                        id="payDateInput"
+                        min="1"
+                        max="31"
+                        placeholder="e.g. 1st of month"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="payrollCurrencySelect">Currency</label>
+                      <select id="payrollCurrencySelect">
+                        <option>INR (₹)</option>
+                        <option>USD ($)</option>
+                        <option>EUR (€)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="taxRuleInput">Tax Rules</label
+                      ><input
+                        type="text"
+                        id="taxRuleInput"
+                        placeholder="e.g. As per Income Tax slab"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="pfPercentInput">PF (%)</label
+                      ><input
+                        type="number"
+                        id="pfPercentInput"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="esiPercentInput">ESI (%)</label
+                      ><input
+                        type="number"
+                        id="esiPercentInput"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="bonusRulesInput">Bonus Rules</label
+                      ><textarea
+                        id="bonusRulesInput"
+                        rows="2"
+                        placeholder="e.g. Annual bonus of 8.33% of basic salary"
+                      ></textarea>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== HOLIDAY ========== -->
+              <div class="settings-panel" id="panel-holiday">
+                <div class="settings-panel-head">
+                  <h2>Holiday Settings</h2>
+                  <p>Configure holiday calendar rules and regional holidays.</p>
+                </div>
+                <form id="holidaySettingsForm">
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Regional Holidays</strong
+                      ><span>Apply state/region-specific holidays</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="regionalHolidays" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Optional Holidays</strong
+                      ><span>Let employees choose optional holidays</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="optionalHolidays" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Working Saturdays</strong
+                      ><span>Some Saturdays count as working days</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="workingSaturdays" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="margin-top: 16px; max-width: 280px"
+                  >
+                    <label for="holidayCalendarSelect">Holiday Calendar</label>
+                    <select id="holidayCalendarSelect">
+                      <option>India</option>
+                      <option>United States</option>
+                      <option>United Kingdom</option>
+                      <option>UAE</option>
+                      <option>Custom</option>
+                    </select>
+                  </div>
+                </form>
+                <p class="form-hint" style="margin-top: 14px">
+                  Manage individual holiday dates from the
+                  <strong>Holidays</strong> module.
+                </p>
+              </div>
+
+              <!-- ========== DOCUMENTS ========== -->
+              <div class="settings-panel" id="panel-documents">
+                <div class="settings-panel-head">
+                  <h2>Document Settings</h2>
+                  <p>Control uploads and storage policy.</p>
+                </div>
+                <form id="documentSettingsForm">
+                  <div class="form-grid">
+                    <div class="form-group form-group-full">
+                      <label for="allowedFileTypesInput"
+                        >Allowed File Types</label
+                      ><input
+                        type="text"
+                        id="allowedFileTypesInput"
+                        placeholder="pdf, docx, xlsx, png, jpg"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="maxUploadSizeInput"
+                        >Maximum Upload Size (MB)</label
+                      ><input type="number" id="maxUploadSizeInput" min="1" />
+                    </div>
+                    <div class="form-group">
+                      <label for="storageProviderSelect"
+                        >Storage Provider</label
+                      >
+                      <select id="storageProviderSelect">
+                        <option>Firebase Storage</option>
+                        <option>Amazon S3</option>
+                        <option>Google Cloud Storage</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="autoDeleteSelect">Auto Delete Policy</label>
+                      <select id="autoDeleteSelect">
+                        <option>Never</option>
+                        <option>After 1 Year in Trash</option>
+                        <option>After 90 Days in Trash</option>
+                        <option>After 30 Days in Trash</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ========== APPEARANCE ========== -->
+              <div class="settings-panel" id="panel-appearance">
+                <div class="settings-panel-head">
+                  <h2>Appearance</h2>
+                  <p>Personalize how WorkSpare looks for your organization.</p>
+                </div>
+                <div class="settings-section">
+                  <div class="settings-section-title">Theme</div>
+                  <div class="theme-options">
+                    <label class="theme-option"
+                      ><input
+                        type="radio"
+                        name="themeOption"
+                        value="light"
+                      /><span class="theme-option-card"
+                        ><i class="ri-sun-line"></i><span>Light</span></span
+                      ></label
+                    >
+                    <label class="theme-option"
+                      ><input
+                        type="radio"
+                        name="themeOption"
+                        value="dark"
+                      /><span class="theme-option-card"
+                        ><i class="ri-moon-line"></i><span>Dark</span></span
+                      ></label
+                    >
+                    <label class="theme-option"
+                      ><input
+                        type="radio"
+                        name="themeOption"
+                        value="system"
+                      /><span class="theme-option-card"
+                        ><i class="ri-computer-line"></i
+                        ><span>System</span></span
+                      ></label
+                    >
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <div class="settings-section-title">Primary Color</div>
+                  <div class="color-swatches" id="primaryColorPicker">
+                    <label class="color-swatch" style="--swatch: #6c5ce7"
+                      ><input
+                        type="radio"
+                        name="primaryColor"
+                        value="#6c5ce7"
+                        checked
+                    /></label>
+                    <label class="color-swatch" style="--swatch: #0984e3"
+                      ><input type="radio" name="primaryColor" value="#0984e3"
+                    /></label>
+                    <label class="color-swatch" style="--swatch: #00b894"
+                      ><input type="radio" name="primaryColor" value="#00b894"
+                    /></label>
+                    <label class="color-swatch" style="--swatch: #fdcb6e"
+                      ><input type="radio" name="primaryColor" value="#fdcb6e"
+                    /></label>
+                    <label class="color-swatch" style="--swatch: #e17055"
+                      ><input type="radio" name="primaryColor" value="#e17055"
+                    /></label>
+                    <label class="color-swatch" style="--swatch: #e84393"
+                      ><input type="radio" name="primaryColor" value="#e84393"
+                    /></label>
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <div class="settings-section-title">Layout</div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Compact Mode</strong
+                      ><span>Reduce padding for denser layouts</span></span
+                    ><label class="switch"
+                      ><input type="checkbox" id="compactMode" /><span
+                        class="switch-slider"
+                      ></span
+                    ></label>
+                  </div>
+                  <div class="toggle-row">
+                    <span class="toggle-row-label"
+                      ><strong>Animations</strong
+                      ><span
+                        >Enable smooth transitions &amp; hover effects</span
+                      ></span
+                    ><label class="switch"
+                      ><input
+                        type="checkbox"
+                        id="animationsEnabled"
+                        checked /><span class="switch-slider"></span
+                    ></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ========== INTEGRATIONS ========== -->
+              <div class="settings-panel" id="panel-integrations">
+                <div class="settings-panel-head">
+                  <h2>Integrations</h2>
+                  <p>Connect WorkSpare with your favorite tools.</p>
+                </div>
+                <div id="integrationsList"></div>
+              </div>
+
+              <!-- ========== API KEYS ========== -->
+              <div class="settings-panel" id="panel-apikeys">
+                <div class="settings-panel-head">
+                  <h2>API Keys</h2>
+                  <p>Manage keys used to access the WorkSpare API.</p>
+                </div>
+                <div class="toolbar-row">
+                  <button class="btn btn-primary btn-sm" id="generateKeyBtn">
+                    <i class="ri-key-2-line"></i> Generate API Key
+                  </button>
+                </div>
+                <div id="apiKeysList"></div>
+                <div class="empty-state" id="apiKeysEmptyState" hidden>
+                  <i class="ri-key-2-line"></i>
+                  <h3>No API Keys Yet</h3>
+                  <p>Generate a key to start using the API.</p>
+                </div>
+              </div>
+
+              <!-- ========== EMAIL TEMPLATES ========== -->
+              <div class="settings-panel" id="panel-emailtemplates">
+                <div class="settings-panel-head">
+                  <h2>Email Templates</h2>
+                  <p>Customize automated emails sent to employees.</p>
+                </div>
+                <div class="toolbar-row">
+                  <div class="search-box search-box-wide">
+                    <i class="ri-search-line"></i
+                    ><input
+                      type="text"
+                      id="templateSearchInput"
+                      placeholder="Search templates..."
+                    />
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Template Name</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                        <th class="col-actions">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="templatesTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- ========== BACKUP & RESTORE ========== -->
+              <div class="settings-panel" id="panel-backup">
+                <div class="settings-panel-head">
+                  <h2>Backup &amp; Restore</h2>
+                  <p>Protect your data with regular backups.</p>
+                </div>
+                <div class="backup-row">
+                  <div>
+                    <div class="backup-info-title">Manual Backup</div>
+                    <div class="backup-info-sub">
+                      Create a snapshot of your data right now.
+                    </div>
+                  </div>
+                  <button class="btn btn-primary btn-sm" id="backupNowBtn">
+                    <i class="ri-download-2-line"></i> Backup Now
+                  </button>
+                </div>
+                <div class="backup-row">
+                  <div>
+                    <div class="backup-info-title">Restore Backup</div>
+                    <div class="backup-info-sub">
+                      Restore your system from a previous backup file.
+                    </div>
+                  </div>
+                  <button class="btn btn-outline btn-sm" id="restoreBackupBtn">
+                    <i class="ri-upload-2-line"></i> Restore Backup
+                  </button>
+                </div>
+                <div
+                  class="form-group"
+                  style="max-width: 280px; margin-top: 16px"
+                >
+                  <label for="autoBackupSelect"
+                    >Automatic Backup Schedule</label
+                  >
+                  <select id="autoBackupSelect">
+                    <option>Disabled</option>
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                  </select>
+                </div>
+                <div class="settings-section" style="margin-top: 24px">
+                  <div class="settings-section-title">Recent Backups</div>
+                  <div id="backupHistoryList"></div>
+                </div>
+              </div>
+
+              <!-- ========== AUDIT LOGS ========== -->
+              <div class="settings-panel" id="panel-auditlogs">
+                <div class="settings-panel-head">
+                  <h2>Audit Logs</h2>
+                  <p>Track every important action taken across the system.</p>
+                </div>
+                <div class="toolbar-row">
+                  <div class="search-box search-box-wide">
+                    <i class="ri-search-line"></i
+                    ><input
+                      type="text"
+                      id="auditSearchInput"
+                      placeholder="Search audit logs..."
+                    />
+                  </div>
+                  <select id="filterAuditModule" class="filter-select">
+                    <option value="">All Modules</option>
+                  </select>
+                  <select id="filterAuditDate" class="filter-select">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                  </select>
+                  <button class="btn btn-outline btn-sm" id="exportAuditBtn">
+                    <i class="ri-download-2-line"></i> Export
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>IP Address</th>
+                        <th>Browser</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="auditLogsTableBody"></tbody>
+                  </table>
+                </div>
+                <div class="empty-state" id="auditLogsEmptyState" hidden>
+                  <i class="ri-file-list-3-line"></i>
+                  <h3>No Audit Logs</h3>
+                  <p>Activity will appear here as it happens.</p>
+                </div>
+                <div class="table-pagination" id="auditPagination">
+                  <span class="pagination-info" id="auditPaginationInfo"></span>
+                  <div
+                    class="pagination-controls"
+                    id="auditPaginationControls"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- ========== ABOUT SYSTEM ========== -->
+              <div class="settings-panel" id="panel-about">
+                <div class="settings-panel-head">
+                  <h2>About System</h2>
+                  <p>Current environment and system information.</p>
+                </div>
+                <div class="about-grid">
+                  <div class="about-item">
+                    <span class="about-label">Application Name</span
+                    ><span class="about-value">WorkSpare EMS</span>
+                  </div>
+                  <div class="about-item">
+                    <span class="about-label">Current Version</span
+                    ><span class="about-value">v2.4.0</span>
+                  </div>
+                  <div class="about-item">
+                    <span class="about-label">Environment</span
+                    ><span class="about-value">Production</span>
+                  </div>
+                  <div class="about-item">
+                    <span class="about-label">Firebase Project</span
+                    ><span class="about-value" id="aboutFirebaseProject"
+                      >—</span
+                    >
+                  </div>
+                  <div class="about-item">
+                    <span class="about-label">Database Status</span
+                    ><span class="about-value"
+                      ><span
+                        class="status-badge status-badge--active"
+                        id="aboutDbStatus"
+                        >Checking…</span
+                      ></span
+                    >
+                  </div>
+                  <div class="about-item">
+                    <span class="about-label">Last Update</span
+                    ><span class="about-value" id="aboutLastUpdate">—</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       ADD / EDIT ROLE MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="roleModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="roleModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="roleModalTitle">Add Role</h3>
+          <button class="modal-close" id="closeRoleModalBtn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="roleForm" class="modal-body">
+          <input type="hidden" id="roleDocId" value="" />
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="roleNameInput">Role Name</label
+            ><input type="text" id="roleNameInput" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="roleStatusSelect">Status</label>
+            <select id="roleStatusSelect">
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Permissions</label>
+            <div class="permission-grid" id="rolePermissionsGrid">
+              <label class="permission-item"
+                ><input type="checkbox" value="View Dashboard" /> View
+                Dashboard</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Employees" /> Manage
+                Employees</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Departments" /> Manage
+                Departments</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Attendance" /> Manage
+                Attendance</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Approve Leave" /> Approve
+                Leave</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Run Payroll" /> Run
+                Payroll</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Documents" /> Manage
+                Documents</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="View Reports" /> View
+                Reports</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Settings" /> Manage
+                Settings</label
+              >
+              <label class="permission-item"
+                ><input type="checkbox" value="Manage Roles" /> Manage
+                Roles</label
+              >
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelRoleModalBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveRoleBtn">
+              <i class="ri-save-line"></i> Save Role
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       DELETE CONFIRMATION MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="deleteModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+      >
+        <div class="modal-body modal-body-center">
+          <div class="modal-icon modal-icon-danger">
+            <i class="ri-delete-bin-6-line"></i>
+          </div>
+          <h3 id="deleteModalTitle">Delete Item?</h3>
+          <p>
+            This will permanently remove
+            <strong id="deleteTargetName">this item</strong>. This action cannot
+            be undone.
+          </p>
+        </div>
+        <div class="modal-footer modal-footer-center">
+          <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="ri-delete-bin-6-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       GENERATE API KEY MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="apiKeyModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="apiKeyModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="apiKeyModalTitle">Generate API Key</h3>
+          <button class="modal-close" id="closeApiKeyModalBtn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="apiKeyNameInput">Key Name</label
+            ><input
+              type="text"
+              id="apiKeyNameInput"
+              placeholder="e.g. Mobile App Integration"
+            />
+          </div>
+          <div id="generatedKeyWrap" hidden>
+            <label
+              style="
+                font-size: 12.5px;
+                font-weight: 700;
+                color: var(--panel-light-text-muted);
+              "
+              >Your New API Key</label
+            >
+            <div class="generated-key-box" style="margin-top: 6px">
+              <span id="generatedKeyText"></span>
+              <button
+                type="button"
+                class="icon-btn-sm"
+                id="copyGeneratedKeyBtn"
+              >
+                <i class="ri-file-copy-line"></i>
+              </button>
+            </div>
+            <p class="form-hint" style="margin-top: 8px">
+              Copy this key now — it won't be shown again in full.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="cancelApiKeyModalBtn">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="confirmGenerateKeyBtn"
+          >
+            <i class="ri-key-2-line"></i> Generate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       EDIT EMAIL TEMPLATE MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="templateModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="templateModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="templateModalTitle">Edit Email Template</h3>
+          <button class="modal-close" id="closeTemplateModalBtn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="templateForm" class="modal-body">
+          <input type="hidden" id="templateDocId" value="" />
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="templateNameInput">Template Name</label
+            ><input type="text" id="templateNameInput" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="templateSubjectInput">Subject Line</label
+            ><input type="text" id="templateSubjectInput" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 16px">
+            <label for="templateBodyInput">Email Body</label
+            ><textarea id="templateBodyInput" rows="6" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="templateStatusSelect">Status</label>
+            <select id="templateStatusSelect">
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelTemplateModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveTemplateBtn">
+              <i class="ri-save-line"></i> Save Template
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       RESTORE BACKUP MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="restoreModalOverlay" hidden>
+      <div
+        class="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="restoreModalTitle"
+      >
+        <div class="modal-body modal-body-center">
+          <div class="modal-icon modal-icon-primary">
+            <i class="ri-upload-2-line"></i>
+          </div>
+          <h3 id="restoreModalTitle">Restore from Backup</h3>
+          <p>
+            Select a backup file to restore. This will overwrite current
+            settings data.
+          </p>
+          <input
+            type="file"
+            id="restoreFileInput"
+            accept=".json"
+            style="margin-top: 14px"
+          />
+        </div>
+        <div class="modal-footer modal-footer-center">
+          <button class="btn btn-ghost" id="cancelRestoreBtn">Cancel</button>
+          <button class="btn btn-primary" id="confirmRestoreBtn">
+            <i class="ri-upload-2-line"></i> Restore
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SCRIPTS
+    ====================================================== -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/settings.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>
