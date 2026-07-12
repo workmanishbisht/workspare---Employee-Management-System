@@ -13,7 +13,7 @@
   </head>
   <body>
     <div class="app">
-      <!-- ============ SIDEBAR (reused) ============ -->
+      <!-- ============ SIDEBAR ============ -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar__brand">
           <div class="brand__icon"><i class="ri-team-fill"></i></div>
@@ -25,16 +25,9 @@
 
         <nav class="sidebar__nav">
           <ul id="navList">
-            <!-- injected by renderNav() -->
+            <!-- Populated by renderNav() -->
           </ul>
         </nav>
-
-        <div class="sidebar__upgrade">
-          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
-          <p class="upgrade__title">Upgrade to Pro</p>
-          <p class="upgrade__sub">Unlock more features</p>
-          <button class="btn btn--primary btn--block">Upgrade Now</button>
-        </div>
 
         <div class="sidebar__user-wrap">
           <button
@@ -93,8 +86,8 @@
                 class="user-menu__item user-menu__item--danger"
                 data-action="logout"
               >
-                <i class="ri-logout-box-r-line" style="color: #cf2626"></i
-                ><span style="color: #cf2626">Logout</span>
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
+                <span style="color: #cf2626">Logout</span>
               </button>
             </li>
           </ul>
@@ -103,10 +96,10 @@
 
       <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-      <!-- ============ MAIN ============ -->
+      <!-- ============ MAIN CONTENT ============ -->
       <div class="main">
-        <!-- ============ TOPBAR (reused) ============ -->
-        <header class="topbar" id="navbar">
+        <!-- ============ TOPBAR ============ -->
+        <header class="topbar">
           <button
             class="icon-btn topbar__menu"
             id="menuToggle"
@@ -120,7 +113,7 @@
             <input
               type="text"
               id="searchInput"
-              placeholder="Search employees, documents..."
+              placeholder="Search employees, departments..."
             />
             <kbd>⌘ K</kbd>
           </div>
@@ -132,261 +125,266 @@
               type="button"
               aria-label="Toggle Theme"
             >
-              <span id="themeToggleLight" class="theme-toggle__option"
-                ><i class="ri-sun-line"></i
-              ></span>
-              <span id="themeToggleDark" class="theme-toggle__option"
-                ><i class="ri-moon-line"></i
-              ></span>
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
             </button>
             <button class="icon-btn has-badge" aria-label="Notifications">
               <i class="ri-notification-3-line"></i>
-              <span class="badge" id="notifBadge">5</span>
-            </button>
-            <button class="icon-btn" aria-label="Messages">
-              <i class="ri-message-3-line"></i>
+              <span class="badge" id="notifBadge">0</span>
             </button>
           </div>
         </header>
 
         <!-- ============ PAGE CONTENT ============ -->
         <main class="content" id="notificationsPage">
-          <!-- ---------- PAGE HEADER ---------- -->
-          <div class="page-header">
+          <!-- Page Header -->
+          <section class="page-header">
             <div class="page-header-text">
               <h1>Notifications</h1>
               <p>
-                Manage company announcements, alerts and employee notifications.
+                Manage announcements, alerts, employee birthdays, holidays and
+                system notifications from one place.
               </p>
             </div>
+
             <div class="page-header-actions">
-              <button class="btn btn-outline" id="markAllReadBtn">
-                <i class="ri-checkbox-multiple-line"></i> Mark All as Read
+              <button class="btn btn-outline" id="refreshNotificationsBtn">
+                <i class="ri-refresh-line"></i> Refresh
+              </button>
+              <button class="btn btn-outline" id="exportBtn">
+                <i class="ri-download-2-line"></i> Export
               </button>
               <button class="btn btn-primary" id="newAnnouncementBtn">
                 <i class="ri-add-line"></i> New Announcement
               </button>
             </div>
-          </div>
+          </section>
 
-          <!-- ---------- STATISTICS ---------- -->
-          <section
-            class="stats-grid stats-grid-notifications"
-            id="statsGrid"
-            aria-live="polite"
-          >
-            <div class="card stat-card">
+          <!-- Statistics Grid -->
+          <section class="stats-grid-notifications">
+            <article class="card stat-card">
               <div class="stat-card-top">
                 <div class="stat-icon stat-icon-primary">
                   <i class="ri-notification-3-fill"></i>
                 </div>
                 <span class="stat-label">Total Notifications</span>
               </div>
-              <h3 class="stat-value" id="statTotal">0</h3>
-              <span class="stat-sub" id="statTotalSub">All time</span>
-            </div>
+              <h2 class="stat-value" id="statTotal">0</h2>
+              <span class="stat-sub">Total notifications created</span>
+            </article>
 
-            <div class="card stat-card">
+            <article class="card stat-card">
               <div class="stat-card-top">
                 <div class="stat-icon stat-icon-warning">
                   <i class="ri-mail-unread-fill"></i>
                 </div>
                 <span class="stat-label">Unread</span>
               </div>
-              <h3 class="stat-value" id="statUnread">0</h3>
-              <span class="stat-sub" id="statUnreadSub">Needs attention</span>
-            </div>
+              <h2 class="stat-value" id="statUnread">0</h2>
+              <span class="stat-sub">Pending notifications</span>
+            </article>
 
-            <div class="card stat-card">
-              <div class="stat-card-top">
-                <div class="stat-icon stat-icon-info">
-                  <i class="ri-megaphone-fill"></i>
-                </div>
-                <span class="stat-label">Announcements</span>
-              </div>
-              <h3 class="stat-value" id="statAnnouncements">0</h3>
-              <span class="stat-sub" id="statAnnouncementsSub">Published</span>
-            </div>
-
-            <div class="card stat-card">
+            <article class="card stat-card">
               <div class="stat-card-top">
                 <div class="stat-icon stat-icon-success">
-                  <i class="ri-time-fill"></i>
+                  <i class="ri-megaphone-fill"></i>
+                </div>
+                <span class="stat-label">Updates</span>
+              </div>
+              <h2 class="stat-value" id="statAnnouncement">0</h2>
+              <span class="stat-sub">Published Updates</span>
+            </article>
+
+            <article class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-calendar-schedule-fill"></i>
                 </div>
                 <span class="stat-label">Scheduled</span>
               </div>
-              <h3 class="stat-value" id="statScheduled">0</h3>
-              <span class="stat-sub" id="statScheduledSub">Upcoming</span>
-            </div>
+              <h2 class="stat-value" id="statScheduled">0</h2>
+              <span class="stat-sub">Upcoming notifications</span>
+            </article>
+
+            <article class="card stat-card birthday-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-birthday">
+                  <i class="ri-cake-2-fill"></i>
+                </div>
+                <span class="stat-label">Today's Birthdays</span>
+              </div>
+              <h2 class="stat-value" id="statBirthday">0</h2>
+              <span class="stat-sub">Employees celebrating today</span>
+            </article>
+
+            <article class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-calendar-event-fill"></i>
+                </div>
+                <span class="stat-label">Upcoming Holidays</span>
+              </div>
+              <h2 class="stat-value" id="statHoliday">0</h2>
+              <span class="stat-sub">Next holidays</span>
+            </article>
           </section>
 
-          <!-- ---------- SEARCH & FILTERS ---------- -->
+          <!-- Toolbar / Filters -->
           <section class="card toolbar-card">
-            <div class="search-box search-box-wide">
+            <div class="search-box-wide">
               <i class="ri-search-line"></i>
               <input
                 type="text"
-                id="notifSearchInput"
-                placeholder="Search notifications by title or description..."
-                autocomplete="off"
+                id="notificationSearch"
+                placeholder="Search notification, employee, department..."
               />
             </div>
 
             <select id="filterType" class="filter-select">
               <option value="">All Types</option>
-              <option value="Announcement">Announcement</option>
-              <option value="System Alert">System Alert</option>
-              <option value="Reminder">Reminder</option>
-              <option value="Leave Update">Leave Update</option>
-              <option value="Attendance">Attendance</option>
-              <option value="Payroll">Payroll</option>
-              <option value="HR Notice">HR Notice</option>
-              <option value="Policy Update">Policy Update</option>
-              <option value="Event">Event</option>
-              <option value="Birthday">Birthday</option>
-              <option value="Holiday">Holiday</option>
+              <option value="announcement">Announcement</option>
+              <option value="birthday">Birthday</option>
+              <option value="holiday">Holiday</option>
+              <option value="reminder">Reminder</option>
+              <option value="alert">Alert</option>
+              <option value="policy">Policy Update</option>
+              <option value="system">System Notification</option>
             </select>
 
             <select id="filterPriority" class="filter-select">
-              <option value="">All Priorities</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
+              <option value="">Priority</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
             </select>
 
             <select id="filterStatus" class="filter-select">
-              <option value="">All Statuses</option>
-              <option value="Draft">Draft</option>
-              <option value="Scheduled">Scheduled</option>
-              <option value="Published">Published</option>
-              <option value="Expired">Expired</option>
+              <option value="">Status</option>
+              <option>Published</option>
+              <option>Scheduled</option>
+              <option>Draft</option>
+              <option>Archived</option>
             </select>
 
-            <div class="dropdown-wrap">
-              <button class="btn btn-outline" id="moreFiltersBtn">
-                <i class="ri-equalizer-line"></i> More Filters
-              </button>
-              <div
-                class="dropdown-menu dropdown-menu-panel"
-                id="moreFiltersMenu"
-                hidden
-              >
-                <div class="form-group">
-                  <label for="filterDepartment">Department</label>
-                  <select id="filterDepartment" class="filter-select">
-                    <option value="">All Departments</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="filterDateRange">Date Range</label>
-                  <select id="filterDateRange" class="filter-select">
-                    <option value="">All Time</option>
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="sortNotifications">Sort By</label>
-                  <select id="sortNotifications" class="filter-select">
-                    <option value="date-desc">Newest First</option>
-                    <option value="date-asc">Oldest First</option>
-                    <option value="priority-desc">Priority: High to Low</option>
-                    <option value="reads-desc">Most Read</option>
-                  </select>
-                </div>
-                <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
-                  <i class="ri-refresh-line"></i> Reset Filters
-                </button>
-              </div>
-            </div>
+            <select id="filterDepartment" class="filter-select">
+              <option value="">Department</option>
+            </select>
+
+            <select id="filterAudience" class="filter-select">
+              <option value="">Audience</option>
+              <option>Everyone</option>
+              <option>Admin</option>
+              <option>HR</option>
+              <option>Managers</option>
+              <option>Employees</option>
+            </select>
+
+            <button class="btn btn-outline" id="resetFiltersBtn">
+              <i class="ri-restart-line"></i> Reset
+            </button>
           </section>
 
-          <!-- ---------- MAIN GRID: table + right sidebar ---------- -->
+          <!-- Main Grid -->
           <div class="notif-main-grid">
-            <section class="card table-card">
-              <!-- ===== SKELETON ===== -->
-              <div class="skeleton-table" id="notifSkeleton">
-                <div class="skeleton-row"></div>
-                <div class="skeleton-row"></div>
-                <div class="skeleton-row"></div>
-                <div class="skeleton-row"></div>
-                <div class="skeleton-row"></div>
-              </div>
+            <!-- Left Content -->
+            <div class="notif-content">
+              <section class="card table-card">
+                <div class="table-header">
+                  <div>
+                    <h3 class="table-title">Notifications</h3>
+                    <span class="table-count">
+                      <span id="notificationCount">0</span> Notifications Found
+                    </span>
+                  </div>
+                </div>
 
-              <div id="notifTableContent" hidden>
-                <div class="table-responsive" id="notifTableWrap">
-                  <table class="data-table" id="notifTable">
+                <div class="table-responsive">
+                  <table class="data-table">
                     <thead>
                       <tr>
-                        <th>Title</th>
+                        <th>Notification</th>
                         <th>Type</th>
                         <th>Priority</th>
-                        <th>Target Audience</th>
-                        <th>Created By</th>
-                        <th>Created Date</th>
+                        <th>Department</th>
+                        <th>Audience</th>
                         <th>Status</th>
-                        <th>Read Count</th>
-                        <th class="col-actions">Actions</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody id="notifTableBody"></tbody>
+                    <tbody id="notificationTableBody">
+                      <!-- Populated by JS -->
+                    </tbody>
                   </table>
                 </div>
 
-                <!-- ===== EMPTY STATE ===== -->
-                <div class="empty-state" id="notifEmptyState" hidden>
-                  <i
-                    class="ri-notification-off-line"
-                    style="font-size: 56px; color: var(--panel-light-border)"
-                  ></i>
-                  <h3>No Notifications Found</h3>
-                  <p>Get started by creating an announcement.</p>
-                  <button class="btn btn-primary" id="emptyStateCreateBtn">
-                    <i class="ri-add-line"></i> Create Announcement
-                  </button>
+                <div class="table-pagination">
+                  <span class="pagination-info">
+                    Showing <strong id="showingCount">0</strong> notifications
+                  </span>
+                  <div class="pagination">
+                    <button class="page-btn">
+                      <i class="ri-arrow-left-s-line"></i>
+                    </button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">
+                      <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                  </div>
                 </div>
+              </section>
+            </div>
 
-                <div class="table-pagination" id="notifPagination">
-                  <span class="pagination-info" id="paginationInfo"></span>
-                  <div
-                    class="pagination-controls"
-                    id="paginationControls"
-                  ></div>
-                </div>
-              </div>
-            </section>
-
-            <!-- ---------- RIGHT SIDEBAR ---------- -->
-            <aside class="side-col">
-              <section class="card">
-                <div class="card__head"><h3>Notification Summary</h3></div>
-                <div class="summary-row">
-                  <span>Total Sent</span><strong id="sumTotal">0</strong>
-                </div>
-                <div class="summary-row">
-                  <span>Avg. Read Rate</span
-                  ><strong id="sumReadRate">0%</strong>
-                </div>
-                <div class="summary-row">
-                  <span>Drafts</span><strong id="sumDrafts">0</strong>
+            <!-- Right Sidebar -->
+            <aside class="notif-sidebar">
+              <!-- Notification Summary -->
+              <section class="sidebar-widget">
+                <div class="widget-header"><h4>Notification Summary</h4></div>
+                <div class="summary-list">
+                  <div class="summary-item">
+                    <span>Total</span><strong id="summaryTotal">0</strong>
+                  </div>
+                  <div class="summary-item">
+                    <span>Unread</span><strong id="summaryUnread">0</strong>
+                  </div>
+                  <div class="summary-item">
+                    <span>Published</span
+                    ><strong id="summaryPublished">0</strong>
+                  </div>
+                  <div class="summary-item">
+                    <span>Scheduled</span
+                    ><strong id="summaryScheduled">0</strong>
+                  </div>
                 </div>
               </section>
 
-              <section class="card">
-                <div class="card__head"><h3>Unread Notifications</h3></div>
-                <div id="unreadList"></div>
+              <!-- Today's Birthdays -->
+              <section class="sidebar-widget birthday-widget">
+                <div class="widget-header"><h4>🎂 Today's Birthdays</h4></div>
+                <div id="birthdayList" class="birthday-list"></div>
               </section>
 
-              <section class="card">
-                <div class="card__head"><h3>Scheduled Notifications</h3></div>
-                <div id="scheduledList"></div>
+              <!-- Upcoming Birthdays -->
+              <section class="sidebar-widget">
+                <div class="widget-header"><h4>🎉 Upcoming Birthdays</h4></div>
+                <div id="upcomingBirthdayList" class="upcoming-birthday"></div>
               </section>
 
-              <section class="card">
-                <div class="card__head"><h3>Recent Activity</h3></div>
-                <div id="recentActivityList"></div>
+              <!-- Upcoming Holidays -->
+              <section class="sidebar-widget">
+                <div class="widget-header"><h4>📅 Upcoming Holidays</h4></div>
+                <div id="holidayList" class="holiday-list"></div>
+              </section>
+
+              <!-- Recent Activity -->
+              <section class="sidebar-widget">
+                <div class="widget-header"><h4>Recent Activity</h4></div>
+                <div id="recentActivity" class="activity-list"></div>
               </section>
             </aside>
           </div>
@@ -394,203 +392,144 @@
       </div>
     </div>
 
-    <!-- =====================================================
-       NEW / EDIT ANNOUNCEMENT MODAL
-    ====================================================== -->
-    <div class="modal-overlay" id="announcementModalOverlay" hidden>
-      <div
-        class="modal modal-lg"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="announcementModalTitle"
-      >
+    <!-- New Announcement Modal -->
+    <div id="announcementModal" class="modal-overlay hidden">
+      <div class="modal modal-lg">
         <div class="modal-header">
-          <h3 id="announcementModalTitle">New Announcement</h3>
-          <button
-            class="modal-close"
-            id="closeAnnouncementModalBtn"
-            aria-label="Close"
-          >
+          <h3>New Announcement</h3>
+          <button type="button" class="modal-close" id="closeAnnouncementModal">
             <i class="ri-close-line"></i>
           </button>
         </div>
 
-        <form id="announcementForm" class="modal-body">
-          <input type="hidden" id="notifDocId" value="" />
-
+        <div class="modal-body">
           <div class="form-grid">
             <div class="form-group form-group-full">
-              <label for="notifTitleInput">Title</label>
+              <label for="announcementTitle">Announcement Title</label>
               <input
                 type="text"
-                id="notifTitleInput"
-                placeholder="e.g. Office closed for Diwali"
-                required
+                id="announcementTitle"
+                placeholder="Enter announcement title"
               />
             </div>
 
             <div class="form-group form-group-full">
-              <label for="notifDescriptionInput">Description</label>
+              <label for="announcementDescription">Description</label>
               <textarea
-                id="notifDescriptionInput"
-                rows="3"
-                placeholder="Write the notification message..."
-                required
+                id="announcementDescription"
+                rows="5"
+                placeholder="Write announcement..."
               ></textarea>
             </div>
 
             <div class="form-group">
-              <label for="notifTypeSelect">Notification Type</label>
-              <select id="notifTypeSelect" required>
+              <label for="announcementType">Notification Type</label>
+              <select id="announcementType">
                 <option value="Announcement">Announcement</option>
-                <option value="System Alert">System Alert</option>
-                <option value="Reminder">Reminder</option>
-                <option value="Leave Update">Leave Update</option>
-                <option value="Attendance">Attendance</option>
-                <option value="Payroll">Payroll</option>
-                <option value="HR Notice">HR Notice</option>
-                <option value="Policy Update">Policy Update</option>
-                <option value="Event">Event</option>
                 <option value="Birthday">Birthday</option>
                 <option value="Holiday">Holiday</option>
+                <option value="Reminder">Reminder</option>
+                <option value="Policy Update">Policy Update</option>
+                <option value="System Notification">System Notification</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="notifPrioritySelect">Priority</label>
-              <select id="notifPrioritySelect" required>
+              <label for="announcementPriority">Priority</label>
+              <select id="announcementPriority">
                 <option value="Low">Low</option>
                 <option value="Medium" selected>Medium</option>
                 <option value="High">High</option>
-                <option value="Critical">Critical</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="notifDepartmentSelect">Department</label>
-              <select id="notifDepartmentSelect">
-                <option value="All Departments">All Departments</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="notifAudienceSelect">Target Audience</label>
-              <select id="notifAudienceSelect">
+              <label for="announcementAudience">Audience</label>
+              <select id="announcementAudience">
                 <option value="Everyone">Everyone</option>
+                <option value="Admin">Admin</option>
+                <option value="HR">HR</option>
                 <option value="Managers">Managers</option>
                 <option value="Employees">Employees</option>
-                <option value="My Department">My Department</option>
               </select>
             </div>
 
-            <div class="form-group form-group-full">
-              <label for="notifFileInput">Attach File (Optional)</label>
-              <div class="file-drop" id="notifFileDropZone">
-                <i class="ri-attachment-2"></i>
-                <p id="notifFileLabel">Click to browse or drag a file here</p>
-                <input type="file" id="notifFileInput" hidden />
-              </div>
+            <div class="form-group">
+              <label for="announcementDepartment">Department</label>
+              <select id="announcementDepartment">
+                <option value="">All Departments</option>
+              </select>
             </div>
 
             <div class="form-group">
-              <label for="notifScheduleDate">Schedule Date</label>
-              <input type="date" id="notifScheduleDate" />
+              <label for="scheduleDate">Schedule Date</label>
+              <input type="date" id="scheduleDate" />
             </div>
 
             <div class="form-group">
-              <label for="notifScheduleTime">Schedule Time</label>
-              <input type="time" id="notifScheduleTime" />
+              <label for="scheduleTime">Schedule Time</label>
+              <input type="time" id="scheduleTime" />
             </div>
 
             <div class="form-group form-group-full">
-              <label>Delivery Channels</label>
-              <div class="toggle-row">
-                <span class="toggle-row-label"
-                  ><i class="ri-smartphone-line"></i> Allow Push
-                  Notification</span
-                >
-                <label class="switch"
-                  ><input type="checkbox" id="allowPush" checked /><span
-                    class="switch-slider"
-                  ></span
-                ></label>
-              </div>
-              <div class="toggle-row">
-                <span class="toggle-row-label"
-                  ><i class="ri-mail-line"></i> Allow Email Notification</span
-                >
-                <label class="switch"
-                  ><input type="checkbox" id="allowEmail" checked /><span
-                    class="switch-slider"
-                  ></span
-                ></label>
-              </div>
-              <div class="toggle-row">
-                <span class="toggle-row-label"
-                  ><i class="ri-notification-3-line"></i> Allow In-App
-                  Notification</span
-                >
-                <label class="switch"
-                  ><input type="checkbox" id="allowInApp" checked /><span
-                    class="switch-slider"
-                  ></span
-                ></label>
+              <label>Attachment</label>
+              <div class="file-drop">
+                <i class="ri-upload-cloud-2-line"></i>
+                <p>Drag & Drop file<br />or Click to Upload</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-ghost"
-              id="cancelAnnouncementModalBtn"
-            >
-              Cancel
-            </button>
-            <button type="button" class="btn btn-outline" id="saveDraftBtn">
-              <i class="ri-draft-line"></i> Save Draft
-            </button>
-            <button type="submit" class="btn btn-primary" id="publishBtn">
-              <i class="ri-send-plane-fill"></i> Publish
-            </button>
-          </div>
-        </form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelAnnouncement">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="publishAnnouncement"
+          >
+            <i class="ri-send-plane-fill"></i> Publish
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- =====================================================
-       DELETE CONFIRMATION MODAL
-    ====================================================== -->
-    <div class="modal-overlay" id="deleteModalOverlay" hidden>
-      <div
-        class="modal modal-sm"
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="deleteModalTitle"
-      >
-        <div class="modal-body modal-body-center">
+    <!-- Delete Notification Modal -->
+    <div id="deleteNotificationModal" class="modal-overlay hidden">
+      <div class="modal modal-sm">
+        <div class="modal-body-center">
           <div class="modal-icon modal-icon-danger">
             <i class="ri-delete-bin-6-line"></i>
           </div>
-          <h3 id="deleteModalTitle">Delete Notification?</h3>
+          <h3>Delete Notification?</h3>
           <p>
-            This will permanently remove
-            <strong id="deleteTargetName">this notification</strong>. This
-            action cannot be undone.
+            This notification will be permanently removed. This action cannot be
+            undone.
           </p>
         </div>
+
         <div class="modal-footer modal-footer-center">
-          <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
-          <button class="btn btn-danger" id="confirmDeleteBtn">
+          <button
+            type="button"
+            class="btn btn-outline"
+            id="cancelDeleteNotification"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="confirmDeleteNotification"
+          >
             <i class="ri-delete-bin-6-line"></i> Delete
           </button>
         </div>
       </div>
     </div>
 
-    <!-- =====================================================
-       SCRIPTS
-    ====================================================== -->
+    <!-- Scripts -->
     <script type="module" src="../js/layout.js"></script>
     <script type="module" src="../js/notifications.js"></script>
     <script src="../js/theme.js"></script>

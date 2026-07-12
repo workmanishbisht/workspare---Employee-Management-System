@@ -30,12 +30,12 @@
           <ul id="navList"></ul>
         </nav>
 
-        <div class="sidebar__upgrade">
+        <!-- <div class="sidebar__upgrade">
           <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
           <p class="upgrade__title">Upgrade to Pro</p>
           <p class="upgrade__sub">Unlock more features</p>
           <button class="btn btn--primary btn--block">Upgrade Now</button>
-        </div>
+        </div> -->
 
         <div class="sidebar__user-wrap">
           <button
@@ -117,7 +117,11 @@
 
           <div class="search-box">
             <i class="ri-search-line"></i>
-            <input type="text" placeholder="Search..." />
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
             <kbd>⌘ K</kbd>
           </div>
 
@@ -128,19 +132,17 @@
               type="button"
               aria-label="Toggle Theme"
             >
-              <span class="theme-toggle__option"
-                ><i class="ri-sun-line"></i
-              ></span>
-              <span class="theme-toggle__option"
-                ><i class="ri-moon-line"></i
-              ></span>
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
             </button>
             <button class="icon-btn has-badge" aria-label="Notifications">
               <i class="ri-notification-3-line"></i>
-              <span class="badge">5</span>
-            </button>
-            <button class="icon-btn" aria-label="Messages">
-              <i class="ri-message-3-line"></i>
+              <span class="badge" id="notifBadge">0</span>
             </button>
           </div>
         </header>

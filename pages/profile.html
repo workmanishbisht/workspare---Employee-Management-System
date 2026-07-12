@@ -33,12 +33,12 @@
           </ul>
         </nav>
 
-        <div class="sidebar__upgrade">
+        <!-- <div class="sidebar__upgrade">
           <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
           <p class="upgrade__title">Upgrade to Pro</p>
           <p class="upgrade__sub">Unlock more features</p>
           <button class="btn btn--primary btn--block">Upgrade Now</button>
-        </div>
+        </div> -->
 
         <!-- ============ USER / PROFILE ============ -->
         <div class="sidebar__user-wrap">
@@ -126,7 +126,11 @@
 
           <div class="search-box">
             <i class="ri-search-line"></i>
-            <input type="text" placeholder="Search anything..." />
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
             <kbd>⌘ K</kbd>
           </div>
 
@@ -140,20 +144,15 @@
               <span id="themeToggleLight" class="theme-toggle__option">
                 <i class="ri-sun-line"></i>
               </span>
+
               <span id="themeToggleDark" class="theme-toggle__option">
                 <i class="ri-moon-line"></i>
               </span>
             </button>
             <button class="icon-btn has-badge" aria-label="Notifications">
               <i class="ri-notification-3-line"></i>
-              <span class="badge">3</span>
+              <span class="badge" id="notifBadge">0</span>
             </button>
-            <img
-              src="https://i.pravatar.cc/80?img=13"
-              class="topbar__avatar"
-              id="topbarAvatar"
-              alt="User avatar"
-            />
           </div>
         </header>
 
@@ -565,47 +564,49 @@
       </div>
     </div>
 
-
     <!-- ============ DELETE ACCOUNT CONFIRMATION MODAL ============ -->
-<div class="modal-overlay modal-overlay--confirm" id="deleteAccountModalOverlay">
-  <div
-    class="modal modal--confirm"
-    role="alertdialog"
-    aria-modal="true"
-    aria-labelledby="deleteAccountModalTitle"
-    aria-describedby="deleteAccountModalDesc"
-  >
-    <div class="confirm-modal__icon-wrap">
-      <i class="ri-delete-bin-6-line confirm-modal__icon"></i>
-    </div>
-
-    <h3 id="deleteAccountModalTitle" class="confirm-modal__title">
-      Delete Account
-    </h3>
-
-    <p id="deleteAccountModalDesc" class="confirm-modal__desc">
-      Are you sure you want to delete your account?<br />
-      This action cannot be undone.
-    </p>
-
-    <div class="confirm-modal__actions">
-      <button
-        type="button"
-        class="btn btn--ghost btn--block"
-        id="cancelDeleteAccountBtn"
+    <div
+      class="modal-overlay modal-overlay--confirm"
+      id="deleteAccountModalOverlay"
+    >
+      <div
+        class="modal modal--confirm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="deleteAccountModalTitle"
+        aria-describedby="deleteAccountModalDesc"
       >
-        No, Cancel
-      </button>
-      <button
-        type="button"
-        class="btn btn--danger btn--block"
-        id="confirmDeleteAccountBtn"
-      >
-        Yes, Delete
-      </button>
+        <div class="confirm-modal__icon-wrap">
+          <i class="ri-delete-bin-6-line confirm-modal__icon"></i>
+        </div>
+
+        <h3 id="deleteAccountModalTitle" class="confirm-modal__title">
+          Delete Account
+        </h3>
+
+        <p id="deleteAccountModalDesc" class="confirm-modal__desc">
+          Are you sure you want to delete your account?<br />
+          This action cannot be undone.
+        </p>
+
+        <div class="confirm-modal__actions">
+          <button
+            type="button"
+            class="btn btn--ghost btn--block"
+            id="cancelDeleteAccountBtn"
+          >
+            No, Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn--danger btn--block"
+            id="confirmDeleteAccountBtn"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <!-- script files -->
     <script type="module" src="../js/layout.js"></script>

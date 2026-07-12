@@ -29,12 +29,12 @@
           <ul id="navList"></ul>
         </nav>
 
-        <div class="sidebar__upgrade">
+        <!-- <div class="sidebar__upgrade">
           <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
           <p class="upgrade__title">Upgrade to Pro</p>
           <p class="upgrade__sub">Unlock more features</p>
           <button class="btn btn--primary btn--block">Upgrade Now</button>
-        </div>
+        </div> -->
 
         <div class="sidebar__user-wrap">
           <button
@@ -60,26 +60,42 @@
 
           <ul class="user-menu" id="userMenu" role="menu">
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="profile">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
                 <i class="ri-user-3-line"></i>
                 <span>View Profile</span>
               </button>
             </li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="password">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
                 <i class="ri-lock-password-line"></i>
                 <span>Change Password</span>
               </button>
             </li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item" data-action="help">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
                 <i class="ri-question-line"></i>
                 <span>Help Center</span>
               </button>
             </li>
             <li class="user-menu__divider" role="separator"></li>
             <li role="none">
-              <button role="menuitem" class="user-menu__item user-menu__item--danger" data-action="logout">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
                 <i class="ri-logout-box-r-line" style="color: #cf2626"></i>
                 <span style="color: #cf2626">Logout</span>
               </button>
@@ -93,7 +109,11 @@
       <!-- ============ MAIN ============ -->
       <div class="main">
         <header class="topbar">
-          <button class="icon-btn topbar__menu" id="menuToggle" aria-label="Toggle menu">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
             <i class="ri-menu-line"></i>
           </button>
 
@@ -101,31 +121,31 @@
             <i class="ri-search-line"></i>
             <input
               type="text"
-              id="departmentSearchInput"
-              placeholder="Search departments by name, head, location..."
+              id="searchInput"
+              placeholder="Search employees, departments..."
             />
             <kbd>⌘ K</kbd>
           </div>
 
           <div class="topbar__right">
-            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle Theme">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
               <span id="themeToggleLight" class="theme-toggle__option">
                 <i class="ri-sun-line"></i>
               </span>
+
               <span id="themeToggleDark" class="theme-toggle__option">
                 <i class="ri-moon-line"></i>
               </span>
             </button>
             <button class="icon-btn has-badge" aria-label="Notifications">
               <i class="ri-notification-3-line"></i>
-              <span class="badge">3</span>
+              <span class="badge" id="notifBadge">0</span>
             </button>
-            <img
-              src="https://i.pravatar.cc/80?img=13"
-              class="topbar__avatar"
-              id="topbarAvatar"
-              alt="User avatar"
-            />
           </div>
         </header>
 
@@ -133,7 +153,10 @@
           <div class="page-head">
             <div>
               <h2>Departments</h2>
-              <p>Manage all company departments, department heads, and employee distribution.</p>
+              <p>
+                Manage all company departments, department heads, and employee
+                distribution.
+              </p>
             </div>
             <button class="btn btn--primary" id="addDepartmentBtn">
               <i class="ri-add-line"></i>
@@ -159,7 +182,10 @@
               <div class="stat-card__body">
                 <p class="stat-card__label">Total Departments</p>
                 <h3 class="stat-card__value" id="statTotalDepartments">0</h3>
-                <p class="stat-card__trend stat-card__trend--up" id="statTotalDepartmentsTrend">
+                <p
+                  class="stat-card__trend stat-card__trend--up"
+                  id="statTotalDepartmentsTrend"
+                >
                   <i class="ri-arrow-up-line"></i> — from last month
                 </p>
               </div>
@@ -172,7 +198,10 @@
               <div class="stat-card__body">
                 <p class="stat-card__label">Total Employees</p>
                 <h3 class="stat-card__value" id="statTotalEmployees">0</h3>
-                <p class="stat-card__trend stat-card__trend--up" id="statTotalEmployeesTrend">
+                <p
+                  class="stat-card__trend stat-card__trend--up"
+                  id="statTotalEmployeesTrend"
+                >
                   <i class="ri-arrow-up-line"></i> — from last month
                 </p>
               </div>
@@ -185,7 +214,10 @@
               <div class="stat-card__body">
                 <p class="stat-card__label">Active Departments</p>
                 <h3 class="stat-card__value" id="statActiveDepartments">0</h3>
-                <p class="stat-card__trend stat-card__trend--up" id="statActiveDepartmentsTrend">
+                <p
+                  class="stat-card__trend stat-card__trend--up"
+                  id="statActiveDepartmentsTrend"
+                >
                   <i class="ri-arrow-up-line"></i> — from last month
                 </p>
               </div>
@@ -198,7 +230,10 @@
               <div class="stat-card__body">
                 <p class="stat-card__label">Department Heads</p>
                 <h3 class="stat-card__value" id="statDepartmentHeads">0</h3>
-                <p class="stat-card__trend stat-card__trend--up" id="statDepartmentHeadsTrend">
+                <p
+                  class="stat-card__trend stat-card__trend--up"
+                  id="statDepartmentHeadsTrend"
+                >
                   <i class="ri-arrow-up-line"></i> — from last month
                 </p>
               </div>
@@ -209,7 +244,11 @@
           <div class="card dept-toolbar">
             <div class="search-box search-box--inline">
               <i class="ri-search-line"></i>
-              <input type="text" id="departmentTableSearch" placeholder="Search departments..." />
+              <input
+                type="text"
+                id="departmentTableSearch"
+                placeholder="Search departments..."
+              />
             </div>
 
             <label class="dept-filter">
@@ -290,8 +329,13 @@
 
             <!-- Pagination -->
             <div class="dept-pagination" id="departmentsPagination">
-              <p class="dept-pagination__info" id="paginationInfo">Showing 0 of 0 departments</p>
-              <div class="dept-pagination__controls" id="paginationControls"></div>
+              <p class="dept-pagination__info" id="paginationInfo">
+                Showing 0 of 0 departments
+              </p>
+              <div
+                class="dept-pagination__controls"
+                id="paginationControls"
+              ></div>
               <label class="dept-pagination__page-size">
                 <select id="pageSizeSelect">
                   <option value="10">10 / page</option>
@@ -307,13 +351,22 @@
 
     <!-- ============ ADD / EDIT DEPARTMENT MODAL ============ -->
     <div class="modal-overlay" id="departmentModalOverlay">
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="departmentModalTitle">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="departmentModalTitle"
+      >
         <div class="modal__head">
           <h3 id="departmentModalTitle">
             <i class="ri-building-4-line"></i>
             Add Department
           </h3>
-          <button class="icon-btn modal__close" id="closeDepartmentModal" aria-label="Close">
+          <button
+            class="icon-btn modal__close"
+            id="closeDepartmentModal"
+            aria-label="Close"
+          >
             <i class="ri-close-line"></i>
           </button>
         </div>
@@ -324,27 +377,53 @@
           <div class="form-grid">
             <label class="form-field">
               <span>Department Name</span>
-              <input type="text" name="departmentName" required placeholder="e.g. Engineering" />
+              <input
+                type="text"
+                name="departmentName"
+                required
+                placeholder="e.g. Engineering"
+              />
             </label>
             <label class="form-field">
               <span>Department Code</span>
-              <input type="text" name="departmentCode" required placeholder="e.g. ENG" />
+              <input
+                type="text"
+                name="departmentCode"
+                required
+                placeholder="e.g. ENG"
+              />
             </label>
             <label class="form-field">
               <span>Department Head</span>
-              <input type="text" name="departmentHead" placeholder="e.g. Rohan Kumar" />
+              <input
+                type="text"
+                name="departmentHead"
+                placeholder="e.g. Rohan Kumar"
+              />
             </label>
             <label class="form-field">
               <span>Office Location</span>
-              <input type="text" name="location" placeholder="e.g. Bangalore, India" />
+              <input
+                type="text"
+                name="location"
+                placeholder="e.g. Bangalore, India"
+              />
             </label>
             <label class="form-field">
               <span>Department Email</span>
-              <input type="email" name="email" placeholder="e.g. engineering@company.com" />
+              <input
+                type="email"
+                name="email"
+                placeholder="e.g. engineering@company.com"
+              />
             </label>
             <label class="form-field">
               <span>Phone Number</span>
-              <input type="tel" name="phone" placeholder="e.g. +91 98765 43210" />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="e.g. +91 98765 43210"
+              />
             </label>
             <label class="form-field">
               <span>Status</span>
@@ -379,14 +458,25 @@
             </label>
             <label class="form-field form-field--full">
               <span>Description</span>
-              <input type="text" name="description" placeholder="Short description of the department" />
+              <input
+                type="text"
+                name="description"
+                placeholder="Short description of the department"
+              />
             </label>
           </div>
         </form>
 
         <div class="modal__footer">
-          <button type="button" class="btn btn--ghost" id="cancelDepartmentBtn">Cancel</button>
-          <button type="submit" form="departmentForm" class="btn btn--primary" id="saveDepartmentBtn">
+          <button type="button" class="btn btn--ghost" id="cancelDepartmentBtn">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="departmentForm"
+            class="btn btn--primary"
+            id="saveDepartmentBtn"
+          >
             <i class="ri-save-3-line"></i>
             Create Department
           </button>
@@ -395,7 +485,10 @@
     </div>
 
     <!-- ============ DELETE DEPARTMENT CONFIRMATION MODAL ============ -->
-    <div class="modal-overlay modal-overlay--confirm" id="deleteDepartmentModalOverlay">
+    <div
+      class="modal-overlay modal-overlay--confirm"
+      id="deleteDepartmentModalOverlay"
+    >
       <div
         class="modal modal--confirm"
         role="alertdialog"
@@ -407,18 +500,29 @@
           <i class="ri-delete-bin-6-line confirm-modal__icon"></i>
         </div>
 
-        <h3 id="deleteDepartmentModalTitle" class="confirm-modal__title">Delete Department</h3>
+        <h3 id="deleteDepartmentModalTitle" class="confirm-modal__title">
+          Delete Department
+        </h3>
 
         <p id="deleteDepartmentModalDesc" class="confirm-modal__desc">
-          Are you sure you want to delete <strong id="deleteDepartmentName">this department</strong>?<br />
+          Are you sure you want to delete
+          <strong id="deleteDepartmentName">this department</strong>?<br />
           This action cannot be undone.
         </p>
 
         <div class="confirm-modal__actions">
-          <button type="button" class="btn btn--ghost btn--block" id="cancelDeleteDepartmentBtn">
+          <button
+            type="button"
+            class="btn btn--ghost btn--block"
+            id="cancelDeleteDepartmentBtn"
+          >
             No, Cancel
           </button>
-          <button type="button" class="btn btn--danger btn--block" id="confirmDeleteDepartmentBtn">
+          <button
+            type="button"
+            class="btn btn--danger btn--block"
+            id="confirmDeleteDepartmentBtn"
+          >
             Yes, Delete
           </button>
         </div>

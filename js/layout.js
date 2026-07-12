@@ -1,5 +1,5 @@
 /* ==========================================================
-   FIREBASE IMPORTS
+   Layout js - FIREBASE IMPORTS
 ========================================================== */
 import { auth, db } from "../firebase/firebase.js";
 import {
@@ -9,6 +9,8 @@ import {
 import {
   doc,
   getDoc,
+  collection,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ==========================================================
@@ -292,6 +294,7 @@ function buildUserData(user, firestoreData) {
     fullName: firestoreData.fullName || user.displayName || "User",
     email: user.email || firestoreData.email || "",
     role: firestoreData.role || "Employee",
+    department: firestoreData.department || "",
     company: firestoreData.company || "",
     photoURL: resolveProfileImage(user, firestoreData),
     authProvider: user.providerData[0]?.providerId || "password",
@@ -344,6 +347,7 @@ export function guardAndLoadUser() {
           try {
             if (!user) {
               clearTimeout(timeoutId);
+              teardownNotifBadgeListener();
               window.location.href = LOGIN_PATH;
               settle(null);
               return;
@@ -465,6 +469,7 @@ export function applyUserToUI(userData) {
 ========================================================== */
 export async function handleLogout() {
   try {
+    teardownNotifBadgeListener();
     await signOut(auth);
     try {
       sessionStorage.removeItem(USER_CACHE_KEY);
@@ -525,7 +530,7 @@ export function setupUserMenu() {
           break;
 
         case "help":
-          window.location.href = "./help.html";
+          window.location.href = "./help-center.html";
           break;
 
         case "logout":
@@ -574,4 +579,202 @@ export function setupSidebarToggle() {
   });
 
   overlay.addEventListener("click", closeMobile);
+}
+
+/* ==========================================================
+   GLOBAL REALTIME NOTIFICATION BADGE
+   ----------------------------------------------------------
+   - Single onSnapshot listener over the "notifications" collection,
+     attached once per page load (guarded against duplicates).
+   - Works globally because layout.js is imported by every module
+     (Dashboard, Employees, Departments, Attendance, Leave, Payroll,
+     Holiday, Documents, Notifications, Help Center, Settings) — no
+     per-page wiring or HTML changes are required.
+   - Reuses the existing #notifBadge element. Does not create a new
+     badge and does not touch page markup or CSS.
+========================================================== */
+const NOTIF_BADGE_ID = "notifBadge";
+const NOTIFICATIONS_PAGE = "./notifications.html";
+
+let notifBadgeUnsubscribe = null;
+let notifBellClickBound = false;
+
+/**
+ * A notification is "unread" if isRead is explicitly false, OR — for
+ * documents created before this upgrade — if the legacy `read` field
+ * is falsy. Anything without either field defaults to unread so new
+ * notifications are never silently missed.
+ */
+function isNotifUnread(data) {
+  if (typeof data.isRead === "boolean") return !data.isRead;
+  if (typeof data.read === "boolean") return !data.read;
+  return true;
+}
+
+function isNotifDeleted(data) {
+  return data.isDeleted === true;
+}
+
+/**
+ * Decides whether a notification is meant for the signed-in user.
+ * Supports a single string audience ("All", a role, a department, or
+ * a specific uid) as well as an array of audience values.
+ */
+function notifMatchesAudience(data, user) {
+  const audience = data.audience;
+
+  if (!audience || audience === "All" || audience === "Everyone") {
+    return true;
+  }
+
+  const candidates = [
+    user?.uid,
+    user?.role,
+    user?.department,
+    user?.company,
+  ].filter(Boolean);
+
+  if (Array.isArray(audience)) {
+    return audience.some(
+      (a) => a === "All" || a === "Everyone" || candidates.includes(a),
+    );
+  }
+
+  return candidates.includes(audience);
+}
+
+function computeUnreadCount(snapshot, user) {
+  let count = 0;
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (
+      !isNotifDeleted(data) &&
+      isNotifUnread(data) &&
+      notifMatchesAudience(data, user)
+    ) {
+      count++;
+    }
+  });
+  return count;
+}
+
+/* ----------------------------------------------------------
+   BADGE RENDER (0 -> hidden, 1-99 -> count, 100+ -> "99+")
+---------------------------------------------------------- */
+function renderNotifBadge(count) {
+  const badge = document.getElementById(NOTIF_BADGE_ID);
+  if (!badge) return;
+
+  if (!count || count <= 0) {
+    badge.textContent = "";
+    badge.hidden = true;
+    badge.style.display = "none";
+    badge.classList.remove("show");
+    badge.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  badge.textContent = count > 99 ? "99+" : String(count);
+  badge.hidden = false;
+  badge.style.display = "";
+  badge.classList.add("show");
+  badge.removeAttribute("aria-hidden");
+}
+
+/* ----------------------------------------------------------
+   BELL CLICK -> notifications.html
+   Tries common bell wrapper ids/selectors first, then falls back to
+   the closest clickable ancestor of the badge itself, so no HTML
+   needs to be modified to wire this up.
+---------------------------------------------------------- */
+function getNotifBellTrigger() {
+  const badge = document.getElementById(NOTIF_BADGE_ID);
+  return (
+    document.getElementById("notifBell") ||
+    document.getElementById("notificationBell") ||
+    document.querySelector("[data-notif-bell]") ||
+    document.querySelector(".topbar__notif") ||
+    badge?.closest("a, button, .topbar__icon-btn, .icon-btn") ||
+    badge
+  );
+}
+
+function bindNotifBellClick() {
+  if (notifBellClickBound) return;
+
+  const trigger = getNotifBellTrigger();
+  if (!trigger) return;
+
+  notifBellClickBound = true;
+  trigger.style.cursor = "pointer";
+  trigger.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = NOTIFICATIONS_PAGE;
+  });
+}
+
+/* ----------------------------------------------------------
+   ATTACH / TEARDOWN
+   Only one listener is ever created (notifBadgeUnsubscribe guard).
+---------------------------------------------------------- */
+function attachNotifBadgeListener(user) {
+  if (notifBadgeUnsubscribe) return; // already listening, avoid duplicates
+
+  try {
+    notifBadgeUnsubscribe = onSnapshot(
+      collection(db, "notifications"),
+      (snapshot) => {
+        renderNotifBadge(computeUnreadCount(snapshot, user));
+      },
+      (error) => {
+        console.error("[layout.js] Notification badge listener error:", error);
+      },
+    );
+  } catch (error) {
+    console.error("[layout.js] Failed to attach notification listener:", error);
+  }
+}
+
+export function teardownNotifBadgeListener() {
+  if (notifBadgeUnsubscribe) {
+    notifBadgeUnsubscribe();
+    notifBadgeUnsubscribe = null;
+  }
+}
+
+/**
+ * Public entry point. Safe to call from any page (including
+ * notifications.js) — idempotent thanks to the guards above.
+ */
+export function initNotificationBadge() {
+  bindNotifBellClick();
+  guardAndLoadUser()
+    .then((user) => attachNotifBadgeListener(user))
+    .catch((error) => {
+      console.error("[layout.js] Notification badge init failed:", error);
+    });
+}
+
+/* ----------------------------------------------------------
+   AUTO-INIT
+   layout.js is imported by every page's controller script, so the
+   badge wires itself up automatically — no changes needed in any
+   other file.
+---------------------------------------------------------- */
+if (typeof document !== "undefined" && !window.__hrmsNotifBadgeAutoInit) {
+  window.__hrmsNotifBadgeAutoInit = true;
+
+  const startNotifBadge = () => initNotificationBadge();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startNotifBadge, {
+      once: true,
+    });
+  } else {
+    startNotifBadge();
+  }
+
+  window.addEventListener("beforeunload", teardownNotifBadgeListener, {
+    once: true,
+  });
 }

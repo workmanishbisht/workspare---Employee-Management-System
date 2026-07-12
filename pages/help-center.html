@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Help Center · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/help-center.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by renderNav() -->
+          </ul>
+        </nav>
+
+        <!-- <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div> -->
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i
+                ><span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- ============ TOPBAR (reused) ============ -->
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">0</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============ PAGE CONTENT ============ -->
+        <main class="content" id="helpCenterPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Help Center</h1>
+              <p>
+                Find guides, FAQs, tutorials, documentation and support
+                resources to use WorkSpare Employee Management System
+                efficiently.
+              </p>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn btn-outline" id="reportBugBtn">
+                <i class="ri-bug-line"></i> Report a Bug
+              </button>
+              <button class="btn btn-outline" id="requestFeatureBtn">
+                <i class="ri-lightbulb-line"></i> Request Feature
+              </button>
+              <button class="btn btn-primary" id="contactSupportBtn">
+                <i class="ri-customer-service-2-line"></i> Contact Support
+              </button>
+            </div>
+          </div>
+
+          <!-- ---------- STATISTICS ---------- -->
+          <section
+            class="stats-grid stats-grid-help"
+            id="statsGrid"
+            aria-live="polite"
+          >
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-primary">
+                  <i class="ri-article-fill"></i>
+                </div>
+                <span class="stat-label">Help Articles</span>
+              </div>
+              <h3 class="stat-value" id="statArticles">0</h3>
+              <span class="stat-trend trend-neutral" id="statArticlesTrend"
+                >Knowledge base</span
+              >
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-question-answer-fill"></i>
+                </div>
+                <span class="stat-label">FAQs</span>
+              </div>
+              <h3 class="stat-value" id="statFaqs">0</h3>
+              <span class="stat-trend trend-neutral" id="statFaqsTrend"
+                >Common questions</span
+              >
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-ticket-2-fill"></i>
+                </div>
+                <span class="stat-label">Open Tickets</span>
+              </div>
+              <h3 class="stat-value" id="statOpenTickets">0</h3>
+              <span class="stat-trend trend-neutral" id="statOpenTicketsTrend"
+                >Needs attention</span
+              >
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-success">
+                  <i class="ri-timer-flash-fill"></i>
+                </div>
+                <span class="stat-label">Avg. Response Time</span>
+              </div>
+              <h3 class="stat-value" id="statResponseTime">—</h3>
+              <span class="stat-trend trend-neutral" id="statResponseTimeTrend"
+                >Last 30 days</span
+              >
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-pink">
+                  <i class="ri-play-circle-fill"></i>
+                </div>
+                <span class="stat-label">Video Tutorials</span>
+              </div>
+              <h3 class="stat-value" id="statVideos">0</h3>
+              <span class="stat-trend trend-neutral" id="statVideosTrend"
+                >Watch &amp; learn</span
+              >
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-indigo">
+                  <i class="ri-rocket-2-fill"></i>
+                </div>
+                <span class="stat-label">Product Updates</span>
+              </div>
+              <h3 class="stat-value" id="statUpdates">0</h3>
+              <span class="stat-trend trend-neutral" id="statUpdatesTrend"
+                >This year</span
+              >
+            </div>
+          </section>
+
+          <!-- ---------- GLOBAL SEARCH ---------- -->
+          <section class="card help-search-card">
+            <h2>How can we help you today?</h2>
+            <div class="help-search-box">
+              <i class="ri-search-line"></i>
+              <input
+                type="text"
+                id="globalSearchInput"
+                placeholder="Search articles, FAQs, documentation or tutorials..."
+                autocomplete="off"
+              />
+            </div>
+            <div
+              class="help-search-results"
+              id="globalSearchResults"
+              hidden
+            ></div>
+          </section>
+
+          <!-- ---------- MAIN GRID ---------- -->
+          <div class="help-main-grid">
+            <div class="help-left-col">
+              <!-- ---------- QUICK HELP CATEGORIES ---------- -->
+              <section class="card">
+                <div class="section-head"><h2>Quick Help Categories</h2></div>
+                <div class="category-grid" id="categoryGrid"></div>
+              </section>
+
+              <!-- ---------- POPULAR ARTICLES ---------- -->
+              <section class="card">
+                <div class="section-head">
+                  <h2>Popular Help Articles</h2>
+                  <select id="articleSortSelect" class="filter-select">
+                    <option value="views-desc">Most Viewed</option>
+                    <option value="date-desc">Latest</option>
+                  </select>
+                </div>
+                <div
+                  class="skeleton-block-help skeleton-row-sm"
+                  id="articlesSkeleton"
+                ></div>
+                <div class="article-list" id="articleList" hidden></div>
+                <div class="empty-state" id="articlesEmptyState" hidden>
+                  <i class="ri-file-search-line"></i>
+                  <h3>No Articles Found</h3>
+                  <p>Try a different search term or check back later.</p>
+                </div>
+              </section>
+
+              <!-- ---------- FAQ ---------- -->
+              <section class="card">
+                <div class="section-head">
+                  <h2>Frequently Asked Questions</h2>
+                </div>
+                <div class="faq-list" id="faqList"></div>
+                <div class="empty-state" id="faqEmptyState" hidden>
+                  <i class="ri-question-line"></i>
+                  <h3>No FAQs Found</h3>
+                  <p>Try a different search term.</p>
+                </div>
+              </section>
+
+              <!-- ---------- VIDEO TUTORIALS ---------- -->
+              <section class="card">
+                <div class="section-head"><h2>Video Tutorials</h2></div>
+                <div class="video-grid" id="videoGrid"></div>
+              </section>
+
+              <!-- ---------- RELEASE NOTES ---------- -->
+              <section class="card">
+                <div class="section-head"><h2>Recent Release Notes</h2></div>
+                <div class="timeline" id="releaseTimeline"></div>
+              </section>
+
+              <!-- ---------- SUPPORT TICKETS ---------- -->
+              <section class="card">
+                <div class="section-head"><h2>Support Tickets</h2></div>
+
+                <div
+                  class="toolbar-card"
+                  style="
+                    padding: 0;
+                    margin-bottom: 14px;
+                    border: none;
+                    box-shadow: none;
+                    background: transparent;
+                  "
+                >
+                  <div class="search-box search-box-wide">
+                    <i class="ri-search-line"></i>
+                    <input
+                      type="text"
+                      id="ticketSearchInput"
+                      placeholder="Search tickets..."
+                      autocomplete="off"
+                    />
+                  </div>
+                  <select id="filterTicketStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                  <select id="filterTicketPriority" class="filter-select">
+                    <option value="">All Priorities</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+
+                <div
+                  class="skeleton-block-help skeleton-row-sm"
+                  id="ticketsSkeleton"
+                ></div>
+
+                <div id="ticketsContent" hidden>
+                  <div class="table-responsive" id="ticketsTableWrap">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>Ticket ID</th>
+                          <th>Subject</th>
+                          <th>Category</th>
+                          <th>Priority</th>
+                          <th>Status</th>
+                          <th>Created</th>
+                          <th>Last Updated</th>
+                          <th class="col-actions">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="ticketsTableBody"></tbody>
+                    </table>
+                  </div>
+                  <div class="empty-state" id="ticketsEmptyState" hidden>
+                    <i class="ri-ticket-2-line"></i>
+                    <h3>No Support Tickets</h3>
+                    <p>Raise a ticket via Contact Support if you need help.</p>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      id="emptyStateContactBtn"
+                    >
+                      Contact Support
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- ---------- RIGHT SIDEBAR ---------- -->
+            <aside class="side-col">
+              <section class="card">
+                <div class="card__head"><h3>Quick Links</h3></div>
+                <div class="quick-links-list">
+                  <button class="quick-link-item">
+                    <i class="ri-file-text-line"></i> Documentation
+                  </button>
+                  <button class="quick-link-item">
+                    <i class="ri-book-open-line"></i> User Guide
+                  </button>
+                  <button class="quick-link-item" id="shortcutsLinkBtn">
+                    <i class="ri-keyboard-line"></i> Keyboard Shortcuts
+                  </button>
+                  <button class="quick-link-item">
+                    <i class="ri-signal-tower-line"></i> System Status
+                  </button>
+                </div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>Support Hours</h3></div>
+                <div class="status-row">
+                  <span>Mon – Fri</span><strong>9:00 AM – 7:00 PM</strong>
+                </div>
+                <div class="status-row">
+                  <span>Saturday</span><strong>10:00 AM – 4:00 PM</strong>
+                </div>
+                <div class="status-row">
+                  <span>Sunday</span><strong>Closed</strong>
+                </div>
+                <div class="status-row">
+                  <span>Current Status</span
+                  ><span class="status-pill"
+                    ><span class="dot"></span> Online</span
+                  >
+                </div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>System Status</h3></div>
+                <div class="status-row">
+                  <span>API</span
+                  ><span class="status-pill"
+                    ><span class="dot"></span> Operational</span
+                  >
+                </div>
+                <div class="status-row">
+                  <span>Firestore</span
+                  ><span class="status-pill"
+                    ><span class="dot"></span> Operational</span
+                  >
+                </div>
+                <div class="status-row">
+                  <span>Authentication</span
+                  ><span class="status-pill"
+                    ><span class="dot"></span> Operational</span
+                  >
+                </div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>Latest Update</h3></div>
+                <div id="latestUpdateWidget"></div>
+              </section>
+
+              <section class="card">
+                <div class="status-row">
+                  <span>Application Version</span><strong>v2.4.0</strong>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       CONTACT SUPPORT MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="contactModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contactModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="contactModalTitle">Contact Support</h3>
+          <button
+            class="modal-close"
+            id="closeContactModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="contactForm" class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="contactNameInput">Name</label
+              ><input type="text" id="contactNameInput" required />
+            </div>
+            <div class="form-group">
+              <label for="contactEmailInput">Email</label
+              ><input type="email" id="contactEmailInput" required />
+            </div>
+            <div class="form-group form-group-full">
+              <label for="contactSubjectInput">Subject</label
+              ><input type="text" id="contactSubjectInput" required />
+            </div>
+            <div class="form-group">
+              <label for="contactCategorySelect">Category</label>
+              <select id="contactCategorySelect">
+                <option>General Inquiry</option>
+                <option>Technical Issue</option>
+                <option>Billing</option>
+                <option>Account Access</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contactPrioritySelect">Priority</label>
+              <select id="contactPrioritySelect">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="contactMessageInput">Message</label
+              ><textarea id="contactMessageInput" rows="4" required></textarea>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="contactFileInput">Attachment (Optional)</label>
+              <div class="file-drop" id="contactFileDropZone">
+                <i class="ri-attachment-2"></i>
+                <p id="contactFileLabel">Click to browse or drag a file here</p>
+                <input type="file" id="contactFileInput" hidden />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelContactModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="sendMessageBtn">
+              <i class="ri-send-plane-fill"></i> Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       REPORT BUG MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="bugModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bugModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="bugModalTitle">Report a Bug</h3>
+          <button class="modal-close" id="closeBugModalBtn" aria-label="Close">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="bugForm" class="modal-body">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="bugTitleInput">Bug Title</label
+              ><input type="text" id="bugTitleInput" required />
+            </div>
+            <div class="form-group">
+              <label for="bugModuleSelect">Affected Module</label>
+              <select id="bugModuleSelect">
+                <option>Dashboard</option>
+                <option>Employees</option>
+                <option>Departments</option>
+                <option>Attendance</option>
+                <option>Leave Management</option>
+                <option>Leave Calendar</option>
+                <option>Payroll</option>
+                <option>Holidays</option>
+                <option>Documents</option>
+                <option>Notifications</option>
+                <option>Reports</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bugPrioritySelect">Priority</label>
+              <select id="bugPrioritySelect">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="bugBrowserSelect">Browser</label>
+              <select id="bugBrowserSelect">
+                <option>Chrome</option>
+                <option>Firefox</option>
+                <option>Safari</option>
+                <option>Edge</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="bugDescriptionInput">Description</label
+              ><textarea
+                id="bugDescriptionInput"
+                rows="4"
+                placeholder="Steps to reproduce, expected vs actual behavior..."
+                required
+              ></textarea>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="bugFileInput">Attachment (Optional)</label>
+              <div class="file-drop" id="bugFileDropZone">
+                <i class="ri-attachment-2"></i>
+                <p id="bugFileLabel">
+                  Click to browse or drag a screenshot here
+                </p>
+                <input type="file" id="bugFileInput" hidden />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelBugModalBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBugBtn">
+              <i class="ri-bug-line"></i> Submit Bug
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       FEATURE REQUEST MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="featureModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="featureModalTitle"
+      >
+        <div class="modal-header">
+          <h3 id="featureModalTitle">Request a Feature</h3>
+          <button
+            class="modal-close"
+            id="closeFeatureModalBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="featureForm" class="modal-body">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="featureTitleInput">Feature Title</label
+              ><input type="text" id="featureTitleInput" required />
+            </div>
+            <div class="form-group form-group-full">
+              <label for="featureModuleSelect">Module</label>
+              <select id="featureModuleSelect">
+                <option>Dashboard</option>
+                <option>Employees</option>
+                <option>Departments</option>
+                <option>Attendance</option>
+                <option>Leave Management</option>
+                <option>Leave Calendar</option>
+                <option>Payroll</option>
+                <option>Holidays</option>
+                <option>Documents</option>
+                <option>Notifications</option>
+                <option>Reports</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="featureReasonInput">Business Reason</label
+              ><textarea
+                id="featureReasonInput"
+                rows="2"
+                placeholder="Why is this needed?"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="featureDescriptionInput">Detailed Description</label
+              ><textarea
+                id="featureDescriptionInput"
+                rows="4"
+                placeholder="Describe the feature in detail..."
+                required
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelFeatureModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitFeatureBtn">
+              <i class="ri-lightbulb-line"></i> Submit Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SCRIPTS
+    ====================================================== -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/help-center.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

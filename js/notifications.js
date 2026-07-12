@@ -1,872 +1,1322 @@
 /* ==========================================================
-   FIREBASE IMPORTS
+   NOTIFICATIONS.JS
+   PART 1
+   Imports + State + Initialization
 ========================================================== */
+
 import { db } from "../firebase/firebase.js";
+
 import {
   collection,
   doc,
+  getDocs,
+  getDoc,
   addDoc,
   updateDoc,
   deleteDoc,
-  getDocs,
-  onSnapshot,
   query,
   orderBy,
-  serverTimestamp,
   writeBatch,
+  Timestamp,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
 import {
-  $,
-  $$,
-  showToast,
   renderNav,
   guardAndLoadUser,
-  setupUserMenu,
   setupSidebarToggle,
-  showSkeleton,
-  hideSkeleton,
-} from "../js/layout.js";
+  setupUserMenu,
+  showToast,
+  getCurrentUser,
+  initNotificationBadge,
+} from "./layout.js";
 
-(function () {
-  "use strict";
+/* ==========================================================
+   COLLECTIONS
+========================================================== */
 
-  /* =========================================================
-     STATIC DATA
-  ========================================================= */
-  const TYPE_ICON = {
-    Announcement: "ri-megaphone-fill",
-    "System Alert": "ri-alarm-warning-fill",
-    Reminder: "ri-alarm-fill",
-    "Leave Update": "ri-calendar-close-fill",
-    Attendance: "ri-calendar-check-fill",
-    Payroll: "ri-bank-card-fill",
-    "HR Notice": "ri-briefcase-4-fill",
-    "Policy Update": "ri-file-shield-2-fill",
-    Event: "ri-calendar-event-fill",
-    Birthday: "ri-cake-2-fill",
-    Holiday: "ri-sun-fill",
-  };
+const notificationsRef = collection(db, "notifications");
+const employeesRef = collection(db, "employees");
+const holidaysRef = collection(db, "holidays");
 
-  /* =========================================================
-     STATE
-  ========================================================= */
-  let allNotifications = [];
-  let filtered = [];
-  let departments = [];
-  let editingId = null;
-  let pendingDeleteId = null;
-  let openRowMenuId = null;
-  let currentPage = 1;
-  const pageSize = 10;
-  let unsubscribeNotifications = null;
-  let currentUser = null;
+/* ==========================================================
+   GLOBAL STATE
+========================================================== */
 
-  /* =========================================================
-     HELPERS
-  ========================================================= */
-  const escapeHtml = (str) =>
-    String(str ?? "").replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
+let notifications = [];
+let employees = [];
+let holidays = [];
 
-  const toMillis = (ts) => {
-    if (!ts) return 0;
-    if (typeof ts.toMillis === "function") return ts.toMillis();
-    if (ts.seconds) return ts.seconds * 1000;
-    return new Date(ts).getTime() || 0;
-  };
+let filteredNotifications = [];
 
-  const formatDate = (ts) =>
-    ts
-      ? new Date(toMillis(ts)).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
-      : "—";
+let currentNotification = null;
 
-  const readPercent = (n) => {
-    const total = Number(n.totalRecipients) || 0;
-    const read = Number(n.readCount) || 0;
-    return total ? Math.round((read / total) * 100) : 0;
-  };
+let currentPage = 1;
+const pageSize = 10;
 
-  /* =========================================================
-     DROPDOWNS
-  ========================================================= */
-  function setupDropdowns() {
-    const t = $("#moreFiltersBtn");
-    const m = $("#moreFiltersMenu");
-    if (t && m) {
-      t.addEventListener("click", (e) => {
-        e.stopPropagation();
-        m.hidden = !m.hidden;
-      });
-      m.addEventListener("click", (e) => e.stopPropagation());
-    }
-    document.addEventListener("click", () => {
-      if (m) m.hidden = true;
-      closeRowMenu();
+/* ==========================================================
+   DOM ELEMENTS
+========================================================== */
+
+// Statistics
+
+const statTotal = document.getElementById("statTotal");
+const statUnread = document.getElementById("statUnread");
+const statAnnouncement = document.getElementById("statAnnouncement");
+const statScheduled = document.getElementById("statScheduled");
+const statBirthday = document.getElementById("statBirthday");
+const statHoliday = document.getElementById("statHoliday");
+
+// Table
+
+const notificationTableBody = document.getElementById("notificationTableBody");
+
+const notificationCount = document.getElementById("notificationCount");
+
+// Sidebar
+
+const birthdayList = document.getElementById("birthdayList");
+
+const upcomingBirthdayList = document.getElementById("upcomingBirthdayList");
+
+const holidayList = document.getElementById("holidayList");
+
+const recentActivity = document.getElementById("recentActivity");
+
+// Search
+
+const searchInput = document.getElementById("notificationSearch");
+
+// Filters
+
+const filterType = document.getElementById("filterType");
+
+const filterPriority = document.getElementById("filterPriority");
+
+const filterStatus = document.getElementById("filterStatus");
+
+const filterDepartment = document.getElementById("filterDepartment");
+
+const filterAudience = document.getElementById("filterAudience");
+
+// Buttons
+
+const refreshBtn = document.getElementById("refreshNotificationsBtn");
+
+const resetBtn = document.getElementById("resetFiltersBtn");
+
+const announcementBtn = document.getElementById("newAnnouncementBtn");
+
+// Optional: only wired up if these exist in the page markup already.
+const markAllReadBtn = document.getElementById("markAllReadBtn");
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+const today = new Date();
+
+function formatDate(date) {
+  if (!date) return "-";
+
+  const d = date.toDate ? date.toDate() : new Date(date);
+
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function isBirthdayToday(dateString) {
+  if (!dateString) return false;
+
+  const dob = new Date(dateString);
+
+  return (
+    dob.getDate() === today.getDate() && dob.getMonth() === today.getMonth()
+  );
+}
+
+function getAge(dateString) {
+  if (!dateString) return "";
+
+  const dob = new Date(dateString);
+
+  let age = today.getFullYear() - dob.getFullYear();
+
+  const month = today.getMonth() - dob.getMonth();
+
+  if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+/**
+ * Unread check shared across the dashboard. Treats the new `isRead`
+ * field as the source of truth, but falls back to the legacy `read`
+ * field for notifications created before this upgrade.
+ */
+function isUnread(item) {
+  if (typeof item.isRead === "boolean") return !item.isRead;
+  if (typeof item.read === "boolean") return !item.read;
+  return true;
+}
+
+/* ==========================================================
+   INIT
+========================================================== */
+
+async function init() {
+  renderNav();
+
+  await guardAndLoadUser();
+
+  setupSidebarToggle();
+
+  setupUserMenu();
+
+  // Realtime bell/badge — safe to call again here, it's idempotent.
+  initNotificationBadge();
+
+  bindEvents();
+
+  await loadInitialData();
+}
+
+/* ==========================================================
+   LOAD INITIAL DATA
+========================================================== */
+
+async function loadInitialData() {
+  try {
+    await Promise.all([loadNotifications(), loadEmployees(), loadHolidays()]);
+
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
+
+    showToast("error", "Failed to load notifications.");
+  }
+}
+
+/* ==========================================================
+   START
+========================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+
+  init,
+);
+
+/* ==========================================================
+   PART 2
+   LOAD DATA + RENDER
+========================================================== */
+
+async function loadNotifications() {
+  notifications = [];
+
+  const q = query(notificationsRef, orderBy("createdAt", "desc"));
+
+  const snap = await getDocs(q);
+
+  snap.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    // Soft-deleted notifications never show up in the list/table.
+    if (data.isDeleted === true) return;
+
+    notifications.push({
+      id: docSnap.id,
+
+      ...data,
     });
-  }
+  });
 
-  function closeRowMenu() {
-    if (!openRowMenuId) return;
-    const menu = $(`#rowMenu-${openRowMenuId}`);
-    if (menu) menu.hidden = true;
-    openRowMenuId = null;
-  }
+  filteredNotifications = [...notifications];
+}
 
-  /* =========================================================
-     init()
-  ========================================================= */
-  async function init() {
-    showSkeleton("notifSkeleton", "notifTableContent");
+async function loadEmployees() {
+  employees = [];
 
-    currentUser = await guardAndLoadUser();
-    renderNav();
-    setupUserMenu();
-    setupSidebarToggle();
+  const snap = await getDocs(employeesRef);
 
-    wireUI();
-    setupDropdowns();
-    await loadDepartments();
-    loadNotifications();
-  }
+  snap.forEach((docSnap) => {
+    employees.push({
+      id: docSnap.id,
 
-  document.addEventListener("DOMContentLoaded", init);
+      ...docSnap.data(),
+    });
+  });
+}
 
-  /* =========================================================
-     loadNotifications() — realtime Firestore listener
-  ========================================================= */
-  function loadNotifications() {
-    const q = query(
-      collection(db, "notifications"),
-      orderBy("createdAt", "desc"),
-    );
-    unsubscribeNotifications = onSnapshot(
-      q,
-      (snap) => {
-        allNotifications = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        currentPage = 1;
-        filterNotifications();
-        renderStatistics();
-        renderSidebarWidgets();
-        hideSkeleton("notifSkeleton", "notifTableContent");
-      },
-      (error) => {
-        console.error("Failed to load notifications:", error);
-        showToast("error", "Could not load notifications.");
-        hideSkeleton("notifSkeleton", "notifTableContent");
-      },
-    );
-  }
+async function loadHolidays() {
+  holidays = [];
 
-  function refreshNotifications() {
-    if (unsubscribeNotifications) unsubscribeNotifications();
-    loadNotifications();
-  }
+  const snap = await getDocs(holidaysRef);
 
-  async function loadDepartments() {
-    try {
-      const snap = await getDocs(collection(db, "departments"));
-      departments = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const opts =
-        '<option value="All Departments">All Departments</option>' +
-        departments
-          .map(
-            (d) =>
-              `<option value="${escapeHtml(d.name || d.id)}">${escapeHtml(d.name || d.id)}</option>`,
-          )
-          .join("");
-      if ($("#notifDepartmentSelect"))
-        $("#notifDepartmentSelect").innerHTML = opts;
-      const filterOpts =
-        '<option value="">All Departments</option>' +
-        departments
-          .map(
-            (d) =>
-              `<option value="${escapeHtml(d.name || d.id)}">${escapeHtml(d.name || d.id)}</option>`,
-          )
-          .join("");
-      if ($("#filterDepartment")) $("#filterDepartment").innerHTML = filterOpts;
-    } catch (error) {
-      console.error("Failed to load departments:", error);
+  snap.forEach((docSnap) => {
+    holidays.push({
+      id: docSnap.id,
+
+      ...docSnap.data(),
+    });
+  });
+}
+
+/* ==========================================================
+   MAIN RENDER
+========================================================== */
+
+function renderDashboard() {
+  renderStatistics();
+
+  renderSummary();
+
+  renderTable();
+
+  renderBirthdays();
+
+  renderUpcomingBirthdays();
+
+  renderHolidays();
+
+  renderRecentActivity();
+}
+
+/* ==========================================================
+   STATISTICS
+========================================================== */
+
+function renderStatistics() {
+  const unread = notifications.filter((n) => isUnread(n)).length;
+
+  const announcements = notifications.filter(
+    (n) => n.type === "Announcement",
+  ).length;
+
+  const scheduled = notifications.filter(
+    (n) => n.status === "Scheduled",
+  ).length;
+
+  const birthdays = employees.filter((e) =>
+    isBirthdayToday(e.dateOfBirth || e.dob),
+  ).length;
+
+  statTotal.textContent = notifications.length;
+
+  statUnread.textContent = unread;
+
+  statAnnouncement.textContent = announcements;
+
+  statScheduled.textContent = scheduled;
+
+  statBirthday.textContent = birthdays;
+
+  statHoliday.textContent = holidays.length;
+}
+
+/* ==========================================================
+   SUMMARY
+========================================================== */
+
+function renderSummary() {
+  const setValue = (id, value) => {
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.textContent = value;
     }
+  };
+
+  setValue(
+    "summaryTotal",
+
+    notifications.length,
+  );
+
+  setValue(
+    "summaryUnread",
+
+    notifications.filter((n) => isUnread(n)).length,
+  );
+
+  setValue(
+    "summaryPublished",
+
+    notifications.filter((n) => n.status === "Published").length,
+  );
+
+  setValue(
+    "summaryScheduled",
+
+    notifications.filter((n) => n.status === "Scheduled").length,
+  );
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+function renderTable() {
+  notificationTableBody.innerHTML = "";
+
+  notificationCount.textContent = filteredNotifications.length;
+
+  if (filteredNotifications.length === 0) {
+    notificationTableBody.innerHTML = `
+
+        <tr>
+
+        <td colspan="8">
+
+            <div class="empty-state">
+
+                <i class="ri-notification-off-line"></i>
+
+                <h3>
+
+                    No Notifications Found
+
+                </h3>
+
+                <p>
+
+                    Create your first announcement.
+
+                </p>
+
+            </div>
+
+        </td>
+
+        </tr>
+
+        `;
+
+    return;
   }
 
-  /* =========================================================
-     renderStatistics()
-  ========================================================= */
-  function renderStatistics() {
-    const total = allNotifications.length;
-    const unread = allNotifications.filter((n) => !n.isReadByAdmin).length;
-    const announcements = allNotifications.filter(
-      (n) => n.type === "Announcement" && n.status === "Published",
-    ).length;
-    const scheduled = allNotifications.filter(
-      (n) => n.status === "Scheduled",
-    ).length;
+  filteredNotifications.forEach((item) => {
+    const unread = isUnread(item);
 
-    setText("statTotal", total);
-    setText("statUnread", unread);
-    setText("statAnnouncements", announcements);
-    setText("statScheduled", scheduled);
+    notificationTableBody.insertAdjacentHTML(
+      "beforeend",
 
-    const drafts = allNotifications.filter((n) => n.status === "Draft").length;
-    const avgRead = total
-      ? Math.round(
-          allNotifications.reduce((sum, n) => sum + readPercent(n), 0) / total,
-        )
-      : 0;
-    setText("sumTotal", total);
-    setText("sumReadRate", `${avgRead}%`);
-    setText("sumDrafts", drafts);
+      `
+
+<tr class="${unread ? "is-unread" : ""}">
+
+<td>
+
+<div class="notification-info">
+
+<div class="notification-avatar">
+
+<i class="ri-notification-3-fill"></i>
+
+</div>
+
+<div class="notification-text">
+
+<h5>${item.title || "-"}</h5>
+
+<p>${item.description || item.message || ""}</p>
+
+</div>
+
+</div>
+
+</td>
+
+<td>
+
+<span class="type-chip type-${(item.type || "announcement").toLowerCase()}">
+
+${item.type || "Announcement"}
+
+</span>
+
+</td>
+
+<td>
+
+<span class="priority-badge priority-${(item.priority || "low").toLowerCase()}">
+
+${item.priority || "Low"}
+
+</span>
+
+</td>
+
+<td>
+
+${item.department || "All"}
+
+</td>
+
+<td>
+
+${item.audience || "Everyone"}
+
+</td>
+
+<td>
+
+<span class="status-badge status-${(item.status || "published").toLowerCase()}">
+
+${item.status || "Published"}
+
+</span>
+
+</td>
+
+<td>
+
+${formatDate(item.createdAt)}
+
+</td>
+
+<td>
+
+<div class="row-actions">
+
+${
+  unread
+    ? `<button class="action-btn mark-read-btn" title="Mark as read" data-id="${item.id}"><i class="ri-mail-check-line"></i></button>`
+    : ""
+}
+
+<button class="action-btn view-btn"
+
+data-id="${item.id}">
+
+<i class="ri-eye-line"></i>
+
+</button>
+
+<button class="action-btn edit-btn"
+
+data-id="${item.id}">
+
+<i class="ri-pencil-line"></i>
+
+</button>
+
+<button class="action-btn delete-btn"
+
+data-id="${item.id}">
+
+<i class="ri-delete-bin-6-line"></i>
+
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`,
+    );
+  });
+}
+
+/* ==========================================================
+   PART 3
+   BIRTHDAYS + HOLIDAYS + RECENT ACTIVITY
+========================================================== */
+
+/* ==========================================================
+   TODAY'S BIRTHDAYS
+========================================================== */
+
+function renderBirthdays() {
+  birthdayList.innerHTML = "";
+
+  const birthdays = employees.filter((emp) =>
+    isBirthdayToday(emp.dateOfBirth || emp.dob),
+  );
+
+  if (!birthdays.length) {
+    birthdayList.innerHTML = `
+            <div class="no-birthday">
+                <i class="ri-cake-2-line"></i>
+                <h5>No Birthdays Today</h5>
+                <p>No employees are celebrating today.</p>
+            </div>
+        `;
+
+    return;
   }
 
-  function setText(id, value) {
-    const el = $(`#${id}`);
-    if (el) el.textContent = value;
+  birthdays.forEach((emp) => {
+    const image =
+      emp.photoURL ||
+      emp.profileImage ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.fullName || emp.name || "Employee")}`;
+
+    birthdayList.insertAdjacentHTML(
+      "beforeend",
+      `
+            <div class="birthday-item">
+
+                <img src="${image}" alt="">
+
+                <div class="birthday-info">
+
+                    <h5>${emp.fullName || emp.name}</h5>
+
+                    <p>
+
+                        ${emp.department || "Department"}
+
+                        •
+
+                        ${emp.designation || "Employee"}
+
+                    </p>
+
+                    <span class="birthday-badge">
+
+                        🎂 ${getAge(emp.dateOfBirth || emp.dob)} Years
+
+                    </span>
+
+                </div>
+
+                <button
+                    class="btn btn-sm btn-primary birthday-wish-btn"
+                    data-id="${emp.id}"
+                >
+
+                    Wish
+
+                </button>
+
+            </div>
+            `,
+    );
+  });
+}
+
+/* ==========================================================
+   UPCOMING BIRTHDAYS
+========================================================== */
+
+function renderUpcomingBirthdays() {
+  upcomingBirthdayList.innerHTML = "";
+
+  const upcoming = [...employees]
+
+    .filter((emp) => emp.dateOfBirth || emp.dob)
+
+    .sort((a, b) => {
+      const da = new Date(a.dateOfBirth || a.dob);
+
+      const db = new Date(b.dateOfBirth || b.dob);
+
+      return da.getMonth() - db.getMonth() || da.getDate() - db.getDate();
+    })
+
+    .slice(0, 5);
+
+  if (!upcoming.length) {
+    upcomingBirthdayList.innerHTML = `<p>No upcoming birthdays.</p>`;
+
+    return;
   }
 
-  /* =========================================================
-     searchNotifications() / filterNotifications()
-  ========================================================= */
-  function searchNotifications() {
-    currentPage = 1;
-    filterNotifications();
+  upcoming.forEach((emp) => {
+    const img =
+      emp.photoURL ||
+      emp.profileImage ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.fullName || emp.name)}`;
+
+    upcomingBirthdayList.insertAdjacentHTML(
+      "beforeend",
+
+      `
+
+<div class="upcoming-person">
+
+<img src="${img}">
+
+<div>
+
+<strong>
+
+${emp.fullName || emp.name}
+
+</strong>
+
+<small>
+
+${formatDate(emp.dateOfBirth || emp.dob)}
+
+</small>
+
+</div>
+
+</div>
+
+`,
+    );
+  });
+}
+
+/* ==========================================================
+   HOLIDAYS
+========================================================== */
+
+function renderHolidays() {
+  holidayList.innerHTML = "";
+
+  if (!holidays.length) {
+    holidayList.innerHTML = `<p>No upcoming holidays.</p>`;
+
+    return;
   }
 
-  function filterNotifications() {
-    const search = ($("#notifSearchInput")?.value || "").trim().toLowerCase();
-    const type = $("#filterType")?.value || "";
-    const priority = $("#filterPriority")?.value || "";
-    const status = $("#filterStatus")?.value || "";
-    const department = $("#filterDepartment")?.value || "";
-    const dateRange = $("#filterDateRange")?.value || "";
-    const sort = $("#sortNotifications")?.value || "date-desc";
+  holidays.forEach((item) => {
+    holidayList.insertAdjacentHTML(
+      "beforeend",
 
-    let rows = [...allNotifications];
+      `
 
-    if (search) {
-      rows = rows.filter(
-        (n) =>
-          (n.title || "").toLowerCase().includes(search) ||
-          (n.description || "").toLowerCase().includes(search),
+<div class="holiday-item">
+
+<div class="holiday-icon">
+
+<i class="ri-calendar-event-fill"></i>
+
+</div>
+
+<div class="holiday-info">
+
+<h5>
+
+${item.name}
+
+</h5>
+
+<p>
+
+${formatDate(item.date)}
+
+</p>
+
+</div>
+
+<span class="days-left">
+
+Upcoming
+
+</span>
+
+</div>
+
+`,
+    );
+  });
+}
+
+/* ==========================================================
+   RECENT ACTIVITY
+========================================================== */
+
+function renderRecentActivity() {
+  recentActivity.innerHTML = "";
+
+  notifications
+
+    .slice(0, 6)
+
+    .forEach((item) => {
+      recentActivity.insertAdjacentHTML(
+        "beforeend",
+
+        `
+
+<div class="activity-item">
+
+<div class="activity-dot"></div>
+
+<div class="activity-content">
+
+<h6>
+
+${item.title || "Notification"}
+
+</h6>
+
+<p>
+
+${item.description || item.message || ""}
+
+</p>
+
+<div class="activity-time">
+
+${formatDate(item.createdAt)}
+
+</div>
+
+</div>
+
+</div>
+
+`,
       );
-    }
-    if (type) rows = rows.filter((n) => n.type === type);
-    if (priority) rows = rows.filter((n) => n.priority === priority);
-    if (status) rows = rows.filter((n) => n.status === status);
-    if (department) rows = rows.filter((n) => n.department === department);
-
-    if (dateRange) {
-      const now = Date.now();
-      const spans = { today: 864e5, week: 7 * 864e5, month: 30 * 864e5 };
-      const span = spans[dateRange];
-      if (span) rows = rows.filter((n) => now - toMillis(n.createdAt) <= span);
-    }
-
-    const priorityRank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
-    rows.sort((a, b) => {
-      switch (sort) {
-        case "date-asc":
-          return toMillis(a.createdAt) - toMillis(b.createdAt);
-        case "priority-desc":
-          return (
-            (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0)
-          );
-        case "reads-desc":
-          return (b.readCount || 0) - (a.readCount || 0);
-        default:
-          return toMillis(b.createdAt) - toMillis(a.createdAt);
-      }
     });
+}
 
-    filtered = rows;
-    renderNotifications();
-  }
+/* ==========================================================
+   PART 4
+   SEARCH + FILTER + CRUD + EVENTS
+========================================================== */
 
-  function resetFilters() {
-    $("#notifSearchInput").value = "";
-    $("#filterType").value = "";
-    $("#filterPriority").value = "";
-    $("#filterStatus").value = "";
-    $("#filterDepartment").value = "";
-    $("#filterDateRange").value = "";
-    $("#sortNotifications").value = "date-desc";
-    currentPage = 1;
-    filterNotifications();
-  }
+/* ==========================================================
+   SEARCH
+========================================================== */
 
-  /* =========================================================
-     renderNotifications() — table + pagination
-  ========================================================= */
-  function renderNotifications() {
-    const tbody = $("#notifTableBody");
-    const emptyState = $("#notifEmptyState");
-    const tableWrap = $("#notifTableWrap");
-    const pagination = $("#notifPagination");
-    if (!tbody) return;
+function applyFilters() {
+  const search = searchInput.value.toLowerCase().trim();
 
-    if (!filtered.length) {
-      tbody.innerHTML = "";
-      emptyState.hidden = false;
-      tableWrap.style.display = "none";
-      pagination.style.display = "none";
-      return;
-    }
+  const type = filterType.value;
 
-    emptyState.hidden = true;
-    tableWrap.style.display = "block";
-    pagination.style.display = "flex";
+  const priority = filterPriority.value;
 
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    currentPage = Math.min(currentPage, totalPages);
-    const start = (currentPage - 1) * pageSize;
-    const pageRows = filtered.slice(start, start + pageSize);
+  const status = filterStatus.value;
 
-    tbody.innerHTML = pageRows.map(rowTemplate).join("");
-    renderPagination(totalPages);
-    wireRowEvents(tbody);
-  }
+  const department = filterDepartment.value;
 
-  function rowTemplate(n) {
-    const priorityClass = `priority-badge--${(n.priority || "low").toLowerCase()}`;
-    const statusClass = `status-badge--${(n.status || "draft").toLowerCase()}`;
-    const icon = TYPE_ICON[n.type] || "ri-notification-3-fill";
-    const pct = readPercent(n);
+  const audience = filterAudience.value;
 
-    return `
-      <tr class="${!n.isReadByAdmin ? "unread" : ""}" data-row-id="${n.id}">
-        <td>
-          <div class="notif-title-cell">
-            <span class="dot ${n.isReadByAdmin ? "read" : ""}"></span>
-            <div class="notif-title-info">
-              <span class="notif-title-name" title="${escapeHtml(n.title)}">${escapeHtml(n.title)}</span>
-              <span class="notif-title-sub">${escapeHtml(n.description || "").slice(0, 60)}${(n.description || "").length > 60 ? "…" : ""}</span>
-            </div>
-          </div>
-        </td>
-        <td><span class="type-badge"><i class="${icon}"></i> ${escapeHtml(n.type || "—")}</span></td>
-        <td><span class="priority-badge ${priorityClass}">${escapeHtml(n.priority || "Low")}</span></td>
-        <td>${escapeHtml(n.targetAudience || "—")}</td>
-        <td>${escapeHtml(n.createdBy || "—")}</td>
-        <td>${formatDate(n.createdAt)}</td>
-        <td><span class="status-badge ${statusClass}">${escapeHtml(n.status || "Draft")}</span></td>
-        <td>
-          <div class="read-count-cell">
-            <div class="read-count-track"><div class="read-count-bar" style="width:${pct}%"></div></div>
-            <span class="read-count-text">${n.readCount || 0}/${n.totalRecipients || 0}</span>
-          </div>
-        </td>
-        <td class="col-actions">
-          <div class="row-actions">
-            <button class="row-action-btn" data-action="view" data-id="${n.id}" title="View"><i class="ri-eye-line"></i></button>
-            <button class="row-action-btn" data-action="edit" data-id="${n.id}" title="Edit"><i class="ri-pencil-line"></i></button>
-            <button class="row-action-btn" data-action="more" data-id="${n.id}" title="More"><i class="ri-more-2-fill"></i></button>
-            <div class="row-menu" id="rowMenu-${n.id}" hidden>
-              <button data-action="duplicate" data-id="${n.id}"><i class="ri-file-copy-line"></i> Duplicate</button>
-              <button data-action="send-again" data-id="${n.id}"><i class="ri-send-plane-line"></i> Send Again</button>
-              <button class="danger" data-action="delete" data-id="${n.id}"><i class="ri-delete-bin-line"></i> Delete</button>
-            </div>
-          </div>
-        </td>
-      </tr>`;
-  }
+  filteredNotifications = notifications.filter((item) => {
+    const matchSearch =
+      (item.title || "").toLowerCase().includes(search) ||
+      (item.description || item.message || "").toLowerCase().includes(search);
 
-  function wireRowEvents(tbody) {
-    $$("[data-action='view']", tbody).forEach((btn) =>
-      btn.addEventListener(
-        "click",
-        () =>
-          (window.location.href = `notification-details.html?id=${btn.dataset.id}`),
-      ),
+    const matchType = !type || item.type === type;
+
+    const matchPriority = !priority || item.priority === priority;
+
+    const matchStatus = !status || item.status === status;
+
+    const matchDepartment = !department || item.department === department;
+
+    const matchAudience = !audience || item.audience === audience;
+
+    return (
+      matchSearch &&
+      matchType &&
+      matchPriority &&
+      matchStatus &&
+      matchDepartment &&
+      matchAudience
     );
-    $$("[data-action='edit']", tbody).forEach((btn) =>
-      btn.addEventListener("click", () =>
-        openAnnouncementModal(btn.dataset.id),
-      ),
-    );
-    $$("[data-action='delete']", tbody).forEach((btn) =>
-      btn.addEventListener("click", () => {
-        closeRowMenu();
-        openDeleteModal(btn.dataset.id);
-      }),
-    );
-    $$("[data-action='duplicate']", tbody).forEach((btn) =>
-      btn.addEventListener("click", () => {
-        closeRowMenu();
-        duplicateAnnouncement(btn.dataset.id);
-      }),
-    );
-    $$("[data-action='send-again']", tbody).forEach((btn) =>
-      btn.addEventListener("click", () => {
-        closeRowMenu();
-        sendAgain(btn.dataset.id);
-      }),
+  });
+
+  renderTable();
+}
+
+/* ==========================================================
+   RESET FILTERS
+========================================================== */
+
+function resetFilters() {
+  searchInput.value = "";
+
+  filterType.value = "";
+
+  filterPriority.value = "";
+
+  filterStatus.value = "";
+
+  filterDepartment.value = "";
+
+  filterAudience.value = "";
+
+  filteredNotifications = [...notifications];
+
+  renderTable();
+}
+
+/* ==========================================================
+   CREATE NOTIFICATION
+   Populates the full notification object required by the global
+   badge system: title, description, type, priority, status,
+   createdAt, createdBy, audience, isRead, isDeleted.
+========================================================== */
+
+async function createNotification(data) {
+  try {
+    const user = getCurrentUser?.() || {};
+
+    await addDoc(
+      notificationsRef,
+
+      {
+        title: data.title || "",
+        description: data.description || data.message || "",
+        type: data.type || "Announcement",
+        priority: data.priority || "Low",
+        status: data.status || "Published",
+        department: data.department || "All",
+        audience: data.audience || "All",
+
+        createdBy: user.uid || user.fullName || "system",
+
+        isRead: false,
+        isDeleted: false,
+
+        createdAt: Timestamp.now(),
+
+        updatedAt: Timestamp.now(),
+      },
     );
 
-    $$("[data-action='more']", tbody).forEach((btn) =>
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        const menu = $(`#rowMenu-${id}`);
-        const willOpen = menu.hidden;
-        closeRowMenu();
-        menu.hidden = !willOpen;
-        openRowMenuId = willOpen ? id : null;
-      }),
+    showToast(
+      "success",
+
+      "Notification Created",
+    );
+
+    // The global onSnapshot listener in layout.js updates the badge
+    // automatically the moment this write lands — no manual refresh
+    // call is needed here.
+
+    await loadNotifications();
+
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
+
+    showToast(
+      "error",
+
+      "Unable to create notification.",
     );
   }
+}
 
-  function renderPagination(totalPages) {
-    const info = $("#paginationInfo");
-    const controls = $("#paginationControls");
-    if (!info || !controls) return;
+/* ==========================================================
+   UPDATE
+========================================================== */
 
-    const start = (currentPage - 1) * pageSize + 1;
-    const end = Math.min(currentPage * pageSize, filtered.length);
-    info.textContent = `Showing ${start}–${end} of ${filtered.length}`;
+async function updateNotification(id, data) {
+  try {
+    await updateDoc(
+      doc(db, "notifications", id),
 
-    let html = `<button class="pagination-btn" data-page="prev" ${currentPage === 1 ? "disabled" : ""}><i class="ri-arrow-left-s-line"></i></button>`;
-    for (let p = 1; p <= totalPages; p++) {
-      html += `<button class="pagination-btn ${p === currentPage ? "active" : ""}" data-page="${p}">${p}</button>`;
-    }
-    html += `<button class="pagination-btn" data-page="next" ${currentPage === totalPages ? "disabled" : ""}><i class="ri-arrow-right-s-line"></i></button>`;
-    controls.innerHTML = html;
+      {
+        ...data,
 
-    $$("[data-page]", controls).forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const val = btn.dataset.page;
-        if (val === "prev") currentPage = Math.max(1, currentPage - 1);
-        else if (val === "next")
-          currentPage = Math.min(totalPages, currentPage + 1);
-        else currentPage = Number(val);
-        renderNotifications();
-      });
-    });
-  }
-
-  /* =========================================================
-     RIGHT SIDEBAR WIDGETS
-  ========================================================= */
-  function renderSidebarWidgets() {
-    const unreadWrap = $("#unreadList");
-    const scheduledWrap = $("#scheduledList");
-    const activityWrap = $("#recentActivityList");
-
-    const unread = allNotifications.filter((n) => !n.isReadByAdmin).slice(0, 5);
-    if (unreadWrap) {
-      unreadWrap.innerHTML = unread.length
-        ? unread
-            .map(
-              (n) => `
-            <div class="mini-item">
-              <span class="mini-dot" style="background:var(--color-primary)"></span>
-              <div class="mini-body">
-                <div class="mini-title">${escapeHtml(n.title)}</div>
-                <div class="mini-meta">${escapeHtml(n.type || "")} · ${formatDate(n.createdAt)}</div>
-              </div>
-            </div>`,
-            )
-            .join("")
-        : `<p style="font-size:12.5px;color:var(--panel-light-text-muted);padding:8px 0;">You're all caught up.</p>`;
-    }
-
-    const scheduled = allNotifications
-      .filter((n) => n.status === "Scheduled")
-      .slice(0, 5);
-    if (scheduledWrap) {
-      scheduledWrap.innerHTML = scheduled.length
-        ? scheduled
-            .map(
-              (n) => `
-            <div class="mini-item">
-              <span class="mini-dot" style="background:var(--stat-blue)"></span>
-              <div class="mini-body">
-                <div class="mini-title">${escapeHtml(n.title)}</div>
-                <div class="mini-meta">${escapeHtml(n.scheduleDate || "")} ${escapeHtml(n.scheduleTime || "")}</div>
-              </div>
-            </div>`,
-            )
-            .join("")
-        : `<p style="font-size:12.5px;color:var(--panel-light-text-muted);padding:8px 0;">Nothing scheduled.</p>`;
-    }
-
-    const recent = [...allNotifications]
-      .sort((a, b) => toMillis(b.updatedAt) - toMillis(a.updatedAt))
-      .slice(0, 5);
-    if (activityWrap) {
-      activityWrap.innerHTML = recent.length
-        ? recent
-            .map(
-              (n) => `
-            <div class="activity-item">
-              <div class="activity-icon"><i class="${TYPE_ICON[n.type] || "ri-notification-3-fill"}"></i></div>
-              <div class="activity-body">
-                <strong>${escapeHtml(n.title)}</strong> was ${escapeHtml((n.status || "draft").toLowerCase())}
-                <span class="activity-time">${formatDate(n.updatedAt || n.createdAt)}</span>
-              </div>
-            </div>`,
-            )
-            .join("")
-        : `<p style="font-size:12.5px;color:var(--panel-light-text-muted);padding:8px 0;">No recent activity.</p>`;
-    }
-  }
-
-  /* =========================================================
-     MODAL: NEW / EDIT ANNOUNCEMENT
-  ========================================================= */
-  let selectedFile = null;
-
-  function openAnnouncementModal(id = null) {
-    editingId = id;
-    const form = $("#announcementForm");
-    form.reset();
-    $("#notifDocId").value = "";
-    $("#notifFileLabel").textContent = "Click to browse or drag a file here";
-    selectedFile = null;
-
-    if (id) {
-      const record = allNotifications.find((n) => n.id === id);
-      if (!record) return;
-      $("#announcementModalTitle").textContent = "Edit Announcement";
-      $("#notifDocId").value = id;
-      fillForm(record);
-    } else {
-      $("#announcementModalTitle").textContent = "New Announcement";
-      $("#allowPush").checked = true;
-      $("#allowEmail").checked = true;
-      $("#allowInApp").checked = true;
-    }
-
-    $("#announcementModalOverlay").hidden = false;
-  }
-
-  function closeAnnouncementModal() {
-    $("#announcementModalOverlay").hidden = true;
-    editingId = null;
-  }
-
-  function fillForm(n) {
-    $("#notifTitleInput").value = n.title || "";
-    $("#notifDescriptionInput").value = n.description || "";
-    $("#notifTypeSelect").value = n.type || "Announcement";
-    $("#notifPrioritySelect").value = n.priority || "Medium";
-    $("#notifDepartmentSelect").value = n.department || "All Departments";
-    $("#notifAudienceSelect").value = n.targetAudience || "Everyone";
-    $("#notifScheduleDate").value = n.scheduleDate || "";
-    $("#notifScheduleTime").value = n.scheduleTime || "";
-    $("#allowPush").checked = !!n.allowPush;
-    $("#allowEmail").checked = !!n.allowEmail;
-    $("#allowInApp").checked = !!n.allowInApp;
-    if (n.attachmentName) $("#notifFileLabel").textContent = n.attachmentName;
-  }
-
-  function setupFileDrop() {
-    const zone = $("#notifFileDropZone");
-    const input = $("#notifFileInput");
-    if (!zone || !input) return;
-    zone.addEventListener("click", () => input.click());
-    input.addEventListener("change", () => handleFile(input.files[0]));
-    ["dragenter", "dragover"].forEach((evt) =>
-      zone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        zone.classList.add("drag-over");
-      }),
+        updatedAt: Timestamp.now(),
+      },
     );
-    ["dragleave", "drop"].forEach((evt) =>
-      zone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        zone.classList.remove("drag-over");
-      }),
+
+    showToast(
+      "success",
+
+      "Notification Updated",
     );
-    zone.addEventListener("drop", (e) => handleFile(e.dataTransfer.files[0]));
-  }
 
-  function handleFile(file) {
-    if (!file) return;
-    selectedFile = file;
-    $("#notifFileLabel").textContent = file.name;
-  }
+    await loadNotifications();
 
-  function readFormPayload(status) {
-    return {
-      title: $("#notifTitleInput").value.trim(),
-      description: $("#notifDescriptionInput").value.trim(),
-      type: $("#notifTypeSelect").value,
-      priority: $("#notifPrioritySelect").value,
-      department: $("#notifDepartmentSelect").value,
-      targetAudience: $("#notifAudienceSelect").value,
-      attachmentName: selectedFile ? selectedFile.name : "",
-      attachmentUrl: "",
-      scheduleDate: $("#notifScheduleDate").value || "",
-      scheduleTime: $("#notifScheduleTime").value || "",
-      allowPush: $("#allowPush").checked,
-      allowEmail: $("#allowEmail").checked,
-      allowInApp: $("#allowInApp").checked,
-      status,
-    };
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  async function handleFormSubmit(e) {
-    e.preventDefault();
-    await publishAnnouncement();
-  }
+/* ==========================================================
+   MARK AS READ (single)
+========================================================== */
 
-  /* =========================================================
-     createAnnouncement() / updateAnnouncement()
-  ========================================================= */
-  async function createAnnouncement(payload) {
-    await addDoc(collection(db, "notifications"), {
-      ...payload,
-      createdBy: currentUser?.fullName || "Admin",
-      createdById: currentUser?.uid || "",
-      readCount: 0,
-      totalRecipients: 0,
-      isReadByAdmin: true,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-  }
-
-  async function updateAnnouncement(id, payload) {
+async function markNotificationRead(id) {
+  try {
     await updateDoc(doc(db, "notifications", id), {
-      ...payload,
-      updatedAt: serverTimestamp(),
+      isRead: true,
+      updatedAt: Timestamp.now(),
     });
+
+    // Badge decreases automatically via the realtime listener.
+
+    await loadNotifications();
+
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
+
+    showToast("error", "Unable to mark notification as read.");
+  }
+}
+
+/* ==========================================================
+   MARK ALL AS READ
+========================================================== */
+
+async function markAllNotificationsRead() {
+  const unread = notifications.filter((n) => isUnread(n));
+
+  if (!unread.length) {
+    showToast("success", "No unread notifications.");
+    return;
   }
 
-  /* =========================================================
-     publishAnnouncement() / scheduleAnnouncement()
-  ========================================================= */
-  async function publishAnnouncement() {
-    const title = $("#notifTitleInput").value.trim();
-    if (!title) {
-      showToast("error", "Please enter a title.");
-      return;
-    }
+  try {
+    const batch = writeBatch(db);
 
-    const hasSchedule =
-      $("#notifScheduleDate").value && $("#notifScheduleTime").value;
-    const status = hasSchedule ? "Scheduled" : "Published";
-    const payload = readFormPayload(status);
-
-    try {
-      if (editingId) {
-        await updateAnnouncement(editingId, payload);
-        showToast(
-          "success",
-          hasSchedule ? "Announcement scheduled." : "Announcement updated.",
-        );
-      } else {
-        await createAnnouncement(payload);
-        showToast(
-          "success",
-          hasSchedule ? "Announcement scheduled." : "Announcement published.",
-        );
-      }
-      closeAnnouncementModal();
-    } catch (error) {
-      console.error("Publish failed:", error);
-      showToast("error", "Something went wrong. Please try again.");
-    }
-  }
-
-  async function scheduleAnnouncement(id, scheduleDate, scheduleTime) {
-    try {
-      await updateDoc(doc(db, "notifications", id), {
-        status: "Scheduled",
-        scheduleDate,
-        scheduleTime,
-        updatedAt: serverTimestamp(),
+    unread.forEach((n) => {
+      batch.update(doc(db, "notifications", n.id), {
+        isRead: true,
+        updatedAt: Timestamp.now(),
       });
-      showToast("success", "Announcement scheduled.");
-    } catch (error) {
-      console.error("Schedule failed:", error);
-      showToast("error", "Could not schedule announcement.");
-    }
+    });
+
+    await batch.commit();
+
+    showToast("success", "All notifications marked as read.");
+
+    // Badge hides automatically once the batch commits.
+
+    await loadNotifications();
+
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
+
+    showToast("error", "Unable to mark all as read.");
   }
+}
 
-  async function saveDraft() {
-    const title = $("#notifTitleInput").value.trim();
-    if (!title) {
-      showToast("error", "Please enter a title.");
-      return;
-    }
-    const payload = readFormPayload("Draft");
+/* ==========================================================
+   DELETE
+========================================================== */
 
-    try {
-      if (editingId) {
-        await updateAnnouncement(editingId, payload);
-      } else {
-        await createAnnouncement(payload);
-      }
-      showToast("success", "Saved as draft.");
-      closeAnnouncementModal();
-    } catch (error) {
-      console.error("Save draft failed:", error);
-      showToast("error", "Could not save draft.");
-    }
+async function removeNotification(id) {
+  try {
+    await deleteDoc(doc(db, "notifications", id));
+
+    showToast(
+      "success",
+
+      "Notification Deleted",
+    );
+
+    // Badge/unread count refreshes instantly via the realtime listener.
+
+    await loadNotifications();
+
+    renderDashboard();
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  /* =========================================================
-     deleteAnnouncement()
-  ========================================================= */
-  function openDeleteModal(id) {
-    const record = allNotifications.find((n) => n.id === id);
-    pendingDeleteId = id;
-    $("#deleteTargetName").textContent = record
-      ? record.title
-      : "this notification";
-    $("#deleteModalOverlay").hidden = false;
-  }
-  function closeDeleteModal() {
-    pendingDeleteId = null;
-    $("#deleteModalOverlay").hidden = true;
-  }
+/* ==========================================================
+   BIRTHDAY WISH
+========================================================== */
 
-  async function confirmDelete() {
-    if (!pendingDeleteId) return;
-    await deleteAnnouncement(pendingDeleteId);
-    closeDeleteModal();
-  }
+function sendBirthdayWish(employeeId) {
+  showToast(
+    "success",
 
-  async function deleteAnnouncement(id) {
-    try {
-      await deleteDoc(doc(db, "notifications", id));
-      showToast("success", "Notification deleted.");
-    } catch (error) {
-      console.error("Delete failed:", error);
-      showToast("error", "Could not delete notification.");
-    }
-  }
+    "Birthday wishes sent 🎉",
+  );
+}
 
-  /* =========================================================
-     duplicateAnnouncement()
-  ========================================================= */
-  async function duplicateAnnouncement(id) {
-    const record = allNotifications.find((n) => n.id === id);
-    if (!record) return;
-    try {
-      const { id: _omit, createdAt, updatedAt, readCount, ...rest } = record;
-      await addDoc(collection(db, "notifications"), {
-        ...rest,
-        title: `${record.title} (Copy)`,
-        status: "Draft",
-        readCount: 0,
-        totalRecipients: 0,
-        isReadByAdmin: true,
-        createdBy: currentUser?.fullName || "Admin",
-        createdById: currentUser?.uid || "",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      showToast("success", "Announcement duplicated as draft.");
-    } catch (error) {
-      console.error("Duplicate failed:", error);
-      showToast("error", "Could not duplicate announcement.");
-    }
-  }
+/* ==========================================================
+   EVENTS
+========================================================== */
 
-  /* =========================================================
-     Send Again — republish an expired/sent notification
-  ========================================================= */
-  async function sendAgain(id) {
-    try {
-      await updateDoc(doc(db, "notifications", id), {
-        status: "Published",
-        readCount: 0,
-        isReadByAdmin: false,
-        updatedAt: serverTimestamp(),
-      });
-      showToast("success", "Notification sent again.");
-    } catch (error) {
-      console.error("Send again failed:", error);
-      showToast("error", "Could not send notification again.");
-    }
-  }
+function bindEvents() {
+  /* Search */
 
-  /* =========================================================
-     markAllRead()
-  ========================================================= */
-  async function markAllRead() {
-    const unread = allNotifications.filter((n) => !n.isReadByAdmin);
-    if (!unread.length) {
-      showToast("success", "Nothing to mark — you're all caught up.");
-      return;
-    }
+  searchInput?.addEventListener(
+    "input",
 
-    try {
-      const batch = writeBatch(db);
-      unread.forEach((n) =>
-        batch.update(doc(db, "notifications", n.id), { isReadByAdmin: true }),
+    applyFilters,
+  );
+
+  /* Filters */
+
+  [
+    filterType,
+
+    filterPriority,
+
+    filterStatus,
+
+    filterDepartment,
+
+    filterAudience,
+  ].forEach((el) => {
+    el?.addEventListener(
+      "change",
+
+      applyFilters,
+    );
+  });
+
+  /* Reset */
+
+  resetBtn?.addEventListener(
+    "click",
+
+    resetFilters,
+  );
+
+  /* Refresh */
+
+  refreshBtn?.addEventListener(
+    "click",
+
+    async () => {
+      await loadInitialData();
+
+      showToast(
+        "success",
+
+        "Notifications refreshed.",
       );
-      await batch.commit();
-      showToast("success", `Marked ${unread.length} notification(s) as read.`);
-    } catch (error) {
-      console.error("Mark all read failed:", error);
-      showToast("error", "Could not mark notifications as read.");
+    },
+  );
+
+  /* Mark All As Read (only wired up if the button exists on the page) */
+
+  markAllReadBtn?.addEventListener(
+    "click",
+
+    markAllNotificationsRead,
+  );
+
+  /* Table Actions */
+
+  notificationTableBody.addEventListener(
+    "click",
+
+    async (e) => {
+      const btn = e.target.closest(".action-btn");
+
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+
+      if (btn.classList.contains("mark-read-btn")) {
+        await markNotificationRead(id);
+        return;
+      }
+
+      if (btn.classList.contains("view-btn")) {
+        await markNotificationRead(id);
+        window.location.href = `notification-details.html?id=${id}`;
+      }
+
+      if (btn.classList.contains("edit-btn")) {
+        currentNotification = id;
+
+        // Open Edit Modal
+      }
+
+      if (btn.classList.contains("delete-btn")) {
+        const yes = confirm("Delete this notification?");
+
+        if (yes) {
+          await removeNotification(id);
+        }
+      }
+    },
+  );
+
+  /* Birthday Wish */
+
+  birthdayList.addEventListener(
+    "click",
+
+    (e) => {
+      const btn = e.target.closest(".birthday-wish-btn");
+
+      if (!btn) return;
+
+      sendBirthdayWish(btn.dataset.id);
+    },
+  );
+}
+
+/* ==========================================================
+   PART 5
+   MODALS + VIEW + EDIT + DELETE
+========================================================== */
+
+const announcementModal = document.getElementById("announcementModal");
+
+const deleteModal = document.getElementById("deleteNotificationModal");
+
+const birthdayModal = document.getElementById("birthdayWishModal");
+
+/* ==========================================================
+   MODAL HELPERS
+========================================================== */
+
+function openModal(modal) {
+  modal?.classList.remove("hidden");
+}
+
+function closeModal(modal) {
+  modal?.classList.add("hidden");
+}
+
+/* ==========================================================
+   ANNOUNCEMENT
+========================================================== */
+
+announcementBtn?.addEventListener("click", () => {
+  openModal(announcementModal);
+});
+
+document
+  .getElementById("closeAnnouncementModal")
+  ?.addEventListener("click", () => {
+    closeModal(announcementModal);
+  });
+
+document.getElementById("cancelAnnouncement")?.addEventListener("click", () => {
+  closeModal(announcementModal);
+});
+
+/* ==========================================================
+   DELETE
+========================================================== */
+
+let deleteId = null;
+
+function openDeleteModal(id) {
+  deleteId = id;
+
+  openModal(deleteModal);
+}
+
+document
+  .getElementById("cancelDeleteNotification")
+  ?.addEventListener("click", () => {
+    deleteId = null;
+
+    closeModal(deleteModal);
+  });
+
+document
+  .getElementById("confirmDeleteNotification")
+  ?.addEventListener("click", async () => {
+    if (!deleteId) return;
+
+    await removeNotification(deleteId);
+
+    closeModal(deleteModal);
+
+    deleteId = null;
+  });
+
+/* ==========================================================
+   BIRTHDAY MODAL
+========================================================== */
+
+function openBirthdayModal(id) {
+  currentNotification = id;
+
+  openModal(birthdayModal);
+}
+
+document.getElementById("closeBirthdayModal")?.addEventListener("click", () => {
+  closeModal(birthdayModal);
+});
+
+document.getElementById("cancelBirthdayWish")?.addEventListener("click", () => {
+  closeModal(birthdayModal);
+});
+
+document.getElementById("sendBirthdayWish")?.addEventListener("click", () => {
+  showToast(
+    "success",
+
+    "Birthday wishes sent.",
+  );
+
+  closeModal(birthdayModal);
+});
+
+/* ==========================================================
+   TABLE ACTIONS
+========================================================== */
+
+notificationTableBody.addEventListener(
+  "click",
+
+  (e) => {
+    const btn = e.target.closest(".action-btn");
+
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains("mark-read-btn")) {
+      markNotificationRead(id);
+    } else if (btn.classList.contains("view-btn")) {
+      markNotificationRead(id);
+      window.location.href = `notification-details.html?id=${id}`;
+    } else if (btn.classList.contains("edit-btn")) {
+      currentNotification = id;
+
+      openModal(announcementModal);
+    } else if (btn.classList.contains("delete-btn")) {
+      openDeleteModal(id);
     }
+  },
+);
+
+/* ==========================================================
+   BIRTHDAY BUTTON
+========================================================== */
+
+birthdayList.addEventListener(
+  "click",
+
+  (e) => {
+    const btn = e.target.closest(".birthday-wish-btn");
+
+    if (!btn) return;
+
+    openBirthdayModal(btn.dataset.id);
+  },
+);
+
+/* ==========================================================
+   CLOSE MODALS ON OVERLAY
+========================================================== */
+
+document.querySelectorAll(".modal-overlay").forEach((modal) => {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal(modal);
+    }
+  });
+});
+
+/* ==========================================================
+   ESC KEY
+========================================================== */
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeModal(announcementModal);
+
+    closeModal(deleteModal);
+
+    closeModal(birthdayModal);
   }
-
-  /* =========================================================
-     STATIC UI WIRING
-  ========================================================= */
-  function wireUI() {
-    setupFileDrop();
-
-    $("#newAnnouncementBtn")?.addEventListener("click", () =>
-      openAnnouncementModal(),
-    );
-    $("#emptyStateCreateBtn")?.addEventListener("click", () =>
-      openAnnouncementModal(),
-    );
-    $("#markAllReadBtn")?.addEventListener("click", markAllRead);
-
-    $("#notifSearchInput")?.addEventListener("input", searchNotifications);
-    [
-      "filterType",
-      "filterPriority",
-      "filterStatus",
-      "filterDepartment",
-      "filterDateRange",
-      "sortNotifications",
-    ].forEach((id) =>
-      $(`#${id}`)?.addEventListener("change", () => {
-        currentPage = 1;
-        filterNotifications();
-      }),
-    );
-    $("#resetFiltersBtn")?.addEventListener("click", resetFilters);
-
-    $("#closeAnnouncementModalBtn")?.addEventListener(
-      "click",
-      closeAnnouncementModal,
-    );
-    $("#cancelAnnouncementModalBtn")?.addEventListener(
-      "click",
-      closeAnnouncementModal,
-    );
-    $("#announcementForm")?.addEventListener("submit", handleFormSubmit);
-    $("#saveDraftBtn")?.addEventListener("click", saveDraft);
-
-    $("#cancelDeleteBtn")?.addEventListener("click", closeDeleteModal);
-    $("#confirmDeleteBtn")?.addEventListener("click", confirmDelete);
-
-    $$(".modal-overlay").forEach((overlay) =>
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) overlay.hidden = true;
-      }),
-    );
-  }
-})();
+});

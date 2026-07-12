@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leave Calendar · Employee Management System</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/leave-calendar.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR (reused) ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">
+          <div class="brand__icon"><i class="ri-team-fill"></i></div>
+          <div class="brand__text">
+            <h1>Workspare</h1>
+            <p>Employee Management System</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav">
+          <ul id="navList">
+            <!-- injected by renderNav() -->
+          </ul>
+        </nav>
+
+        <!-- <div class="sidebar__upgrade">
+          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
+          <p class="upgrade__title">Upgrade to Pro</p>
+          <p class="upgrade__sub">Unlock more features</p>
+          <button class="btn btn--primary btn--block">Upgrade Now</button>
+        </div> -->
+
+        <div class="sidebar__user-wrap">
+          <button
+            class="sidebar__user"
+            id="userMenuTrigger"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            <img
+              src="https://i.pravatar.cc/80?img=13"
+              alt="User avatar"
+              class="user__avatar"
+            />
+            <div class="user__info">
+              <p class="user__name">User</p>
+              <p class="user__role">Admin</p>
+            </div>
+            <i class="ri-arrow-down-s-line user__chevron"></i>
+          </button>
+
+          <ul class="user-menu" id="userMenu" role="menu">
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="profile"
+              >
+                <i class="ri-user-3-line"></i><span>View Profile</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="password"
+              >
+                <i class="ri-lock-password-line"></i
+                ><span>Change Password</span>
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item"
+                data-action="help"
+              >
+                <i class="ri-question-line"></i><span>Help Center</span>
+              </button>
+            </li>
+            <li class="user-menu__divider" role="separator"></li>
+            <li role="none">
+              <button
+                role="menuitem"
+                class="user-menu__item user-menu__item--danger"
+                data-action="logout"
+              >
+                <i class="ri-logout-box-r-line" style="color: #cf2626"></i
+                ><span style="color: #cf2626">Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- ============ TOPBAR (reused) ============ -->
+        <header class="topbar">
+          <button
+            class="icon-btn topbar__menu"
+            id="menuToggle"
+            aria-label="Toggle menu"
+          >
+            <i class="ri-menu-line"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search employees, departments..."
+            />
+            <kbd>⌘ K</kbd>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Toggle Theme"
+            >
+              <span id="themeToggleLight" class="theme-toggle__option">
+                <i class="ri-sun-line"></i>
+              </span>
+
+              <span id="themeToggleDark" class="theme-toggle__option">
+                <i class="ri-moon-line"></i>
+              </span>
+            </button>
+            <button class="icon-btn has-badge" aria-label="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge" id="notifBadge">0</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============ PAGE CONTENT ============ -->
+        <main class="content" id="leaveCalendarPage">
+          <!-- ---------- PAGE HEADER ---------- -->
+          <div class="page-header">
+            <div class="page-header-text">
+              <h1>Leave Calendar</h1>
+              <p>
+                View employee leaves, holidays, birthdays and company events in
+                calendar format.
+              </p>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn btn-outline btn-sm" id="todayBtn">
+                Today
+              </button>
+              <div class="view-switch">
+                <button data-view="month" class="active">Month</button>
+                <button data-view="week">Week</button>
+                <button data-view="day">Day</button>
+              </div>
+              <button class="btn btn-outline" id="exportCalendarBtn">
+                <i class="ri-download-2-line"></i> Export Calendar
+              </button>
+              <button class="btn btn-primary" id="addLeaveBtn">
+                <i class="ri-add-line"></i> Add Leave
+              </button>
+            </div>
+          </div>
+
+          <!-- ---------- STATISTICS ---------- -->
+          <section
+            class="stats-grid stats-grid-leavecal"
+            id="statsGrid"
+            aria-live="polite"
+          >
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-primary">
+                  <i class="ri-calendar-2-fill"></i>
+                </div>
+                <span class="stat-label">Total Leaves</span>
+              </div>
+              <h3 class="stat-value" id="statTotalLeaves">0</h3>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-success">
+                  <i class="ri-checkbox-circle-fill"></i>
+                </div>
+                <span class="stat-label">Approved</span>
+              </div>
+              <h3 class="stat-value" id="statApproved">0</h3>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-warning">
+                  <i class="ri-time-fill"></i>
+                </div>
+                <span class="stat-label">Pending</span>
+              </div>
+              <h3 class="stat-value" id="statPending">0</h3>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-danger">
+                  <i class="ri-user-unfollow-fill"></i>
+                </div>
+                <span class="stat-label">On Leave Today</span>
+              </div>
+              <h3 class="stat-value" id="statOnLeaveToday">0</h3>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-info">
+                  <i class="ri-sun-fill"></i>
+                </div>
+                <span class="stat-label">Upcoming Holidays</span>
+              </div>
+              <h3 class="stat-value" id="statUpcomingHolidays">0</h3>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon stat-icon-pink">
+                  <i class="ri-cake-2-fill"></i>
+                </div>
+                <span class="stat-label">Birthdays This Month</span>
+              </div>
+              <h3 class="stat-value" id="statBirthdays">0</h3>
+            </div>
+          </section>
+
+          <!-- ---------- TOOLBAR: filters + search ---------- -->
+          <section class="card toolbar-card">
+            <div class="search-box search-box-wide">
+              <i class="ri-search-line"></i>
+              <input
+                type="text"
+                id="calSearchInput"
+                placeholder="Search employees..."
+                autocomplete="off"
+              />
+            </div>
+            <select id="filterDepartment" class="filter-select">
+              <option value="">All Departments</option>
+            </select>
+            <select id="filterLeaveType" class="filter-select">
+              <option value="">All Leave Types</option>
+              <option value="Sick Leave">Sick Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Earned Leave">Earned Leave</option>
+              <option value="Unpaid Leave">Unpaid Leave</option>
+              <option value="Maternity Leave">Maternity Leave</option>
+              <option value="Paternity Leave">Paternity Leave</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Statuses</option>
+              <option value="Approved">Approved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <select id="filterEmployee" class="filter-select">
+              <option value="">All Employees</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="resetFiltersBtn">
+              <i class="ri-refresh-line"></i> Reset
+            </button>
+          </section>
+
+          <!-- ---------- MAIN GRID: calendar + right sidebar ---------- -->
+          <div class="calendar-main-grid">
+            <section class="card">
+              <div class="calendar-card-head">
+                <div class="calendar-nav">
+                  <button class="icon-btn-sm" id="prevBtn">
+                    <i class="ri-arrow-left-s-line"></i>
+                  </button>
+                  <span class="calendar-nav-label" id="calNavLabel"
+                    >July 2026</span
+                  >
+                  <button class="icon-btn-sm" id="nextBtn">
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="calendar-legend">
+                <span
+                  ><span class="legend-swatch approved"></span>Approved</span
+                >
+                <span><span class="legend-swatch pending"></span>Pending</span>
+                <span
+                  ><span class="legend-swatch rejected"></span>Rejected</span
+                >
+                <span><span class="legend-swatch holiday"></span>Holiday</span>
+                <span
+                  ><span class="legend-swatch birthday"></span>Birthday</span
+                >
+                <span
+                  ><span class="legend-swatch anniversary"></span
+                  >Anniversary</span
+                >
+              </div>
+
+              <!-- ===== SKELETON ===== -->
+              <div class="skeleton-calendar" id="calSkeleton"></div>
+
+              <div id="calContent" hidden>
+                <!-- MONTH VIEW -->
+                <div id="monthView">
+                  <div class="calendar-grid" id="monthDowRow"></div>
+                  <div
+                    class="calendar-grid"
+                    id="monthGrid"
+                    style="margin-top: 6px"
+                  ></div>
+                </div>
+
+                <!-- WEEK VIEW -->
+                <div id="weekView" hidden>
+                  <div class="week-grid" id="weekGrid"></div>
+                </div>
+
+                <!-- DAY VIEW -->
+                <div id="dayView" hidden>
+                  <div class="day-view-head">
+                    <strong id="dayViewLabel">Monday, 12 July 2026</strong>
+                  </div>
+                  <div class="day-agenda" id="dayAgenda"></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- RIGHT SIDEBAR ---------- -->
+            <aside class="side-col">
+              <section class="card">
+                <div class="card__head"><h3>Today's Leaves</h3></div>
+                <div id="todaysLeavesList"></div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>Upcoming Leaves</h3></div>
+                <div id="upcomingLeavesList"></div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>Upcoming Birthdays</h3></div>
+                <div id="upcomingBirthdaysList"></div>
+              </section>
+
+              <section class="card">
+                <div class="card__head"><h3>Upcoming Holidays</h3></div>
+                <div id="upcomingHolidaysList"></div>
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <h3>Recent Calendar Activities</h3>
+                </div>
+                <div id="recentActivityList"></div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       LEAVE DETAILS MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="leaveDetailsModalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="leaveDetailsTitle"
+      >
+        <div class="modal-header">
+          <h3 id="leaveDetailsTitle">Leave Details</h3>
+          <button
+            class="modal-close"
+            id="closeLeaveDetailsBtn"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div class="modal-body" id="leaveDetailsBody">
+          <!-- injected by JS -->
+        </div>
+        <div class="modal-footer" id="leaveDetailsFooter">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       ADD / EDIT LEAVE MODAL
+    ====================================================== -->
+    <div class="modal-overlay" id="leaveFormModalOverlay" hidden>
+      <div
+        class="modal modal-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="leaveFormTitle"
+      >
+        <div class="modal-header">
+          <h3 id="leaveFormTitle">Add Leave</h3>
+          <button class="modal-close" id="closeLeaveFormBtn" aria-label="Close">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form id="leaveForm" class="modal-body">
+          <input type="hidden" id="leaveDocId" value="" />
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="leaveEmployeeSelect">Employee</label>
+              <select id="leaveEmployeeSelect" required>
+                <option value="">Select employee</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="leaveTypeSelect">Leave Type</label>
+              <select id="leaveTypeSelect" required>
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Casual Leave">Casual Leave</option>
+                <option value="Earned Leave">Earned Leave</option>
+                <option value="Unpaid Leave">Unpaid Leave</option>
+                <option value="Maternity Leave">Maternity Leave</option>
+                <option value="Paternity Leave">Paternity Leave</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="leaveDurationSelect">Duration</label>
+              <select id="leaveDurationSelect">
+                <option value="Full Day">Full Day</option>
+                <option value="Half Day">Half Day</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="leaveStartDate">Start Date</label>
+              <input type="date" id="leaveStartDate" required />
+            </div>
+            <div class="form-group">
+              <label for="leaveEndDate">End Date</label>
+              <input type="date" id="leaveEndDate" required />
+            </div>
+            <div class="form-group form-group-full">
+              <label for="leaveReasonInput">Reason</label>
+              <textarea
+                id="leaveReasonInput"
+                rows="3"
+                placeholder="Reason for leave..."
+              ></textarea>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="leaveStatusSelect">Status</label>
+              <select id="leaveStatusSelect">
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelLeaveFormBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveLeaveBtn">
+              <i class="ri-save-line"></i> Save Leave
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =====================================================
+       SCRIPTS
+    ====================================================== -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/leave-calendar.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>
