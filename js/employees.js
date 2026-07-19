@@ -21,6 +21,17 @@ import {
   hideSkeleton,
 } from "../js/layout.js";
 
+/* ==========================================================
+   RBAC IMPORTS — consume existing permission system only
+========================================================== */
+import {
+  MODULES,
+  canView,
+  canCreate,
+  canEdit,
+  canDelete,
+} from "../js/permissions.js";
+
 (function () {
   "use strict";
 
@@ -36,6 +47,51 @@ import {
     inactive: "Inactive",
     leave: "On Leave",
   };
+
+  /* =========================================================
+     RBAC STATE
+     ----------------------------------------------------------
+     Resolved once in init() from the existing permissions.js
+     and reused everywhere below — no permission logic is
+     duplicated here, only consumed.
+  ========================================================= */
+  let userCanCreate = false;
+  let userCanEdit = false;
+  let userCanDelete = false;
+
+  function debugLog(action, allowed) {
+    console.log(`[RBAC][Employees] action="${action}" allowed=${allowed}`);
+  }
+
+  function guardCreate() {
+    const allowed = canCreate(MODULES.EMPLOYEES);
+    debugLog("create", allowed);
+    if (!allowed) {
+      showToast("error", "Access Denied — you don't have permission.");
+      return false;
+    }
+    return true;
+  }
+
+  function guardEditPerm() {
+    const allowed = canEdit(MODULES.EMPLOYEES);
+    debugLog("edit", allowed);
+    if (!allowed) {
+      showToast("error", "Access Denied — you don't have permission.");
+      return false;
+    }
+    return true;
+  }
+
+  function guardDeletePerm() {
+    const allowed = canDelete(MODULES.EMPLOYEES);
+    debugLog("delete", allowed);
+    if (!allowed) {
+      showToast("error", "Access Denied — you don't have permission.");
+      return false;
+    }
+    return true;
+  }
 
   /* =========================================================
      FIRESTORE: EMPLOYEES CRUD
@@ -60,6 +116,14 @@ import {
 
   async function saveEmployee(formData, docId) {
     const isEdit = Boolean(docId);
+
+    // Defense in depth: never trust the UI alone — verify again
+    // right before the Firestore write, regardless of how this
+    // function was reached.
+    if (isEdit ? !guardEditPerm() : !guardCreate()) {
+      throw new Error("RBAC_DENIED");
+    }
+
     const employeeId = docId || `EMP${Date.now().toString().slice(-6)}`;
 
     const payload = {
@@ -84,6 +148,11 @@ import {
   }
 
   async function removeEmployee(docId) {
+    // Defense in depth: verify again right before the delete,
+    // regardless of how this function was reached.
+    if (!guardDeletePerm()) {
+      throw new Error("RBAC_DENIED");
+    }
     await deleteDoc(doc(db, "employees", docId));
   }
 
@@ -112,6 +181,17 @@ import {
             (emp.fullName || "E").slice(0, 2),
           )}&background=6c5ce7&color=fff`;
 
+        const editBtn = userCanEdit
+          ? `<button class="row-actions__btn edit" data-action="edit" data-doc-id="${emp.docId}">
+               <i class="ri-pencil-line"></i>
+             </button>`
+          : "";
+        const deleteBtn = userCanDelete
+          ? `<button class="row-actions__btn delete" data-action="delete" data-doc-id="${emp.docId}">
+               <i class="ri-delete-bin-line"></i>
+             </button>`
+          : "";
+
         return `
         <tr data-doc-id="${emp.docId}">
           <td>
@@ -136,12 +216,7 @@ import {
           </td>
           <td>
             <div class="row-actions">
-              <button class="row-actions__btn edit" data-action="edit" data-doc-id="${emp.docId}">
-                <i class="ri-pencil-line"></i>
-              </button>
-              <button class="row-actions__btn delete" data-action="delete" data-doc-id="${emp.docId}">
-                <i class="ri-delete-bin-line"></i>
-              </button>
+              ${editBtn}${deleteBtn}
             </div>
           </td>
         </tr>`;
@@ -165,6 +240,11 @@ import {
      MODAL: ADD / EDIT
   ========================================================= */
   function openEmployeeModal(employee) {
+    // Defense in depth: verify again right before opening,
+    // regardless of how this function was reached.
+    const allowed = employee ? guardEditPerm() : guardCreate();
+    if (!allowed) return;
+
     const overlay = $("#employeeModalOverlay");
     const title = $("#employeeModalTitle");
     const saveBtnText = $("#saveEmployeeBtnText");
@@ -196,9 +276,10 @@ import {
   }
 
   function setupEmployeeModal() {
-    $("#openAddEmployeeBtn")?.addEventListener("click", () =>
-      openEmployeeModal(null),
-    );
+    $("#openAddEmployeeBtn")?.addEventListener("click", () => {
+      if (!guardCreate()) return;
+      openEmployeeModal(null);
+    });
     $("#closeEmployeeModalBtn")?.addEventListener("click", closeEmployeeModal);
     $("#cancelEmployeeFormBtn")?.addEventListener("click", closeEmployeeModal);
 
@@ -208,6 +289,8 @@ import {
 
     $("#employeeForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      if (editingDocId ? !guardEditPerm() : !guardCreate()) return;
 
       const formData = {
         fullName: $("#empFullName").value.trim(),
@@ -247,8 +330,10 @@ import {
         allEmployees = await fetchEmployees();
         renderTable(allEmployees);
       } catch (error) {
-        console.error("Failed to save employee:", error);
-        showToast("error", "Could not save employee. Please try again.");
+        if (error.message !== "RBAC_DENIED") {
+          console.error("Failed to save employee:", error);
+          showToast("error", "Could not save employee. Please try again.");
+        }
       } finally {
         saveBtn.disabled = false;
       }
@@ -259,6 +344,10 @@ import {
      MODAL: DELETE CONFIRM
   ========================================================= */
   function openDeleteModal(docId, name) {
+    // Defense in depth: verify again right before opening,
+    // regardless of how this function was reached.
+    if (!guardDeletePerm()) return;
+
     pendingDeleteId = docId;
     $("#deleteEmployeeName").textContent = name || "this employee";
     $("#deleteModalOverlay")?.classList.add("show");
@@ -279,6 +368,7 @@ import {
 
     $("#confirmDeleteBtn")?.addEventListener("click", async () => {
       if (!pendingDeleteId) return;
+      if (!guardDeletePerm()) return;
 
       try {
         await removeEmployee(pendingDeleteId);
@@ -287,8 +377,10 @@ import {
         allEmployees = await fetchEmployees();
         applySearchFilter($("#employeeSearchInput")?.value || "");
       } catch (error) {
-        console.error("Failed to delete employee:", error);
-        showToast("error", "Could not remove employee. Please try again.");
+        if (error.message !== "RBAC_DENIED") {
+          console.error("Failed to delete employee:", error);
+          showToast("error", "Could not remove employee. Please try again.");
+        }
       }
     });
   }
@@ -309,8 +401,10 @@ import {
       if (!employee) return;
 
       if (btn.dataset.action === "edit") {
+        if (!guardEditPerm()) return;
         openEmployeeModal(employee);
       } else if (btn.dataset.action === "delete") {
+        if (!guardDeletePerm()) return;
         openDeleteModal(docId, employee.fullName);
       }
     });
@@ -331,17 +425,50 @@ import {
   function handleQueryParams() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("action") === "add") {
+      if (!guardCreate()) return;
       openEmployeeModal(null);
     }
+  }
+
+  /* =========================================================
+     RBAC UI ENFORCEMENT
+     ----------------------------------------------------------
+     Hides (not disables) the Add Employee trigger when the
+     current role cannot create. Row-level Edit/Delete buttons
+     are already omitted at render time in renderTable().
+  ========================================================= */
+  function applyAccessControlToUI() {
+    const addBtn = $("#openAddEmployeeBtn");
+    if (addBtn) addBtn.hidden = !userCanCreate;
   }
 
   /* =========================================================
      INIT
   ========================================================= */
   async function init() {
-    showSkeleton("empSkeleton", "empContent");
+    const currentUser = await guardAndLoadUser();
 
-    await guardAndLoadUser();
+    const allowedToView = canView(MODULES.EMPLOYEES);
+    debugLog("view", allowedToView);
+    console.log(
+      `[RBAC][Employees] currentRole="${currentUser?.role || "unknown"}"`,
+    );
+
+    if (!allowedToView) {
+      // Route Guard is expected to have already redirected an
+      // Employee-role user before this page ever loads. This is
+      // a defensive second check: stop here, load nothing, render
+      // nothing, and bounce to a safe page.
+      showToast("error", "Access Denied — you don't have permission.");
+      window.location.href = "./dashboard.html";
+      return;
+    }
+
+    userCanCreate = canCreate(MODULES.EMPLOYEES);
+    userCanEdit = canEdit(MODULES.EMPLOYEES);
+    userCanDelete = canDelete(MODULES.EMPLOYEES);
+
+    showSkeleton("empSkeleton", "empContent");
 
     renderNav();
     setupUserMenu();
@@ -350,6 +477,7 @@ import {
     setupDeleteModal();
     setupTableActions();
     setupSearch();
+    applyAccessControlToUI();
 
     allEmployees = await fetchEmployees();
     renderTable(allEmployees);
