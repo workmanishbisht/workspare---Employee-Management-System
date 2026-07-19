@@ -37,7 +37,8 @@ import {
 ========================================================== */
 
 const DASHBOARD_PATH = "./pages/dashboard.html";
-const ADMIN_ROLE = "admin";
+const DEFAULT_SOCIAL_ROLE = "employee";
+const VALID_ROLES = ["admin", "hr", "manager", "employee"];
 
 /* ==========================================================
    DOM ELEMENTS
@@ -55,10 +56,14 @@ const signupPasswordInput = document.getElementById("signupPasswordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
 const companyInput = document.getElementById("companyInput");
 const roleSelect = document.getElementById("roleSelect");
+
+// Role selection is required for multi-role signup — make sure it is
+// visible and enforced (a previous version of this file hid it and
+// force-assigned "admin" to every account).
 if (roleSelect) {
   const roleField = roleSelect.closest(".form-group") || roleSelect;
-  roleField.style.display = "none";
-  roleSelect.removeAttribute("required");
+  roleField.style.display = "";
+  roleSelect.setAttribute("required", "required");
 }
 
 const forgotForm = document.getElementById("forgotForm");
@@ -93,6 +98,114 @@ function showToast(type, message) {
 }
 
 /* ==========================================================
+   BUTTON LOADING / DOUBLE-SUBMIT PROTECTION
+========================================================== */
+
+function setButtonLoading(button, isLoading, loadingText = "Please wait...") {
+  if (!button) return;
+
+  if (isLoading) {
+    if (!button.dataset.originalText) {
+      button.dataset.originalText = button.innerHTML;
+    }
+    button.disabled = true;
+    button.classList.add("is-loading");
+    button.innerHTML = loadingText;
+  } else {
+    button.disabled = false;
+    button.classList.remove("is-loading");
+    if (button.dataset.originalText) {
+      button.innerHTML = button.dataset.originalText;
+    }
+  }
+}
+
+function getSubmitButton(form) {
+  return form ? form.querySelector('button[type="submit"]') : null;
+}
+
+/* ==========================================================
+   VALIDATION HELPERS
+========================================================== */
+
+function validateFullName(name) {
+  if (!name) {
+    return { valid: false, message: "Full name is required." };
+  }
+  if (name.length < 3 || name.length > 50) {
+    return {
+      valid: false,
+      message: "Full name must be between 3 and 50 characters.",
+    };
+  }
+  if (!/^[A-Za-z\s]+$/.test(name)) {
+    return {
+      valid: false,
+      message: "Full name can only contain letters and spaces.",
+    };
+  }
+  return { valid: true, message: "" };
+}
+
+function validateEmail(email) {
+  if (!email) {
+    return { valid: false, message: "Email is required." };
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { valid: false, message: "Invalid email address." };
+  }
+  return { valid: true, message: "" };
+}
+
+function validatePassword(password) {
+  if (!password) {
+    return { valid: false, message: "Password is required." };
+  }
+  if (password.length < 8 || password.length > 32) {
+    return {
+      valid: false,
+      message: "Password must be between 8 and 32 characters.",
+    };
+  }
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/;
+  if (!strongPasswordRegex.test(password)) {
+    return {
+      valid: false,
+      message:
+        "Password must contain at least one uppercase, one lowercase, one number and one special character.",
+    };
+  }
+  return { valid: true, message: "" };
+}
+
+function validateConfirmPassword(password, confirmPassword) {
+  if (!confirmPassword) {
+    return { valid: false, message: "Please confirm your password." };
+  }
+  if (password !== confirmPassword) {
+    return { valid: false, message: "Passwords do not match." };
+  }
+  return { valid: true, message: "" };
+}
+
+function validateRole(role) {
+  if (!role) {
+    return { valid: false, message: "Role is required." };
+  }
+  if (!VALID_ROLES.includes(role)) {
+    return { valid: false, message: "Please select a valid role." };
+  }
+  return { valid: true, message: "" };
+}
+
+function sanitizeCompany(company) {
+  const trimmed = (company || "").trim();
+  return trimmed.slice(0, 100);
+}
+
+/* ==========================================================
    MICROSOFT PROFILE PHOTO (via Microsoft Graph API)
 ========================================================== */
 
@@ -124,10 +237,18 @@ async function fetchMicrosoftPhoto(accessToken) {
 }
 
 /* ==========================================================
-   FIRESTORE USER HELPER (Admin-only, dev phase)
+   FIRESTORE USER HELPER (multi-role)
+
+   Behavior:
+   - If the user document already exists, role is NEVER included
+     in the update payload, so it can never be overwritten on
+     login or on a repeat social sign-in.
+   - If the user document does not exist yet, it is created with
+     the role supplied in extraData.role (signup flow), falling
+     back to "employee" for brand-new social logins.
 ========================================================== */
 
-async function createOrUpdateAdminUser(user, provider, extraData = {}) {
+async function createOrUpdateUser(user, provider, extraData = {}) {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
@@ -136,30 +257,36 @@ async function createOrUpdateAdminUser(user, provider, extraData = {}) {
 
     if (userSnap.exists()) {
       const updatePayload = {
-        role: ADMIN_ROLE,
         updatedAt: serverTimestamp(),
+        emailVerified: user.emailVerified,
       };
 
       if (resolvedPhotoURL) {
         updatePayload.photoURL = resolvedPhotoURL;
       }
 
+      // Role is intentionally omitted here — existing role is preserved.
       await setDoc(userRef, updatePayload, { merge: true });
-      return;
+      return userSnap.data().role;
     }
+
+    const roleToSave = (extraData.role || DEFAULT_SOCIAL_ROLE).toLowerCase();
 
     await setDoc(userRef, {
       uid: user.uid,
       fullName: extraData.fullName || user.displayName || "",
       email: user.email || "",
-      photoURL: resolvedPhotoURL,
-      provider,
-      role: ADMIN_ROLE,
+      role: roleToSave,
       company: extraData.company || "",
+      provider,
+      status: "Active",
+      photoURL: resolvedPhotoURL,
       emailVerified: user.emailVerified,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+
+    return roleToSave;
   } catch (error) {
     console.error("Firestore Error:", error);
 
@@ -168,6 +295,8 @@ async function createOrUpdateAdminUser(user, provider, extraData = {}) {
     } else {
       showToast("error", "Unable to save user data.");
     }
+
+    throw error;
   }
 }
 
@@ -203,10 +332,19 @@ if (loginForm) {
     const email = loginEmail.value.trim();
     const password = loginPassword.value;
 
-    if (!email || !password) {
-      showToast("error", "Please enter email and password.");
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.valid) {
+      showToast("error", emailCheck.message);
       return;
     }
+
+    if (!password) {
+      showToast("error", "Password is required.");
+      return;
+    }
+
+    const submitBtn = getSubmitButton(loginForm);
+    setButtonLoading(submitBtn, true, "Logging in...");
 
     try {
       await setPersistence(
@@ -229,7 +367,8 @@ if (loginForm) {
         return;
       }
 
-      await createOrUpdateAdminUser(user, "email");
+      // Role is read from Firestore and never overwritten here.
+      await createOrUpdateUser(user, "email");
 
       showToast("success", "Login Successful");
       goToDashboard();
@@ -258,12 +397,14 @@ if (loginForm) {
       }
 
       showToast("error", message);
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   });
 }
 
 /* ==========================================================
-   EMAIL SIGNUP (Admin-only)
+   EMAIL SIGNUP (multi-role)
 ========================================================== */
 
 if (signupForm) {
@@ -274,22 +415,43 @@ if (signupForm) {
     const email = signupEmailInput.value.trim();
     const password = signupPasswordInput.value;
     const confirmPassword = confirmPasswordInput.value;
-    const company = companyInput ? companyInput.value.trim() : "";
+    const company = sanitizeCompany(companyInput ? companyInput.value : "");
+    const selectedRole = roleSelect
+      ? roleSelect.value.trim().toLowerCase()
+      : "";
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      showToast("error", "Please fill all required fields.");
+    const nameCheck = validateFullName(fullName);
+    if (!nameCheck.valid) {
+      showToast("error", nameCheck.message);
       return;
     }
 
-    if (password.length < 6) {
-      showToast("error", "Password must be at least 6 characters.");
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.valid) {
+      showToast("error", emailCheck.message);
       return;
     }
 
-    if (password !== confirmPassword) {
-      showToast("error", "Passwords do not match.");
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
+      showToast("error", passwordCheck.message);
       return;
     }
+
+    const confirmCheck = validateConfirmPassword(password, confirmPassword);
+    if (!confirmCheck.valid) {
+      showToast("error", confirmCheck.message);
+      return;
+    }
+
+    const roleCheck = validateRole(selectedRole);
+    if (!roleCheck.valid) {
+      showToast("error", roleCheck.message);
+      return;
+    }
+
+    const submitBtn = getSubmitButton(signupForm);
+    setButtonLoading(submitBtn, true, "Creating account...");
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -299,7 +461,13 @@ if (signupForm) {
       );
       const user = userCredential.user;
 
-      await createOrUpdateAdminUser(user, "email", { fullName, company });
+      // Selected role is saved as-is and is never forced to "admin".
+      await createOrUpdateUser(user, "email", {
+        fullName,
+        company,
+        role: selectedRole,
+      });
+
       await sendEmailVerification(user);
 
       showToast(
@@ -336,15 +504,19 @@ if (signupForm) {
       }
 
       showToast("error", message);
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   });
 }
 
 /* ==========================================================
-   GOOGLE & MICROSOFT AUTHENTICATION (Admin-only)
+   GOOGLE & MICROSOFT AUTHENTICATION (multi-role)
 ========================================================== */
 
-async function socialLogin(provider, providerName) {
+async function socialLogin(provider, providerName, triggerButton) {
+  setButtonLoading(triggerButton, true, "Connecting...");
+
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
@@ -358,7 +530,12 @@ async function socialLogin(provider, providerName) {
       if (graphPhoto) photoURL = graphPhoto;
     }
 
-    await createOrUpdateAdminUser(user, providerName, { photoURL });
+    // Existing users keep their stored role. Brand-new social users
+    // default to "employee" unless the application supplies another role.
+    await createOrUpdateUser(user, providerName, {
+      photoURL,
+      role: DEFAULT_SOCIAL_ROLE,
+    });
 
     showToast("success", `${providerName} Login Successful`);
     goToDashboard();
@@ -385,21 +562,25 @@ async function socialLogin(provider, providerName) {
     }
 
     showToast("error", error.message);
+  } finally {
+    setButtonLoading(triggerButton, false);
   }
 }
 
 googleButtons.forEach((button) => {
-  button.addEventListener("click", () => socialLogin(googleProvider, "Google"));
+  button.addEventListener("click", () =>
+    socialLogin(googleProvider, "Google", button),
+  );
 });
 
 microsoftButtons.forEach((button) => {
   button.addEventListener("click", () =>
-    socialLogin(microsoftProvider, "Microsoft"),
+    socialLogin(microsoftProvider, "Microsoft", button),
   );
 });
 
 /* ==========================================================
-   REDIRECT RESULT (Admin-only)
+   REDIRECT RESULT (multi-role)
 ========================================================== */
 
 async function checkRedirectLogin() {
@@ -419,7 +600,10 @@ async function checkRedirectLogin() {
       if (graphPhoto) photoURL = graphPhoto;
     }
 
-    await createOrUpdateAdminUser(result.user, providerName, { photoURL });
+    await createOrUpdateUser(result.user, providerName, {
+      photoURL,
+      role: DEFAULT_SOCIAL_ROLE,
+    });
 
     showToast("success", "Login Successful");
     goToDashboard();
@@ -441,10 +625,14 @@ if (forgotForm) {
 
     const email = forgotEmailInput.value.trim();
 
-    if (!email) {
-      showToast("error", "Please enter your email.");
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.valid) {
+      showToast("error", emailCheck.message);
       return;
     }
+
+    const submitBtn = getSubmitButton(forgotForm);
+    setButtonLoading(submitBtn, true, "Sending...");
 
     try {
       await sendPasswordResetEmail(auth, email);
@@ -466,6 +654,8 @@ if (forgotForm) {
       }
 
       showToast("error", message);
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   });
 }

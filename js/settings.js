@@ -26,6 +26,11 @@ import {
   setupSidebarToggle,
 } from "../js/layout.js";
 
+/* ==========================================================
+   RBAC IMPORTS — consume existing permission system only
+========================================================== */
+import { canView, canEdit, MODULES } from "../js/permissions.js";
+
 (function () {
   "use strict";
 
@@ -261,6 +266,26 @@ import {
   let generatedKeyValue = null;
 
   /* =========================================================
+     RBAC STATE
+     ----------------------------------------------------------
+     hasEditAccess is resolved once in init() from the existing
+     permissions.js (canEdit(MODULES.SETTINGS)) and reused by
+     every render/action function below — no permission logic
+     is duplicated here, only consumed.
+  ========================================================= */
+  let hasEditAccess = false;
+
+  function guardEdit() {
+    if (hasEditAccess) return true;
+    showToast("error", "Access Denied");
+    return false;
+  }
+
+  function denyAccessRedirect() {
+    window.location.href = "./dashboard.html";
+  }
+
+  /* =========================================================
      HELPERS
   ========================================================= */
   const escapeHtml = (str) =>
@@ -331,11 +356,19 @@ import {
   ========================================================= */
   async function init() {
     currentUser = await guardAndLoadUser();
+
+    if (!canView(MODULES.SETTINGS)) {
+      denyAccessRedirect();
+      return;
+    }
+    hasEditAccess = canEdit(MODULES.SETTINGS);
+
     renderNav();
     setupUserMenu();
     setupSidebarToggle();
 
     wireUI();
+    applyReadOnlyMode();
     loadFormConfig("general");
     loadRoles();
     loadApiKeys();
@@ -346,6 +379,38 @@ import {
   }
 
   document.addEventListener("DOMContentLoaded", init);
+
+  /* =========================================================
+     RBAC UI ENFORCEMENT
+     ----------------------------------------------------------
+     Runs once after wireUI(). View-only users get every write
+     trigger HIDDEN (not just disabled) and every input/select/
+     textarea/switch in the settings panels DISABLED.
+  ========================================================= */
+  function applyReadOnlyMode() {
+    if (hasEditAccess) return;
+
+    [
+      "saveChangesBtn",
+      "resetChangesBtn",
+      "exportSettingsBtn",
+      "addRoleBtn",
+      "emptyRoleAddBtn",
+      "generateKeyBtn",
+      "backupNowBtn",
+      "restoreBackupBtn",
+      "uploadLogoBtn",
+    ].forEach((id) => {
+      const el = $(`#${id}`);
+      if (el) el.hidden = true;
+    });
+
+    $$(
+      ".settings-panel input, .settings-panel select, .settings-panel textarea",
+    ).forEach((el) => {
+      el.disabled = true;
+    });
+  }
 
   /* =========================================================
      TAB SWITCHING
@@ -375,6 +440,7 @@ import {
         if (!el) return;
         if (el.type === "checkbox") el.checked = !!data[dataKey];
         else el.value = data[dataKey] ?? "";
+        el.disabled = !hasEditAccess;
       });
     } catch (error) {
       console.error(`Failed to load ${tab} settings:`, error);
@@ -382,6 +448,7 @@ import {
   }
 
   async function saveFormConfig(tab) {
+    if (!guardEdit()) return;
     const config = FORM_CONFIGS[tab];
     if (!config) return;
     const payload = {};
@@ -409,6 +476,7 @@ import {
   }
 
   async function handleSaveChanges() {
+    if (!guardEdit()) return;
     if (FORM_CONFIGS[currentTab]) {
       await saveFormConfig(currentTab);
       return;
@@ -421,6 +489,7 @@ import {
   }
 
   function handleResetChanges() {
+    if (!guardEdit()) return;
     if (FORM_CONFIGS[currentTab]) {
       loadFormConfig(currentTab);
       showToast("success", "Changes reset.");
@@ -450,12 +519,17 @@ import {
       }
       $("#compactMode").checked = !!data.compactMode;
       $("#animationsEnabled").checked = data.animationsEnabled !== false;
+
+      $$(
+        'input[name="themeOption"], input[name="primaryColor"], #compactMode, #animationsEnabled',
+      ).forEach((el) => (el.disabled = !hasEditAccess));
     } catch (error) {
       console.error("Failed to load appearance:", error);
     }
   }
 
   async function saveAppearance() {
+    if (!guardEdit()) return;
     const payload = {
       theme: $("input[name='themeOption']:checked")?.value || "light",
       primaryColor: $("input[name='primaryColor']:checked")?.value || "#6c5ce7",
@@ -530,10 +604,14 @@ import {
         <td>${r.usersCount || 0}</td>
         <td><span class="status-badge status-badge--${(r.status || "active").toLowerCase()}">${escapeHtml(r.status || "Active")}</span></td>
         <td class="col-actions">
-          <div class="row-actions">
+          ${
+            hasEditAccess
+              ? `<div class="row-actions">
             <button class="row-action-btn" data-edit-role="${r.id}" title="Edit"><i class="ri-pencil-line"></i></button>
             <button class="row-action-btn danger" data-delete-role="${r.id}" title="Delete"><i class="ri-delete-bin-line"></i></button>
-          </div>
+          </div>`
+              : ""
+          }
         </td>
       </tr>`,
       )
@@ -554,6 +632,7 @@ import {
   }
 
   function openRoleModal(id = null) {
+    if (!guardEdit()) return;
     editingRoleId = id;
     $("#roleForm").reset();
     $$("#rolePermissionsGrid input[type=checkbox]").forEach(
@@ -582,6 +661,7 @@ import {
 
   async function handleRoleSubmit(e) {
     e.preventDefault();
+    if (!guardEdit()) return;
     const name = $("#roleNameInput").value.trim();
     if (!name) return;
 
@@ -628,6 +708,7 @@ import {
      GENERIC DELETE MODAL (roles, templates)
   ========================================================= */
   function openDeleteModal(type, id, label) {
+    if (!guardEdit()) return;
     pendingDelete = { type, id };
     $("#deleteTargetName").textContent = label || "this item";
     $("#deleteModalTitle").textContent =
@@ -640,6 +721,7 @@ import {
   }
 
   async function confirmDelete() {
+    if (!guardEdit()) return;
     if (!pendingDelete) return;
     const { type, id } = pendingDelete;
     try {
@@ -697,8 +779,12 @@ import {
         </div>
         <div class="api-key-actions">
           <button class="icon-btn-sm" data-copy-key="${k.id}" title="Copy"><i class="ri-file-copy-line"></i></button>
-          <button class="icon-btn-sm" data-regen-key="${k.id}" title="Regenerate"><i class="ri-refresh-line"></i></button>
-          <button class="icon-btn-sm" data-revoke-key="${k.id}" title="Revoke"><i class="ri-forbid-line"></i></button>
+          ${
+            hasEditAccess
+              ? `<button class="icon-btn-sm" data-regen-key="${k.id}" title="Regenerate"><i class="ri-refresh-line"></i></button>
+          <button class="icon-btn-sm" data-revoke-key="${k.id}" title="Revoke"><i class="ri-forbid-line"></i></button>`
+              : ""
+          }
         </div>
       </div>`,
       )
@@ -721,6 +807,7 @@ import {
   }
 
   async function regenerateKey(id) {
+    if (!guardEdit()) return;
     try {
       const newKey = genKey();
       await updateDoc(doc(db, "apiKeys", id), {
@@ -737,6 +824,7 @@ import {
   }
 
   async function revokeKey(id) {
+    if (!guardEdit()) return;
     try {
       await updateDoc(doc(db, "apiKeys", id), {
         revoked: true,
@@ -751,6 +839,7 @@ import {
   }
 
   function openApiKeyModal() {
+    if (!guardEdit()) return;
     generatedKeyValue = null;
     $("#apiKeyNameInput").value = "";
     $("#generatedKeyWrap").hidden = true;
@@ -761,6 +850,7 @@ import {
   }
 
   async function handleGenerateKey() {
+    if (!guardEdit()) return;
     const name = $("#apiKeyNameInput").value.trim();
     if (!name) {
       showToast("error", "Please name your key.");
@@ -814,6 +904,7 @@ import {
   }
 
   async function seedDefaultTemplates() {
+    if (!hasEditAccess) return;
     try {
       await Promise.all(
         DEFAULT_TEMPLATES.map((t) =>
@@ -848,10 +939,14 @@ import {
         <td><span class="status-badge status-badge--${(t.status || "active").toLowerCase()}">${escapeHtml(t.status || "Active")}</span></td>
         <td>${formatDate(t.updatedAt || t.createdAt)}</td>
         <td class="col-actions">
-          <div class="row-actions">
+          ${
+            hasEditAccess
+              ? `<div class="row-actions">
             <button class="row-action-btn" data-edit-template="${t.id}" title="Edit"><i class="ri-pencil-line"></i></button>
             <button class="row-action-btn danger" data-delete-template="${t.id}" title="Delete"><i class="ri-delete-bin-line"></i></button>
-          </div>
+          </div>`
+              : ""
+          }
         </td>
       </tr>`,
       )
@@ -874,6 +969,7 @@ import {
   }
 
   function openTemplateModal(id) {
+    if (!guardEdit()) return;
     editingTemplateId = id;
     const t = templates.find((x) => x.id === id);
     if (!t) return;
@@ -892,6 +988,7 @@ import {
 
   async function handleTemplateSubmit(e) {
     e.preventDefault();
+    if (!guardEdit()) return;
     if (!editingTemplateId) return;
     const payload = {
       name: $("#templateNameInput").value.trim(),
@@ -944,7 +1041,7 @@ import {
       <div class="integration-row">
         <div class="integration-icon" style="background:${i.color}"><i class="${i.icon}"></i></div>
         <div class="integration-info"><div class="integration-name">${escapeHtml(i.name)}</div><div class="integration-desc">${escapeHtml(i.desc)}</div></div>
-        <label class="switch"><input type="checkbox" data-integration="${i.key}" ${i.connected ? "checked" : ""} /><span class="switch-slider"></span></label>
+        <label class="switch"><input type="checkbox" data-integration="${i.key}" ${i.connected ? "checked" : ""} ${hasEditAccess ? "" : "disabled"} /><span class="switch-slider"></span></label>
       </div>`,
       )
       .join("");
@@ -957,6 +1054,7 @@ import {
   }
 
   async function toggleIntegration(key, connected) {
+    if (!guardEdit()) return;
     try {
       await setDoc(
         doc(db, "integrations", key),
@@ -981,6 +1079,7 @@ import {
      BACKUP & RESTORE
   ========================================================= */
   async function backupNow() {
+    if (!guardEdit()) return;
     try {
       const collections = [
         "settings",
@@ -1037,6 +1136,7 @@ import {
   }
 
   function openRestoreModal() {
+    if (!guardEdit()) return;
     $("#restoreFileInput").value = "";
     $("#restoreModalOverlay").hidden = false;
   }
@@ -1045,6 +1145,7 @@ import {
   }
 
   async function handleRestore() {
+    if (!guardEdit()) return;
     const file = $("#restoreFileInput").files[0];
     if (!file) {
       showToast("error", "Please choose a backup file.");
@@ -1245,6 +1346,7 @@ import {
      EXPORT SETTINGS (header action)
   ========================================================= */
   async function exportAllSettings() {
+    if (!guardEdit()) return;
     await backupNow();
   }
 
@@ -1256,8 +1358,12 @@ import {
     const input = $("#logoFileInput");
     const preview = $("#logoPreview");
     if (!btn || !input) return;
-    btn.addEventListener("click", () => input.click());
+    btn.addEventListener("click", () => {
+      if (!guardEdit()) return;
+      input.click();
+    });
     input.addEventListener("change", () => {
+      if (!guardEdit()) return;
       const file = input.files[0];
       if (!file) return;
       const reader = new FileReader();

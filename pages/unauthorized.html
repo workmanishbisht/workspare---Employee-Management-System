@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unauthorized · Employee Management System</title>
+
+    <!-- Existing EMS design system (variables, typography, resets) -->
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="../css/unauthorized.css" />
+  </head>
+  <body class="ems-unauthorized">
+    <!-- Ambient gradient background -->
+    <div class="ua-bg" aria-hidden="true">
+      <span class="ua-blob ua-blob--one"></span>
+      <span class="ua-blob ua-blob--two"></span>
+      <span class="ua-blob ua-blob--three"></span>
+      <span class="ua-grid"></span>
+    </div>
+
+    <main class="ua-shell">
+      <!-- Logged-in user chip -->
+      <div class="ua-user" id="uaUser" aria-live="polite">
+        <span class="ua-user__avatar" id="uaUserAvatar">MB</span>
+        <span class="ua-user__meta">
+          <span class="ua-user__name" id="uaUserName">Loading…</span>
+          <span class="ua-user__role" id="uaUserRole">&nbsp;</span>
+        </span>
+      </div>
+
+      <section class="ua-card" role="alert" aria-labelledby="uaTitle">
+        <!-- Illustration -->
+        <div class="ua-illustration" aria-hidden="true">
+          <div class="ua-illustration__glow"></div>
+          <svg
+            class="ua-shield"
+            viewBox="0 0 160 160"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient
+                id="shieldGrad"
+                x1="0"
+                y1="0"
+                x2="160"
+                y2="160"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop offset="0" stop-color="var(--ua-accent-start)" />
+                <stop offset="1" stop-color="var(--ua-accent-end)" />
+              </linearGradient>
+              <linearGradient id="lockGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0.75" />
+              </linearGradient>
+            </defs>
+
+            <path
+              class="ua-shield__body"
+              d="M80 8 L146 32 V78 C146 118 118 146 80 154 C42 146 14 118 14 78 V32 Z"
+              fill="url(#shieldGrad)"
+            />
+            <path
+              d="M80 8 L146 32 V78 C146 118 118 146 80 154 C42 146 14 118 14 78 V32 Z"
+              fill="none"
+              stroke="rgba(255,255,255,0.35)"
+              stroke-width="1.5"
+            />
+
+            <g class="ua-lock">
+              <rect
+                x="60"
+                y="78"
+                width="40"
+                height="32"
+                rx="7"
+                fill="url(#lockGrad)"
+              />
+              <path
+                class="ua-lock__shackle"
+                d="M68 78 V64 a12 12 0 0 1 24 0 V78"
+                stroke="#ffffff"
+                stroke-width="6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="80" cy="93" r="4" fill="var(--ua-accent-start)" />
+              <rect
+                x="78"
+                y="93"
+                width="4"
+                height="9"
+                rx="2"
+                fill="var(--ua-accent-start)"
+              />
+            </g>
+          </svg>
+        </div>
+
+        <p class="ua-code">403</p>
+        <h1 class="ua-title" id="uaTitle">Access Denied</h1>
+        <p class="ua-desc">
+          You don't have permission to access this page.<br
+            class="ua-desc__break"
+          />
+          If you believe this is a mistake, please contact your administrator.
+        </p>
+
+        <!-- Permission detail card -->
+        <div class="ua-permit">
+          <div class="ua-permit__row">
+            <span class="ua-permit__label">Current Role</span>
+            <span class="ua-permit__value" id="uaCurrentRole">HR</span>
+          </div>
+          <div class="ua-permit__divider" aria-hidden="true"></div>
+          <div class="ua-permit__row">
+            <span class="ua-permit__label">Requested Module</span>
+            <span class="ua-permit__value" id="uaRequestedModule">Payroll</span>
+          </div>
+          <div class="ua-permit__divider" aria-hidden="true"></div>
+          <div class="ua-permit__row">
+            <span class="ua-permit__label">Status</span>
+            <span class="ua-permit__value ua-permit__value--denied">
+              <span class="ua-status-dot" aria-hidden="true"></span>
+              Permission Denied
+            </span>
+          </div>
+        </div>
+
+        <div class="ua-actions">
+          <button
+            type="button"
+            class="ua-btn ua-btn--primary"
+            id="uaBackDashboard"
+          >
+            <span class="ua-btn__arrow" aria-hidden="true">&larr;</span>
+            Back to Dashboard
+          </button>
+          <button type="button" class="ua-btn ua-btn--secondary" id="uaGoBack">
+            Go Back
+          </button>
+        </div>
+      </section>
+
+      <p class="ua-footnote">Employee Management System · Error 403</p>
+    </main>
+
+    <!-- script files -->
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module" src="../js/unauthorized.js"></script>
+    <script src="../js/theme.js"></script>
+  </body>
+</html>

@@ -14,6 +14,26 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ==========================================================
+   RBAC IMPORTS
+   ----------------------------------------------------------
+   permissions.js owns all role/permission state and logic.
+   layout.js only feeds it the Firestore role via
+   loadPermissions(uid, role) and consumes its read-only
+   helpers — no permission rules, module lists, or route
+   tables are duplicated here anymore.
+========================================================== */
+import {
+  loadPermissions,
+  getCurrentRole,
+  getAllowedModules,
+  enforceRouteGuard,
+  checkModule,
+  checkPermission,
+  refreshPermissions as rbacRefreshPermissions,
+  MODULE_ROUTES,
+} from "../js/permissions.js";
+
+/* ==========================================================
    CONSTANTS
 ========================================================== */
 export const LOGIN_PATH = "../index.html";
@@ -57,6 +77,19 @@ export const NAV_ITEMS = [
   },
   { label: "Settings", icon: "ri-settings-3-line", href: "./settings.html" },
 ];
+
+/* ==========================================================
+   RBAC: filename -> module key lookup, built from
+   permissions.js's own MODULE_ROUTES so this table only
+   exists once in the whole project.
+========================================================== */
+function moduleKeyForHref(href) {
+  const filename = (href || "").split("/").pop();
+  for (const [moduleKey, files] of Object.entries(MODULE_ROUTES)) {
+    if (files.includes(filename)) return moduleKey;
+  }
+  return null;
+}
 
 /* ==========================================================
    DOM HELPERS
@@ -105,7 +138,6 @@ function writeJSON(storage, key, value) {
 
 /* ==========================================================
    THEME MANAGER
-   ----------------------------------------------------------
 ========================================================== */
 function getStoredTheme() {
   const stored = readStorage(localStorage, THEME_KEY);
@@ -225,6 +257,10 @@ export function toggleSkeleton(skeletonId, contentId, loading) {
 
 /* ==========================================================
    SIDEBAR NAV
+   ----------------------------------------------------------
+   Filters NAV_ITEMS through permissions.js's getAllowedModules(),
+   keyed off the current role permissions.js already holds
+   internally (set by loadPermissions() inside guardAndLoadUser()).
 ========================================================== */
 let navRendered = false;
 
@@ -233,20 +269,36 @@ export function renderNav() {
   if (!list || navRendered) return;
 
   const currentPage = window.location.pathname.split("/").pop();
+  const role = getCurrentRole();
+  const allowedModules = new Set(getAllowedModules(role));
 
-  list.innerHTML = NAV_ITEMS.map((item) => {
-    const itemPage = item.href.split("/").pop();
-    const isActive = item.href !== "#" && itemPage === currentPage;
-    return `
+  const visibleItems = NAV_ITEMS.filter((item) => {
+    const moduleKey = moduleKeyForHref(item.href);
+    if (!moduleKey) return true; // no RBAC mapping for this item -> always show
+    return allowedModules.has(moduleKey);
+  });
+
+  list.innerHTML = visibleItems
+    .map((item) => {
+      const itemPage = item.href.split("/").pop();
+      const isActive = item.href !== "#" && itemPage === currentPage;
+      return `
       <li>
         <a href="${item.href}" class="nav-item${isActive ? " active" : ""}">
           <i class="${item.icon}"></i>
           <span>${item.label}</span>
         </a>
       </li>`;
-  }).join("");
+    })
+    .join("");
 
   navRendered = true;
+  console.log("[RBAC] Current Role:", role);
+  console.log("[RBAC] Allowed Modules:", [...allowedModules]);
+  console.log(
+    "[RBAC] Sidebar Modules:",
+    visibleItems.map((i) => i.label),
+  );
 }
 
 /* ==========================================================
@@ -269,6 +321,13 @@ export function restoreSidebarState() {
 /* ==========================================================
    AUTH GUARD + CURRENT USER (with instant cache)
    ----------------------------------------------------------
+   Flow: Firebase Login -> Firestore User -> Read role ->
+   loadPermissions(uid, role) -> Route Guard -> settle().
+   The session cache is used ONLY to paint the sidebar user-card
+   (name/avatar) instantly — it never drives permissions and
+   never resolves this promise. Firestore's role is always what
+   loadPermissions() receives, and the cache is unconditionally
+   overwritten with that fresh data every time.
 ========================================================== */
 let currentUserData = null;
 let authListenerBound = false;
@@ -363,20 +422,27 @@ export function guardAndLoadUser() {
               return;
             }
 
+            // Cache: paint the user-card instantly, nothing more.
             const cached = readCachedUser(user.uid);
             if (cached) {
               currentUserData = cached;
               applyUserToUI(currentUserData);
-              clearTimeout(timeoutId);
-              settle(currentUserData);
             }
 
+            // Firestore is the single source of truth for role.
             const firestoreData = await fetchFirestoreUser(user.uid);
             const freshUserData = buildUserData(user, firestoreData);
 
             currentUserData = freshUserData;
-            writeCachedUser(freshUserData);
+            writeCachedUser(freshUserData); // always overwritten, never trusted stale
             applyUserToUI(freshUserData);
+
+            await loadPermissions(freshUserData.uid, freshUserData.role);
+
+            if (!enforceRouteGuard()) {
+              clearTimeout(timeoutId);
+              return;
+            }
 
             clearTimeout(timeoutId);
             settle(freshUserData);
@@ -403,6 +469,35 @@ export function guardAndLoadUser() {
   });
 
   return authResolvedPromise;
+}
+
+/* ==========================================================
+   RBAC PUBLIC RE-EXPORTS
+   ----------------------------------------------------------
+   Thin pass-throughs so modules can import these from
+   layout.js alongside everything else. No logic lives here —
+   permissions.js is the only implementation.
+========================================================== */
+export { checkModule, checkPermission, getCurrentRole };
+
+export async function refreshPermissions() {
+  if (!currentUserData?.uid) return getCurrentRole();
+
+  const firestoreData = await fetchFirestoreUser(currentUserData.uid);
+  const updatedRole = firestoreData.role || "Employee";
+
+  currentUserData = { ...currentUserData, role: updatedRole };
+  writeCachedUser(currentUserData);
+
+  await rbacRefreshPermissions(updatedRole);
+
+  navRendered = false;
+  const list = $("#navList");
+  if (list) list.innerHTML = "";
+  renderNav();
+
+  enforceRouteGuard();
+  return getCurrentRole();
 }
 
 /* ==========================================================
@@ -583,15 +678,6 @@ export function setupSidebarToggle() {
 
 /* ==========================================================
    GLOBAL REALTIME NOTIFICATION BADGE
-   ----------------------------------------------------------
-   - Single onSnapshot listener over the "notifications" collection,
-     attached once per page load (guarded against duplicates).
-   - Works globally because layout.js is imported by every module
-     (Dashboard, Employees, Departments, Attendance, Leave, Payroll,
-     Holiday, Documents, Notifications, Help Center, Settings) — no
-     per-page wiring or HTML changes are required.
-   - Reuses the existing #notifBadge element. Does not create a new
-     badge and does not touch page markup or CSS.
 ========================================================== */
 const NOTIF_BADGE_ID = "notifBadge";
 const NOTIFICATIONS_PAGE = "./notifications.html";
@@ -599,12 +685,6 @@ const NOTIFICATIONS_PAGE = "./notifications.html";
 let notifBadgeUnsubscribe = null;
 let notifBellClickBound = false;
 
-/**
- * A notification is "unread" if isRead is explicitly false, OR — for
- * documents created before this upgrade — if the legacy `read` field
- * is falsy. Anything without either field defaults to unread so new
- * notifications are never silently missed.
- */
 function isNotifUnread(data) {
   if (typeof data.isRead === "boolean") return !data.isRead;
   if (typeof data.read === "boolean") return !data.read;
@@ -615,11 +695,6 @@ function isNotifDeleted(data) {
   return data.isDeleted === true;
 }
 
-/**
- * Decides whether a notification is meant for the signed-in user.
- * Supports a single string audience ("All", a role, a department, or
- * a specific uid) as well as an array of audience values.
- */
 function notifMatchesAudience(data, user) {
   const audience = data.audience;
 
@@ -658,9 +733,6 @@ function computeUnreadCount(snapshot, user) {
   return count;
 }
 
-/* ----------------------------------------------------------
-   BADGE RENDER (0 -> hidden, 1-99 -> count, 100+ -> "99+")
----------------------------------------------------------- */
 function renderNotifBadge(count) {
   const badge = document.getElementById(NOTIF_BADGE_ID);
   if (!badge) return;
@@ -681,12 +753,6 @@ function renderNotifBadge(count) {
   badge.removeAttribute("aria-hidden");
 }
 
-/* ----------------------------------------------------------
-   BELL CLICK -> notifications.html
-   Tries common bell wrapper ids/selectors first, then falls back to
-   the closest clickable ancestor of the badge itself, so no HTML
-   needs to be modified to wire this up.
----------------------------------------------------------- */
 function getNotifBellTrigger() {
   const badge = document.getElementById(NOTIF_BADGE_ID);
   return (
@@ -713,10 +779,6 @@ function bindNotifBellClick() {
   });
 }
 
-/* ----------------------------------------------------------
-   ATTACH / TEARDOWN
-   Only one listener is ever created (notifBadgeUnsubscribe guard).
----------------------------------------------------------- */
 function attachNotifBadgeListener(user) {
   if (notifBadgeUnsubscribe) return; // already listening, avoid duplicates
 
@@ -742,10 +804,6 @@ export function teardownNotifBadgeListener() {
   }
 }
 
-/**
- * Public entry point. Safe to call from any page (including
- * notifications.js) — idempotent thanks to the guards above.
- */
 export function initNotificationBadge() {
   bindNotifBellClick();
   guardAndLoadUser()
@@ -755,12 +813,6 @@ export function initNotificationBadge() {
     });
 }
 
-/* ----------------------------------------------------------
-   AUTO-INIT
-   layout.js is imported by every page's controller script, so the
-   badge wires itself up automatically — no changes needed in any
-   other file.
----------------------------------------------------------- */
 if (typeof document !== "undefined" && !window.__hrmsNotifBadgeAutoInit) {
   window.__hrmsNotifBadgeAutoInit = true;
 
