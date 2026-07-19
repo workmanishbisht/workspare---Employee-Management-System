@@ -50,8 +50,11 @@
             aria-expanded="false"
             aria-controls="userMenu"
           >
+            <!-- FIX: was src="{img}" (a literal, invalid URL) — now
+                 starts empty and profile.js sets a real photo or an
+                 initials-avatar fallback before this is ever visible. -->
             <img
-              src="{img}"
+              src=""
               alt="User avatar"
               class="user__avatar"
               id="sidebarAvatar"
@@ -179,8 +182,13 @@
               <!-- Hero card -->
               <section class="card hero-card">
                 <div class="hero-card__photo-wrap">
+                  <!-- FIX: was src={img} (unquoted literal text, not a
+                       real URL) — this is why the photo showed as a
+                       broken image with "Profile photo" alt text. Now
+                       starts empty and profile.js always sets either
+                       the real photoURL or an initials-avatar fallback. -->
                   <img
-                    src={img}
+                    src=""
                     alt="Profile photo"
                     class="hero-card__photo"
                     id="profilePhoto"
@@ -559,6 +567,59 @@
           >
             <i class="ri-save-3-line"></i>
             Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TOGGLE SETTING MODAL (2FA / Email Notifications / Privacy) ============ -->
+    <div class="modal-overlay" id="toggleSettingModalOverlay">
+      <div
+        class="modal modal--sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="toggleSettingTitle"
+      >
+        <div class="modal__head">
+          <h3 id="toggleSettingTitle">
+            <i class="ri-toggle-line" id="toggleSettingIcon"></i>
+            <span id="toggleSettingTitleText">Setting</span>
+          </h3>
+          <button
+            class="icon-btn modal__close"
+            id="closeToggleSettingModal"
+            aria-label="Close"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+
+        <div class="modal__body">
+          <p class="toggle-setting__desc" id="toggleSettingDesc">—</p>
+          <div class="toggle-setting__row">
+            <span id="toggleSettingStateLabel">Disabled</span>
+            <label class="switch">
+              <input type="checkbox" id="toggleSettingInput" />
+              <span class="switch__slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button
+            type="button"
+            class="btn btn--ghost"
+            id="cancelToggleSettingBtn"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn--primary"
+            id="saveToggleSettingBtn"
+          >
+            <i class="ri-save-3-line"></i>
+            Save
           </button>
         </div>
       </div>

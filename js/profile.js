@@ -68,8 +68,49 @@ import {
     employee: "Employee",
   };
 
+  /* =========================================================
+     TOGGLE SETTING DEFINITIONS
+     ----------------------------------------------------------
+     Drives the "Two-Factor Authentication" / "Email Notifications"
+     / "Privacy Settings" rows in Account Settings. Each maps a
+     settings-list action to the Firestore field it reads/writes,
+     plus the copy shown in the toggle modal — one generic modal,
+     three real, persisted settings instead of "coming soon" toasts.
+  ========================================================= */
+  const TOGGLE_SETTINGS = {
+    "2fa": {
+      icon: "ri-shield-keyhole-line",
+      title: "Two-Factor Authentication",
+      description:
+        "Require a verification code in addition to your password when signing in.",
+      field: "twoFactorEnabled",
+      onLabel: "Enabled",
+      offLabel: "Disabled",
+    },
+    notifications: {
+      icon: "ri-mail-settings-line",
+      title: "Email Notifications",
+      description:
+        "Receive email updates about leave approvals, payroll, holidays and announcements.",
+      field: "emailNotificationsEnabled",
+      onLabel: "Enabled",
+      offLabel: "Disabled",
+      defaultValue: true,
+    },
+    privacy: {
+      icon: "ri-eye-off-line",
+      title: "Privacy Settings",
+      description:
+        "When enabled, other employees can only see your name and department — not your contact details.",
+      field: "profilePrivate",
+      onLabel: "Private",
+      offLabel: "Public",
+    },
+  };
+
   let currentUid = null;
   let currentUser = {};
+  let activeToggleKey = null;
 
   /* =========================================================
      FIRESTORE: LOAD / SAVE
@@ -98,6 +139,30 @@ import {
       showToast("error", "Could not save your changes.");
       return false;
     }
+  }
+
+  /* =========================================================
+     AVATAR FALLBACK
+     ----------------------------------------------------------
+     Every <img> that shows the user's photo now always gets a
+     real, valid src — either the uploaded photoURL, or a
+     generated initials avatar. Nothing is ever left pointing at
+     a placeholder/broken URL.
+  ========================================================= */
+  function buildInitialsAvatar(name) {
+    const initials = encodeURIComponent((name || "U").trim().slice(0, 2));
+    return `https://ui-avatars.com/api/?name=${initials}&background=6c5ce7&color=fff&bold=true`;
+  }
+
+  function setAvatarSrc(imgEl, photoURL, fallbackName) {
+    if (!imgEl) return;
+    const fallback = buildInitialsAvatar(fallbackName);
+    imgEl.referrerPolicy = "no-referrer";
+    imgEl.onerror = () => {
+      imgEl.onerror = null;
+      imgEl.src = fallback;
+    };
+    imgEl.src = photoURL || fallback;
   }
 
   /* =========================================================
@@ -190,13 +255,13 @@ import {
     }
     if (verifiedEl) verifiedEl.style.display = user.emailVerified ? "" : "none";
 
-    const photoSrc = user.photoURL || "";
-    if (photoEl && photoSrc) photoEl.src = photoSrc;
-
-    const sidebarAvatar = $("#sidebarAvatar");
-    const topbarAvatar = $("#topbarAvatar");
-    if (sidebarAvatar && photoSrc) sidebarAvatar.src = photoSrc;
-    if (topbarAvatar && photoSrc) topbarAvatar.src = photoSrc;
+    // FIX: previously only set when photoSrc was truthy, leaving the
+    // HTML's literal `src={img}` placeholder in place otherwise. Now
+    // every avatar always gets either the real photo or a generated
+    // initials fallback.
+    setAvatarSrc($("#profilePhoto"), user.photoURL, fullName);
+    setAvatarSrc($("#sidebarAvatar"), user.photoURL, fullName);
+    setAvatarSrc($("#topbarAvatar"), user.photoURL, fullName);
 
     const sidebarName = $("#sidebarUserName");
     const sidebarRole = $("#sidebarUserRole");
@@ -306,10 +371,28 @@ import {
 
   /* =========================================================
      RENDER: ACCOUNT SETTINGS LIST
+     ----------------------------------------------------------
+     2FA, Email Notifications, and Privacy Settings each read
+     their live value straight off `user` and show a real
+     Enabled/Disabled (or Private/Public) chip — not a static
+     placeholder — driven by TOGGLE_SETTINGS above.
   ========================================================= */
   function renderSettingsList(user) {
     const list = $("#settingsList");
     if (!list) return;
+
+    const toggleChip = (key) => {
+      const cfg = TOGGLE_SETTINGS[key];
+      const value = user[cfg.field] ?? cfg.defaultValue ?? false;
+      return {
+        chip: value ? cfg.onLabel : cfg.offLabel,
+        chipClass: value ? "chip-enabled" : "chip-disabled",
+      };
+    };
+
+    const twoFa = toggleChip("2fa");
+    const notif = toggleChip("notifications");
+    const privacy = toggleChip("privacy");
 
     const items = [
       {
@@ -318,17 +401,26 @@ import {
         action: "password",
       },
       {
-        icon: "ri-shield-keyhole-line",
-        label: "Two-Factor Authentication",
+        icon: TOGGLE_SETTINGS["2fa"].icon,
+        label: TOGGLE_SETTINGS["2fa"].title,
         action: "2fa",
-        chip: user.twoFactorEnabled ? "Enabled" : null,
+        chip: twoFa.chip,
+        chipClass: twoFa.chipClass,
       },
       {
-        icon: "ri-mail-settings-line",
-        label: "Email Notifications",
+        icon: TOGGLE_SETTINGS.notifications.icon,
+        label: TOGGLE_SETTINGS.notifications.title,
         action: "notifications",
+        chip: notif.chip,
+        chipClass: notif.chipClass,
       },
-      { icon: "ri-eye-off-line", label: "Privacy Settings", action: "privacy" },
+      {
+        icon: TOGGLE_SETTINGS.privacy.icon,
+        label: TOGGLE_SETTINGS.privacy.title,
+        action: "privacy",
+        chip: privacy.chip,
+        chipClass: privacy.chipClass,
+      },
       {
         icon: "ri-delete-bin-6-line",
         label: "Delete Account",
@@ -344,7 +436,7 @@ import {
         <button class="settings-list__item ${it.danger ? "settings-list__item--danger" : ""}" data-settings-action="${it.action}">
           <i class="${it.icon}"></i>
           <span>${it.label}</span>
-          ${it.chip ? `<span class="chip-enabled">${it.chip}</span>` : ""}
+          ${it.chip ? `<span class="${it.chipClass}">${it.chip}</span>` : ""}
           <i class="ri-arrow-right-s-line"></i>
         </button>
       </li>`,
@@ -365,6 +457,10 @@ import {
     }
     if (action === "delete") {
       openDeleteModal();
+      return;
+    }
+    if (TOGGLE_SETTINGS[action]) {
+      openToggleSettingModal(action);
       return;
     }
     showToast("success", "This setting is coming soon.");
@@ -533,6 +629,107 @@ import {
   }
 
   /* =========================================================
+     TOGGLE SETTING MODAL (2FA / Email Notifications / Privacy)
+     ----------------------------------------------------------
+     One generic modal reused for all three, driven entirely by
+     TOGGLE_SETTINGS[action]. Saving writes the real field to
+     the user's Firestore document and re-renders the settings
+     list so the chip updates immediately.
+  ========================================================= */
+  function openToggleSettingModal(action) {
+    const cfg = TOGGLE_SETTINGS[action];
+    if (!cfg) return;
+    activeToggleKey = action;
+
+    const overlay = $("#toggleSettingModalOverlay");
+    const icon = $("#toggleSettingIcon");
+    const titleText = $("#toggleSettingTitleText");
+    const desc = $("#toggleSettingDesc");
+    const input = $("#toggleSettingInput");
+    const stateLabel = $("#toggleSettingStateLabel");
+    if (!overlay) return;
+
+    const currentValue = currentUser[cfg.field] ?? cfg.defaultValue ?? false;
+
+    icon.className = cfg.icon;
+    titleText.textContent = cfg.title;
+    desc.textContent = cfg.description;
+    input.checked = currentValue;
+    stateLabel.textContent = currentValue ? cfg.onLabel : cfg.offLabel;
+
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeToggleSettingModal() {
+    const overlay = $("#toggleSettingModalOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+    activeToggleKey = null;
+  }
+
+  async function handleSaveToggleSetting() {
+    if (!activeToggleKey) return;
+    const cfg = TOGGLE_SETTINGS[activeToggleKey];
+    const input = $("#toggleSettingInput");
+    const saveBtn = $("#saveToggleSettingBtn");
+    const newValue = input.checked;
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="ri-loader-4-line"></i> Saving…`;
+    }
+
+    const ok = await saveUserDoc(currentUid, { [cfg.field]: newValue });
+
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `<i class="ri-save-3-line"></i> Save`;
+    }
+
+    if (!ok) return;
+
+    currentUser = { ...currentUser, [cfg.field]: newValue };
+    renderSettingsList(currentUser);
+    closeToggleSettingModal();
+    showToast(
+      "success",
+      `${cfg.title} ${newValue ? cfg.onLabel.toLowerCase() : cfg.offLabel.toLowerCase()}.`,
+    );
+  }
+
+  function setupToggleSettingModal() {
+    const overlay = $("#toggleSettingModalOverlay");
+    const closeBtn = $("#closeToggleSettingModal");
+    const cancelBtn = $("#cancelToggleSettingBtn");
+    const saveBtn = $("#saveToggleSettingBtn");
+    const input = $("#toggleSettingInput");
+
+    closeBtn?.addEventListener("click", closeToggleSettingModal);
+    cancelBtn?.addEventListener("click", closeToggleSettingModal);
+    saveBtn?.addEventListener("click", handleSaveToggleSetting);
+
+    input?.addEventListener("change", () => {
+      if (!activeToggleKey) return;
+      const cfg = TOGGLE_SETTINGS[activeToggleKey];
+      const stateLabel = $("#toggleSettingStateLabel");
+      if (stateLabel) {
+        stateLabel.textContent = input.checked ? cfg.onLabel : cfg.offLabel;
+      }
+    });
+
+    overlay?.addEventListener("click", (e) => {
+      if (e.target === overlay) closeToggleSettingModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay?.classList.contains("open")) {
+        closeToggleSettingModal();
+      }
+    });
+  }
+
+  /* =========================================================
      DELETE ACCOUNT CONFIRMATION MODAL
   ========================================================= */
   function openDeleteModal() {
@@ -625,6 +822,7 @@ import {
     setupUserMenu();
     setupSidebarToggle();
     setupEditModal();
+    setupToggleSettingModal();
     setupDeleteModal();
     setupPhotoUpload();
 

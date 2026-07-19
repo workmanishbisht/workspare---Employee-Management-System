@@ -85,6 +85,13 @@
   object-fit: cover;
   border: 4px solid var(--panel-light-bg);
   box-shadow: var(--shadow-card);
+  /* Fallback background so there's no blank/broken box while
+     profile.js is still resolving the real src on first paint. */
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
 }
 
 .hero-card__camera-btn {
@@ -371,6 +378,15 @@
   border-radius: 999px;
 }
 
+.settings-list__item .chip-disabled {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--panel-light-text-muted);
+  background: var(--panel-light-input-bg);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
 .settings-list__item .ri-arrow-right-s-line {
   color: var(--panel-light-text-muted);
   font-size: 16px;
@@ -457,6 +473,10 @@
   transform: translateY(0) scale(1);
 }
 
+.modal--sm {
+  max-width: 440px;
+}
+
 .modal__head {
   display: flex;
   align-items: center;
@@ -537,6 +557,81 @@
   padding: 18px 26px;
   border-top: 1px solid var(--panel-light-border);
   flex-shrink: 0;
+}
+
+/* ==========================================================
+   TOGGLE SETTING MODAL (2FA / Email Notifications / Privacy)
+========================================================== */
+.toggle-setting__desc {
+  font-size: 13.5px;
+  color: var(--panel-light-text-muted);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.toggle-setting__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--panel-light-input-bg);
+  border: 1px solid var(--panel-light-border);
+}
+
+.toggle-setting__row span {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--panel-light-text);
+}
+
+/* ---------- Reusable toggle switch ---------- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 25px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch__slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: var(--panel-light-border);
+  border-radius: 999px;
+  transition: 0.2s;
+}
+
+.switch__slider::before {
+  content: "";
+  position: absolute;
+  height: 19px;
+  width: 19px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.switch input:checked + .switch__slider {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
+}
+
+.switch input:checked + .switch__slider::before {
+  transform: translateX(19px);
 }
 
 /* ==========================================================
