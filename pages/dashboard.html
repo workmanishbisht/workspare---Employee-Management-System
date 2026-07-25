@@ -16,7 +16,7 @@
   </head>
   <body>
     <div class="app">
-      <!-- ============ SIDEBAR ============ -->
+      <!-- ============ SIDEBAR (untouched) ============ -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar__brand">
           <div class="brand__icon"><i class="ri-team-fill"></i></div>
@@ -31,13 +31,6 @@
             <!-- injected by JS -->
           </ul>
         </nav>
-
-        <!-- <div class="sidebar__upgrade">
-          <div class="upgrade__icon"><i class="ri-vip-crown-2-fill"></i></div>
-          <p class="upgrade__title">Upgrade to Pro</p>
-          <p class="upgrade__sub">Unlock more features</p>
-          <button class="btn btn--primary btn--block">Upgrade Now</button>
-        </div> -->
 
         <!-- ============ USER / PROFILE ============ -->
         <div class="sidebar__user-wrap">
@@ -112,7 +105,7 @@
 
       <!-- ============ MAIN ============ -->
       <div class="main">
-        <!-- Topbar -->
+        <!-- Topbar (untouched) -->
         <header class="topbar">
           <button
             class="icon-btn topbar__menu"
@@ -160,9 +153,8 @@
             <div>
               <h2>
                 Welcome back,
-                <span id="userName" style="color: #6c5ce7">Manish</span
-                ><span style="color: #6c5ce7">!</span>
-                <!-- <span class="wave">👋</span> -->
+                <span id="userName" class="page-head__accent">Manish</span
+                ><span class="page-head__accent">!</span>
               </h2>
               <p>Here's what's happening in your organization today.</p>
             </div>
@@ -175,18 +167,20 @@
 
           <!-- ============ SKELETON (shown while data loads) ============ -->
           <div class="dash-skeleton-wrap" id="dashSkeleton">
-            <div class="skeleton-stats">
-              <span class="skeleton-block skeleton-stat-card"></span>
-              <span class="skeleton-block skeleton-stat-card"></span>
-              <span class="skeleton-block skeleton-stat-card"></span>
-              <span class="skeleton-block skeleton-stat-card"></span>
+            <div class="skeleton-kpis">
+              <span class="skeleton-block skeleton-kpi-card"></span>
+              <span class="skeleton-block skeleton-kpi-card"></span>
+              <span class="skeleton-block skeleton-kpi-card"></span>
+              <span class="skeleton-block skeleton-kpi-card"></span>
             </div>
-
             <div class="skeleton-charts">
               <span class="skeleton-block skeleton-chart-card"></span>
-              <span class="skeleton-block skeleton-chart-card"></span>
+              <span class="skeleton-block skeleton-chart-card--sm"></span>
             </div>
-
+            <div class="skeleton-charts">
+              <span class="skeleton-block skeleton-chart-card--sm"></span>
+              <span class="skeleton-block skeleton-chart-card--sm"></span>
+            </div>
             <div class="skeleton-bottom">
               <span class="skeleton-block skeleton-bottom-card"></span>
               <span class="skeleton-block skeleton-bottom-card"></span>
@@ -195,26 +189,25 @@
 
           <!-- ============ REAL CONTENT (hidden while loading) ============ -->
           <div id="dashContent" hidden>
-            <!-- Stat cards -->
-            <section class="stats-grid" id="statsGrid">
+            <!-- ===================== SECTION 1: KPI CARDS ===================== -->
+            <section class="kpi-grid" id="kpiGrid" aria-label="Key metrics">
               <!-- injected by JS -->
             </section>
 
-            <!-- Charts row -->
+            <!-- ===================== SECTION 2 + 3: GROWTH + ROLE DISTRIBUTION ===================== -->
             <section class="charts-grid">
               <div class="card overview-card">
                 <div class="card__head">
-                  <h3>Employee Overview</h3>
+                  <h3><i class="ri-line-chart-line"></i> Employee Growth</h3>
                   <div class="dropdown" id="overviewRangeDropdown">
-                    <button class="dropdown__btn">
-                      <span id="overviewRangeLabel">This Month</span>
+                    <button class="dropdown__btn" type="button">
+                      <span id="overviewRangeLabel">Monthly</span>
                       <i class="ri-arrow-down-s-line"></i>
                     </button>
                     <ul class="dropdown__menu">
-                      <li data-range="week">This Week</li>
-                      <li data-range="month" class="selected">This Month</li>
-                      <li data-range="quarter">This Quarter</li>
-                      <li data-range="year">This Year</li>
+                      <li data-range="week">Weekly</li>
+                      <li data-range="month" class="selected">Monthly</li>
+                      <li data-range="year">Yearly</li>
                     </ul>
                   </div>
                 </div>
@@ -225,7 +218,7 @@
 
               <div class="card dept-card">
                 <div class="card__head">
-                  <h3>Employees by Role</h3>
+                  <h3>Role Distribution</h3>
                   <i class="ri-sparkling-2-fill dept-card__sparkle"></i>
                 </div>
                 <div class="dept-card__body">
@@ -240,22 +233,88 @@
                     <!-- injected by JS -->
                   </ul>
                 </div>
-                <button class="btn btn--ghost btn--block">
-                  View Full Report
-                </button>
               </div>
             </section>
 
-            <!-- Quick actions + Recent activity row is on the right column (see grid below) -->
-            <div class="bottom-grid">
-              <section class="card birthdays-card">
+            <!-- ===================== SECTION 4 + 5: ATTENDANCE + LEAVE SUMMARY ===================== -->
+            <section class="charts-grid summary-grid">
+              <div class="card attendance-card">
                 <div class="card__head">
-                  <h3>Upcoming Birthdays &amp; Work Anniversaries</h3>
+                  <h3>
+                    <i class="ri-fingerprint-2-line"></i> Attendance Summary
+                  </h3>
+                  <span class="pill pill--muted" id="attendanceAsOf"
+                    >Today</span
+                  >
+                </div>
+                <div class="attendance-summary" id="attendanceSummaryList">
+                  <!-- injected by JS -->
+                </div>
+              </div>
+
+              <div class="card leave-card">
+                <div class="card__head">
+                  <h3><i class="ri-plane-line"></i> Leave Summary</h3>
+                </div>
+                <div class="leave-summary-grid" id="leaveSummaryGrid">
+                  <!-- injected by JS -->
+                </div>
+                <div class="leave-trend">
+                  <p class="leave-trend__label">Monthly leave trend</p>
+                  <div class="leave-trend__chart-wrap">
+                    <canvas id="leaveTrendChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===================== SECTION 6: BIRTHDAYS + SECTION 7/8: HOLIDAYS & ANNOUNCEMENTS ===================== -->
+            <section class="engagement-grid">
+              <div class="card birthdays-card">
+                <div class="card__head">
+                  <h3>
+                    <i class="ri-cake-2-line"></i> Upcoming Birthdays &amp;
+                    Anniversaries
+                  </h3>
                   <a href="#" class="link">View all</a>
                 </div>
                 <div class="birthdays-list" id="birthdaysList">
                   <!-- injected by JS -->
                 </div>
+              </div>
+
+              <aside class="side-col">
+                <section class="card holidays-card">
+                  <div class="card__head">
+                    <h3><i class="ri-flag-2-line"></i> Upcoming Holidays</h3>
+                  </div>
+                  <ul class="holidays-list" id="holidaysList">
+                    <!-- injected by JS -->
+                  </ul>
+                </section>
+
+                <section class="card announcements-card">
+                  <div class="card__head">
+                    <h3><i class="ri-megaphone-line"></i> Announcements</h3>
+                    <a href="#" class="link">View all</a>
+                  </div>
+                  <ul class="announcements-list" id="announcementsList">
+                    <!-- injected by JS -->
+                  </ul>
+                </section>
+              </aside>
+            </section>
+
+            <!-- ===================== SECTION 9,10,11,12: ACTIVITY + QUICK ACTIONS + STATUS + SYSTEM HEALTH ===================== -->
+            <div class="bottom-grid">
+              <section class="card activity-card">
+                <div class="card__head">
+                  <h3><i class="ri-history-line"></i> Recent Activity</h3>
+                  <a href="#" class="link">View all</a>
+                </div>
+                <ul class="activity-timeline" id="activityList">
+                  <!-- injected by JS -->
+                </ul>
               </section>
 
               <aside class="side-col">
@@ -268,12 +327,20 @@
                   </div>
                 </section>
 
-                <section class="card activity-card">
+                <section class="card status-card" id="employeeStatusCard">
                   <div class="card__head">
-                    <h3>Recent Activity</h3>
-                    <a href="#" class="link">View all</a>
+                    <h3><i class="ri-user-follow-line"></i> Employee Status</h3>
                   </div>
-                  <ul class="activity-list" id="activityList">
+                  <div class="status-grid" id="employeeStatusGrid">
+                    <!-- injected by JS -->
+                  </div>
+                </section>
+
+                <section class="card health-card" id="systemHealthCard">
+                  <div class="card__head">
+                    <h3><i class="ri-heart-pulse-line"></i> System Health</h3>
+                  </div>
+                  <ul class="health-list" id="systemHealthList">
                     <!-- injected by JS -->
                   </ul>
                 </section>
