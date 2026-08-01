@@ -4,7 +4,7 @@
    ROOT VARIABLES (LIGHT THEME)
 ========================================================= */
 :root {
-  --color-primary: #6c5ce7;
+  --color-primary: #503ddf;
   --color-primary-light: #8b7cf6;
   --color-primary-dark: #4c3fc0;
   --color-accent: #a78bfa;
@@ -129,6 +129,23 @@ body {
     color 0.35s ease;
 }
 
+/* =========================================================
+   CHANGE (mobile sidebar scroll fix):
+   Toggled on <body> by the new js/sidebar-scroll-lock.js
+   whenever the mobile sidebar's overlay gets its ".show"
+   class (set by layout.js — unchanged). This stops the page
+   behind the sidebar from scrolling while the sidebar itself
+   is being scrolled, which is what was causing the two touch
+   gestures to fight each other and made the sidebar feel
+   frozen. Only ever applied on mobile, since the overlay only
+   opens on mobile in layout.js's setupSidebarToggle(); desktop
+   behavior is completely unaffected.
+========================================================= */
+body.sidebar-scroll-lock {
+  overflow: hidden;
+  height: 100%;
+}
+
 ul {
   list-style: none;
 }
@@ -226,6 +243,11 @@ img {
   inset: 0;
   background: rgba(10, 8, 26, 0.5);
   z-index: 900;
+  /* CHANGE (mobile sidebar scroll fix): a touch that starts on
+     this dimmed backdrop should never be interpreted as a
+     background-page scroll/pan — it was competing with the
+     sidebar's own scroll gesture on some Android browsers. */
+  touch-action: none;
 }
 
 .sidebar-overlay.show {
@@ -275,6 +297,38 @@ img {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  /* =======================================================
+     CHANGE (mobile sidebar scroll fix) — three additions:
+
+     1. -webkit-overflow-scrolling: touch
+        Enables native momentum ("inertia") scrolling for this
+        nested overflow container on iOS Safari/WebKit. Without
+        it, a drag gesture inside a scrollable element that
+        sits under a position:fixed ancestor can fail to
+        register as a scroll at all on some WebKit versions.
+
+     2. overscroll-behavior-y: contain
+        Stops the scroll gesture from "chaining" up to the
+        document/body once the nav list reaches its top or
+        bottom edge. This was the main culprit: iOS would hand
+        the whole gesture over to the (still scrollable) body
+        behind the fixed sidebar, which made the sidebar look
+        completely frozen even though its own overflow-y:auto
+        was already correct.
+
+     3. touch-action: pan-y
+        Explicitly declares that this element owns vertical
+        panning, removing ambiguity for the browser's gesture
+        router — some Android WebViews mis-route touch-scroll
+        gestures when the scrollable element's ancestor is
+        position:fixed.
+
+     None of this changes layout, spacing, colors, or desktop
+     behavior — it only affects how touch gestures are handled.
+  ======================================================= */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 .sidebar__nav::-webkit-scrollbar {
@@ -1424,6 +1478,22 @@ html.dark-theme .stat-card:hover {
     transition: transform 0.35s ease;
     z-index: 950;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+    /* =====================================================
+       CHANGE (mobile sidebar scroll fix):
+       Fallback scroll container, mobile-only. The sidebar's
+       internal flex-scroll (.sidebar__nav) is the primary
+       scroll mechanism and already works correctly — but this
+       gives the sidebar itself a scrollable fallback in case
+       any mobile browser's flex height math comes out wrong
+       inside a position:fixed ancestor. It's inert (no-op)
+       whenever .sidebar__nav is already handling the scroll,
+       and it's scoped to this mobile media query only, so
+       desktop's `position: sticky` behavior above is untouched.
+    ===================================================== */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
   .sidebar.open {
@@ -1552,4 +1622,17 @@ html.dark-theme .btn--ghost {
 
 [hidden] {
   display: none !important;
+}
+
+
+@media (max-width: 991px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
 }
