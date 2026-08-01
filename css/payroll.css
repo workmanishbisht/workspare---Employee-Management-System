@@ -996,3 +996,62 @@
     padding-right: 18px;
   }
 }
+
+
+/* ===============================
+   PAYROLL PAGE SPACING FIX
+================================= */
+
+#payrollContent{
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+}
+
+.stats-grid-payroll{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:24px;
+    margin-bottom:4px;
+}
+
+.overview-grid{
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1fr;
+    gap:24px;
+    margin-top:4px;
+    margin-bottom:4px;
+}
+
+.overview-card{
+    padding:24px;
+}
+
+.stat-card{
+    padding:24px;
+}
+
+.table-card{
+    margin-top:4px;
+}
+
+
+.stats-grid-payroll {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.stat-card,
+.overview-card,
+.table-card {
+  padding: 24px;
+}

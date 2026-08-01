@@ -301,3 +301,17 @@
     width: 100%;
   }
 }
+
+
+/* Hidden skeleton should not occupy space */
+.emp-skeleton-wrap[hidden] {
+  display: none !important;
+}
+
+#empContent[hidden] {
+  display: none !important;
+}
+
+#empContent:not([hidden]) {
+  display: block;
+}
